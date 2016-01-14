@@ -14,6 +14,7 @@ Parameter* Parameters::getParam(QString name)
     return 0;
 }
 
+
 Parameters::Parameters()
 {
 

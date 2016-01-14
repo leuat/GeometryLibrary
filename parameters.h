@@ -3,7 +3,7 @@
 #include <QVector>
 #include <QString>
 #include <QMap>
-
+#include <ostream>
 class Parameter {
 private:
     double m_value;
@@ -19,6 +19,7 @@ public:
     Parameter() {
 
     }
+
 
     double value() const;
     void setValue(double value);
@@ -51,6 +52,16 @@ public:
     }
 
 
+    friend std::ostream& operator<<(std::ostream& out, const Parameters& params)
+    {
+        out <<"[ ";
+        for(Parameter& p: params.parameters()) {
+            out << "(" << p.getName().toStdString() <<", "  << p.value() << ") ";
+        }
+        return out;
+        out <<"] ";
+
+    }
 };
 
 #endif // PARAMETERS_H
