@@ -1,12 +1,12 @@
 #include "RegularModel.h"
 #include "simplex.h"
 #include "perlin.h"
+
 RegularModel::RegularModel()
 {
 
-
 }
-void RegularModel::Initialize(Noise::NoiseType noiseType, Parameters* np)
+void RegularModel::initialize(Noise::NoiseType noiseType, Parameters* np)
 {
     m_parameters = np;
     if (noiseType == Noise::NoiseType::Simplex)
@@ -17,7 +17,6 @@ void RegularModel::Initialize(Noise::NoiseType noiseType, Parameters* np)
     m_scale = np->getParam("scale")->value();
     m_threshold = np->getParam("threshold")->value();
 
-
     if (np->getParam("inverted")->value()>0.5)
         m_inverted = true;
     if (np->getParam("absolute")->value()>0.5)
@@ -26,7 +25,7 @@ void RegularModel::Initialize(Noise::NoiseType noiseType, Parameters* np)
     m_initialized = true;
 }
 
-bool RegularModel::IsInVoid(const QVector3D &p)
+bool RegularModel::isInVoid(const QVector3D &p)
 {
     if (!m_initialized)
         return false;

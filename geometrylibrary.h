@@ -3,35 +3,36 @@
 #include "noise.h"
 #include "parameters.h"
 #include "models/regularmodel.h"
-#include "geometrymodel.h"
+#include "model.h"
+#include "models/multifractalmodel.h"
 
 class GEOMETRYLIBRARYSHARED_EXPORT GeometryLibrary
 {
 
 private:
-
-    GeometryModel* m_geometryModel = 0;
+    Model* m_model = nullptr;
 
 public:
-    enum Model { Regular, MultiFractal };
+    enum GeometryModel { Regular, MultiFractal };
     GeometryLibrary();
 
-    void Initialize(Model m, Noise::NoiseType noiseType, Parameters* p) {
+    void initialize(GeometryModel m, Noise::NoiseType noiseType, Parameters* p) {
         if (m == Regular)
-            m_geometryModel = new RegularModel();
+            m_model = new RegularModel();
+        if (m == MultiFractal)
+            m_model = new MultiFractalModel();
 
-        if (m_geometryModel!=nullptr) {
-            m_geometryModel->Initialize(noiseType, p);
+        if (m_model!=nullptr) {
+            m_model->initialize(noiseType, p);
         }
 
     }
-    bool IsInVoid(const QVector3D& pos) {
-        if (m_geometryModel == nullptr)
+    bool isInVoid(const QVector3D& pos) {
+        if (m_model == nullptr)
             return false;
-        return m_geometryModel->IsInVoid(pos);
+        return m_model->isInVoid(pos);
     }
 
-
-    GeometryModel *geometryModel() const;
+    Model *model() const;
 };
 

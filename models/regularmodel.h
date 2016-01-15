@@ -1,10 +1,10 @@
 #ifndef REGULARMODEL_H
 #define REGULARMODEL_H
-#include "geometrymodel.h"
+#include "model.h"
 
-class RegularModel : public GeometryModel
+class RegularModel : public Model
 {
-private:
+protected:
     double m_scale = 1;
     double m_threshold = 0;
     bool m_inverted = false;
@@ -12,9 +12,9 @@ private:
 
 public:
     RegularModel();
-    void Initialize(Noise::NoiseType noiseType, Parameters* np) override;
+    virtual void initialize(Noise::NoiseType noiseType, Parameters* np) override;
 
-    bool IsInVoid(const QVector3D& pos) override;
+    virtual bool isInVoid(const QVector3D& pos) override;
 
 
 };

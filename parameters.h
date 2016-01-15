@@ -39,18 +39,6 @@ public:
 
     Parameter* getParam(QString name);
 
-    void CopyTo(Parameters& dst) {
-
-    }
-
-    void Step() {
-
-    }
-
-    void Likelihood() {
-
-    }
-
 
     friend std::ostream& operator<<(std::ostream& out, const Parameters& params)
     {

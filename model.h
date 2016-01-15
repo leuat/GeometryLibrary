@@ -4,7 +4,7 @@
 #include "parameters.h"
 #include <QVector3D>
 
-class GeometryModel
+class Model
 {
 protected:
     Noise* m_noise;
@@ -12,11 +12,11 @@ protected:
     bool m_initialized = false;
 
 public:
-    GeometryModel();
+    Model();
 
-    virtual void Initialize(Noise::NoiseType noiseType, Parameters* np) = 0;
+    virtual void initialize(Noise::NoiseType noiseType, Parameters* np) = 0;
 
-    virtual bool IsInVoid(const QVector3D& pos) = 0;
+    virtual bool isInVoid(const QVector3D& pos) = 0;
 
 
 };

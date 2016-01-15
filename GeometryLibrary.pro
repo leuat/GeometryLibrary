@@ -19,10 +19,11 @@ SOURCES += geometrylibrary.cpp \
     simplexnoise.cpp \
     simplex.cpp \
     parameters.cpp \
-    geometrymodel.cpp \
     models/multifractalparameters.cpp \
     models/noiseparameters.cpp \
-    models/regularmodel.cpp
+    models/regularmodel.cpp \
+    models/multifractalmodel.cpp \
+    model.cpp
 
 HEADERS += geometrylibrary.h\
         geometrylibrary_global.h \
@@ -31,10 +32,11 @@ HEADERS += geometrylibrary.h\
     noise.h \
     simplexnoise.h \
     parameters.h \
-    geometrymodel.h \
     models/multifractalparameters.h \
     models/noiseparameters.h \
-    models/regularmodel.h
+    models/regularmodel.h \
+    models/multifractalmodel.h \
+    model.h
 
 unix {
     target.path = /usr/lib

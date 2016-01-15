@@ -3,10 +3,9 @@
 #include "Perlin.h"
 
 
-
-GeometryModel *GeometryLibrary::geometryModel() const
+Model *GeometryLibrary::model() const
 {
-    return m_geometryModel;
+    return m_model;
 }
 
 GeometryLibrary::GeometryLibrary()
