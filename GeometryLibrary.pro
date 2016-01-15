@@ -9,6 +9,8 @@ QT       -= quick widgets
 TARGET = GeometryLibrary
 TEMPLATE = lib
 
+CONFIG += c++11
+#QMAKE_CXXFLAGS += -std=c++0x-Wno-c++11-extension
 DEFINES += GEOMETRY_LIBRARY
 
 SOURCES += geometrylibrary.cpp \
@@ -17,7 +19,10 @@ SOURCES += geometrylibrary.cpp \
     simplexnoise.cpp \
     simplex.cpp \
     parameters.cpp \
-    noiseparameters.cpp
+    geometrymodel.cpp \
+    models/multifractalparameters.cpp \
+    models/noiseparameters.cpp \
+    models/regularmodel.cpp
 
 HEADERS += geometrylibrary.h\
         geometrylibrary_global.h \
@@ -26,7 +31,10 @@ HEADERS += geometrylibrary.h\
     noise.h \
     simplexnoise.h \
     parameters.h \
-    noiseparameters.h
+    geometrymodel.h \
+    models/multifractalparameters.h \
+    models/noiseparameters.h \
+    models/regularmodel.h
 
 unix {
     target.path = /usr/lib

@@ -20,6 +20,7 @@ using namespace std;
 */
 class Noise {
 public:
+    enum NoiseType { Simplex, Perlin};
 
     int octaves, seed;
     double persistence;

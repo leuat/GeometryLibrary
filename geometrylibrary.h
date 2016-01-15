@@ -1,26 +1,37 @@
 #pragma once
 #include "geometrylibrary_global.h"
-#include <Noise.h>
-#include "noiseparameters.h"
+#include "noise.h"
+#include "parameters.h"
+#include "models/regularmodel.h"
+#include "geometrymodel.h"
 
 class GEOMETRYLIBRARYSHARED_EXPORT GeometryLibrary
 {
 
 private:
-    Noise* m_noise;
-    NoiseParameters* m_noiseParameters;
-    bool m_initialized = false;
-    double m_scale = 1;
-    double m_threshold = 0;
-    bool m_inverted = false;
-    bool m_absolute = false;
+
+    GeometryModel* m_geometryModel = 0;
 
 public:
-    enum NoiseType { SimplexNoise, PerlinNoise };
+    enum Model { Regular, MultiFractal };
     GeometryLibrary();
 
-    void Initialize(NoiseType noiseType, NoiseParameters* np);
+    void Initialize(Model m, Noise::NoiseType noiseType, Parameters* p) {
+        if (m == Regular)
+            m_geometryModel = new RegularModel();
 
-    bool IsInVoid(const QVector3D& pos);
+        if (m_geometryModel!=nullptr) {
+            m_geometryModel->Initialize(noiseType, p);
+        }
+
+    }
+    bool IsInVoid(const QVector3D& pos) {
+        if (m_geometryModel == nullptr)
+            return false;
+        return m_geometryModel->IsInVoid(pos);
+    }
+
+
+    GeometryModel *geometryModel() const;
 };
 
