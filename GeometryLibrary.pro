@@ -12,6 +12,7 @@ TEMPLATE = lib
 CONFIG += c++11
 #QMAKE_CXXFLAGS += -std=c++0x-Wno-c++11-extension
 DEFINES += GEOMETRY_LIBRARY
+#DEFINES += USE_FFTW
 
 SOURCES += geometrylibrary.cpp \
     perlin.cpp \
@@ -23,7 +24,9 @@ SOURCES += geometrylibrary.cpp \
     models/noiseparameters.cpp \
     models/regularmodel.cpp \
     models/multifractalmodel.cpp \
-    model.cpp
+    model.cpp \
+    likelihood/lgraph.cpp \
+    misc/util.cpp
 
 HEADERS += geometrylibrary.h\
         geometrylibrary_global.h \
@@ -36,7 +39,10 @@ HEADERS += geometrylibrary.h\
     models/noiseparameters.h \
     models/regularmodel.h \
     models/multifractalmodel.h \
-    model.h
+    model.h \
+    likelihood/lgraph.h \
+    likelihood/spline.h \
+    misc/util.h
 
 unix {
     target.path = /usr/lib
