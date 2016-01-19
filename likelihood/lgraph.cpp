@@ -90,6 +90,23 @@ void LGraph::cutModes(int from, int to) {
   }
 }
 
+LGraph::LGraph(QVector<QPointF> &points)
+{
+    Initialize(points.size());
+    for (int i=0;i<points.size();i++) {
+        QPointF& p = points[i];
+        Val[i] = p.y();
+        Index[i] = p.x();
+        IndexScaled[i] = p.y();
+    }
+}
+
+QVector<QPointF> LGraph::toQVector()
+{
+    QVector<QPointF> points;
+
+}
+
 void LGraph::dampLargeModes(double v) {
   for (int i=0; i<Bins; i++) {
     double l = (Bins-i);

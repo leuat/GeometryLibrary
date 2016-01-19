@@ -3,7 +3,8 @@
 
 using namespace std;
 
-
+#include <QVector>
+#include <QPointF>
 #include <vector>
 #include <complex>
 #ifdef USE_FFTW
@@ -13,6 +14,7 @@ using namespace std;
 #include <vector>
 #include <string>
 
+
 #define NONE -1E20
 
 class LGraph {
@@ -20,7 +22,11 @@ class LGraph {
   vector<double> Val;
   vector<double> Index;
   vector<double> IndexScaled;
+
   LGraph* chisq;
+
+  LGraph(QVector<QPointF>& points);
+  QVector<QPointF> toQVector();
   
   double mean, std;
 
@@ -135,7 +141,6 @@ class LGraph {
   }
 
   float getAverageValueAt(int idx, int spread);
-
 
   void MulFFT(LGraph& o) {
     for (int i=0;i<Bins;i++) {

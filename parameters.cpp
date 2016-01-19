@@ -1,5 +1,4 @@
 #include "parameters.h"
-
 QVector<Parameter> Parameters::parameters() const
 {
     return m_parameters;
@@ -32,12 +31,26 @@ void Parameter::setStepSize(double stepSize)
 
 QString Parameter::getName() const
 {
-    return name;
+    return m_name;
 }
 
 void Parameter::setName(const QString &value)
 {
-    name = value;
+    m_name = value;
+}
+
+Parameter::Parameter(QObject *parent) : QObject(parent)
+{
+
+}
+
+Parameter::Parameter(const Parameter &param)
+{
+    m_name = param.name();
+    m_value = param.value();
+    m_max = param.max();
+    m_min = param.min();
+
 }
 
 double Parameter::value() const

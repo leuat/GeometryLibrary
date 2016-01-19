@@ -6,6 +6,7 @@ RegularModel::RegularModel()
 {
 
 }
+
 void RegularModel::initialize(Noise::NoiseType noiseType, Parameters* np)
 {
     m_parameters = np;
@@ -30,7 +31,12 @@ bool RegularModel::isInVoid(const QVector3D &p)
     if (!m_initialized)
         return false;
 
-    double val = m_noise->Get(p.x()*m_scale, p.y()*m_scale,p.z()*m_scale);
+    double sx = 0.1245;
+    double sy = 1.2312;
+    double sz = 0.9534;
+    double p1 = (1 + m_skewAmplitude*m_noise->Get(m_skewScale*p.x() + sx,m_skewScale*p.y()+sy,m_skewScale*p.z()+sz));
+
+    double val = m_noise->Get(p.x()*m_scale*p1, p.y()*m_scale*p1,p.z()*m_scale*p1);
 
     if (m_absolute)
         val = fabs(val);
