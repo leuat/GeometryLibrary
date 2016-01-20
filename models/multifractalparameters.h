@@ -4,6 +4,7 @@
 
 class MultiFractalParameters : public Parameters
 {
+    Q_OBJECT
 public:
     MultiFractalParameters();
     MultiFractalParameters(double octaves, double scale, double persistence, double threshold, double inverted, double seed, double absolute,

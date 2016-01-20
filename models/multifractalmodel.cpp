@@ -30,8 +30,8 @@ bool MultiFractalModel::isInVoid(const QVector3D &p)
 void MultiFractalModel::initialize(Noise::NoiseType noiseType, Parameters *np)
 {
     RegularModel::initialize(noiseType, np);
-    m_lacunarity = np->getParam("lacunarity")->value();
-    m_offset = np->getParam("offset")->value();
-    m_gain = np->getParam("gain")->value();
-    m_octaves = np->getParam("octaves")->value();
+    m_lacunarity = np->getParameter("lacunarity")->value();
+    m_offset = np->getParameter("offset")->value();
+    m_gain = np->getParameter("gain")->value();
+    m_octaves = np->getParameter("octaves")->value();
 }

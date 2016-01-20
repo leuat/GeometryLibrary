@@ -4,6 +4,7 @@
 
 class NoiseParameters : public Parameters
 {
+    Q_OBJECT
 public:
     NoiseParameters();
     NoiseParameters(double octaves, double scale, double persistence, double threshold, double inverted, double seed, double absolute, double skewScale, double skewAmplitude);

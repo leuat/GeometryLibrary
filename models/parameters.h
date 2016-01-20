@@ -20,31 +20,11 @@ private:
     double m_max;
     double m_stepSize;
     QString m_name;
-
-
 public:
 
     explicit Parameter(QObject* parent = nullptr);
-
     Parameter(const Parameter& param);
-
-
-    Parameter(double value, double stepSize, QString n) : m_value(value), m_stepSize(stepSize), m_name(n){
-
-    }
-
-
-//    QVariantMap createProperty(QString name, QString type, QString guiType, float min, float max) {
-    QVariantMap createProperty() {
-        QVariantMap property;
-        property["name"] = m_name;
-        property["type"] = "float";
-        property["guiType"] = "slider";
-        property["min"] = m_min;
-        property["max"] = m_max;
-        return property;
-    }
-
+    Parameter(QString name, float value = 0, float min = 0, float max = 0, float stepSize = 0);
 
     double value() const;
     void setValue(double value);
@@ -52,39 +32,13 @@ public:
     void setStepSize(double stepSize);
     QString getName() const;
     void setName(const QString &value);
-    double min() const
-    {
-        return m_min;
-    }
-
-    double max() const
-    {
-        return m_max;
-    }
-
-    QString name() const
-    {
-        return m_name;
-    }
+    double min() const;
+    double max() const;
+    QString name() const;
 
 public slots:
-    void setMin(double min)
-    {
-        if (m_min == min)
-            return;
-
-        m_min = min;
-        emit minChanged(min);
-    }
-
-    void setMax(double max)
-    {
-        if (m_max == max)
-            return;
-
-        m_max = max;
-        emit maxChanged(max);
-    }
+    void setMin(double min);
+    void setMax(double max);
 
 signals:
     void valueChanged(double value);
@@ -96,53 +50,36 @@ signals:
 class Parameters : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QVariantList properties READ properties WRITE setProperties NOTIFY propertiesChanged)
-    QVariantList m_properties;
+    Q_PROPERTY(QVariantList parameters READ parameters WRITE setParameters NOTIFY parametersChanged)
+private:
+    QMap<QString, Parameter*> m_parametersMap;
+    QVariantList m_parameters;
 
-protected:
-//    QVariantMap m_parameters;
-    QVector<Parameter*> m_parameters;
 public:
     Parameters();
-    QVector<Parameter*> parameters() const;
+    QVariantList parameters() const;
+    QVector<Parameter*> parameterList() const;
+    Parameter* getParameter(QString name);
+    void createParameter(QString name, float value = 0, float min = 0, float max = 0, float stepSize = 0);
+    QMap<QString, Parameter *> parametersMap() const;
+    void setParametersMap(const QMap<QString, Parameter *> &parametersMap);
 
-    Parameter* getParam(QString name);
+public slots:
+    void setParameters(QVariantList parameters);
 
+signals:
+    void parametersChanged(QVariantList parameters);
 
-
+public:
     friend std::ostream& operator<<(std::ostream& out, const Parameters& params)
     {
         out <<"[ ";
-        for(Parameter* p: params.parameters()) {
+        for(Parameter* p: params.parameterList()) {
             out << "(" << p->getName().toStdString() <<", "  << p->value() << ") ";
         }
         return out;
         out <<"] ";
-
     }
-
-/*    void buildParameterList() {
-        m_properties.clear();
-        foreach (Parameter* p: m_parameters) {
-            m_properties.append();
-        }
-    }
-*/
-    QVariantList properties() const
-    {
-        return m_properties;
-    }
-public slots:
-    void setProperties(QVariantList properties)
-    {
-        if (m_properties == properties)
-            return;
-
-        m_properties = properties;
-        emit propertiesChanged(properties);
-    }
-signals:
-    void propertiesChanged(QVariantList properties);
 };
 
 #endif // PARAMETERS_H

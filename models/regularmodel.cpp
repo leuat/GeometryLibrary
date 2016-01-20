@@ -11,18 +11,18 @@ void RegularModel::initialize(Noise::NoiseType noiseType, Parameters* np)
 {
     m_parameters = np;
     if (noiseType == Noise::NoiseType::Simplex)
-        m_noise =  new Simplex((int)(np->getParam("octaves")->value()), 1, np->getParam("persistence")->value(), np->getParam("seed")->value());
+        m_noise =  new Simplex((int)(np->getParameter("octaves")->value()), 1, np->getParameter("persistence")->value(), np->getParameter("seed")->value());
     if (noiseType == Noise::NoiseType::Perlin)
-        m_noise =  new Perlin((int)np->getParam("octaves")->value(), 1, np->getParam("persistence")->value(), np->getParam("seed")->value());
+        m_noise =  new Perlin((int)np->getParameter("octaves")->value(), 1, np->getParameter("persistence")->value(), np->getParameter("seed")->value());
 
-    m_scale = np->getParam("scale")->value();
-    m_threshold = np->getParam("threshold")->value();
-    m_skewScale = np->getParam("SkewScale")->value();
-    m_skewAmplitude = np->getParam("SkewAmplitude")->value();
+    m_scale = np->getParameter("scale")->value();
+    m_threshold = np->getParameter("threshold")->value();
+    m_skewScale = np->getParameter("SkewScale")->value();
+    m_skewAmplitude = np->getParameter("SkewAmplitude")->value();
 
-    if (np->getParam("inverted")->value()>0.5)
+    if (np->getParameter("inverted")->value()>0.5)
         m_inverted = true;
-    if (np->getParam("absolute")->value()>0.5)
+    if (np->getParameter("absolute")->value()>0.5)
         m_absolute = true;
 
     m_initialized = true;
