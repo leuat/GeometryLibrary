@@ -17,6 +17,8 @@ void RegularModel::initialize(Noise::NoiseType noiseType, Parameters* np)
 
     m_scale = np->getParam("scale")->value();
     m_threshold = np->getParam("threshold")->value();
+    m_skewScale = np->getParam("SkewScale")->value();
+    m_skewAmplitude = np->getParam("SkewAmplitude")->value();
 
     if (np->getParam("inverted")->value()>0.5)
         m_inverted = true;

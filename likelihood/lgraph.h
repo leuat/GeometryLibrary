@@ -26,6 +26,7 @@ class LGraph {
   LGraph* chisq;
 
   LGraph(QVector<QPointF>& points);
+  void fromQVector(QVector<QPointF>& points);
   QVector<QPointF> toQVector();
   
   double mean, std;
@@ -38,6 +39,8 @@ class LGraph {
   LGraph() {
     chisq = 0;
   }
+
+  void normalizeArea();
 
   void Copy(const LGraph& copy) {
    Initialize(copy.Bins);

@@ -26,7 +26,8 @@ SOURCES += geometrylibrary.cpp \
     models/multifractalmodel.cpp \
     model.cpp \
     likelihood/lgraph.cpp \
-    misc/util.cpp
+    misc/util.cpp \
+    likelihood/likelihood.cpp
 
 HEADERS += geometrylibrary.h\
         geometrylibrary_global.h \
@@ -42,7 +43,8 @@ HEADERS += geometrylibrary.h\
     model.h \
     likelihood/lgraph.h \
     likelihood/spline.h \
-    misc/util.h
+    misc/util.h \
+    likelihood/likelihood.h
 
 unix {
     target.path = /usr/lib

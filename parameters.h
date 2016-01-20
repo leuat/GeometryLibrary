@@ -93,27 +93,56 @@ signals:
     void nameChanged(QString name);
 };
 
-class Parameters
+class Parameters : public QObject
 {
+    Q_OBJECT
+    Q_PROPERTY(QVariantList properties READ properties WRITE setProperties NOTIFY propertiesChanged)
+    QVariantList m_properties;
+
 protected:
-    QVector<Parameter> m_parameters;
+//    QVariantMap m_parameters;
+    QVector<Parameter*> m_parameters;
 public:
     Parameters();
-    QVector<Parameter> parameters() const;
+    QVector<Parameter*> parameters() const;
 
     Parameter* getParam(QString name);
+
 
 
     friend std::ostream& operator<<(std::ostream& out, const Parameters& params)
     {
         out <<"[ ";
-        for(Parameter& p: params.parameters()) {
-            out << "(" << p.getName().toStdString() <<", "  << p.value() << ") ";
+        for(Parameter* p: params.parameters()) {
+            out << "(" << p->getName().toStdString() <<", "  << p->value() << ") ";
         }
         return out;
         out <<"] ";
 
     }
+
+/*    void buildParameterList() {
+        m_properties.clear();
+        foreach (Parameter* p: m_parameters) {
+            m_properties.append();
+        }
+    }
+*/
+    QVariantList properties() const
+    {
+        return m_properties;
+    }
+public slots:
+    void setProperties(QVariantList properties)
+    {
+        if (m_properties == properties)
+            return;
+
+        m_properties = properties;
+        emit propertiesChanged(properties);
+    }
+signals:
+    void propertiesChanged(QVariantList properties);
 };
 
 #endif // PARAMETERS_H

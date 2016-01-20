@@ -1,5 +1,5 @@
 #include "parameters.h"
-QVector<Parameter> Parameters::parameters() const
+QVector<Parameter*> Parameters::parameters() const
 {
     return m_parameters;
 }
@@ -7,8 +7,8 @@ QVector<Parameter> Parameters::parameters() const
 Parameter* Parameters::getParam(QString name)
 {
     for(int i=0;i<m_parameters.size();i++ )
-        if (m_parameters[i].getName().toLower()==name.toLower())
-            return &m_parameters[i];
+        if (m_parameters[i]->getName().toLower()==name.toLower())
+            return m_parameters[i];
 
     return 0;
 }

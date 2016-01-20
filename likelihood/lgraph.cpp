@@ -90,8 +90,12 @@ void LGraph::cutModes(int from, int to) {
   }
 }
 
-LGraph::LGraph(QVector<QPointF> &points)
-{
+LGraph::LGraph(QVector<QPointF> &points) {
+    fromQVector(points);
+}
+
+void LGraph::fromQVector(QVector<QPointF>& points) {
+
     Initialize(points.size());
     for (int i=0;i<points.size();i++) {
         QPointF& p = points[i];
@@ -99,11 +103,34 @@ LGraph::LGraph(QVector<QPointF> &points)
         Index[i] = p.x();
         IndexScaled[i] = p.y();
     }
+
 }
+
 
 QVector<QPointF> LGraph::toQVector()
 {
     QVector<QPointF> points;
+    for (int i=0;i<Val.size();i++) {
+        points.append(QPointF(Index[i], Val[i]));
+    }
+   return points;
+
+}
+
+void LGraph::normalizeArea()
+{
+    double integralSum = 0;
+    for(int i=0; i<Val.size()-1; i++) {
+        //QPointF &p1 = m_points[i];
+        //QPointF &p2 = m_points[i+1];
+        double dx = Index[i+1] - Index[i];
+        double dy = Val[i+1] - Val[i];
+        integralSum += dx*dy;
+    }
+    integralSum *= 0.5;
+    for(int i=0; i<Val.size()-1; i++)
+        Val[i] /= integralSum;
+
 
 }
 
