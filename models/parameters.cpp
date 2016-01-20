@@ -20,6 +20,7 @@ Parameter* Parameters::getParameter(QString name)
     name = name.toLower();
     auto iterator = m_parametersMap.find(name);
     if(iterator == m_parametersMap.end()) {
+        qWarning() << "Could not find parameter " << name;
         return nullptr;
     }
     return *iterator;
