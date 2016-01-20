@@ -1,7 +1,7 @@
 #ifndef LIKELIHOOD_H
 #define LIKELIHOOD_H
-#include "likelihood/lgraph.h"
-#include <parameters.h>
+#include "lgraph.h"
+#include "../models/parameters.h"
 
 class Likelihood
 {

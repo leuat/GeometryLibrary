@@ -1,9 +1,9 @@
 #pragma once
 #include "geometrylibrary_global.h"
 #include "noise.h"
-#include "parameters.h"
+#include "models/parameters.h"
 #include "models/regularmodel.h"
-#include "model.h"
+#include "models/model.h"
 #include "models/multifractalmodel.h"
 
 class GEOMETRYLIBRARYSHARED_EXPORT GeometryLibrary

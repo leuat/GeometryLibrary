@@ -1,6 +1,6 @@
-#include "RegularModel.h"
-#include "simplex.h"
-#include "perlin.h"
+#include "regularmodel.h"
+#include "../simplex.h"
+#include "../perlin.h"
 
 RegularModel::RegularModel()
 {

@@ -1,6 +1,6 @@
 #ifndef GEOMETRYMODEL_H
 #define GEOMETRYMODEL_H
-#include "noise.h"
+#include "../noise.h"
 #include "parameters.h"
 #include <QVector3D>
 

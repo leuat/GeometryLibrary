@@ -1,4 +1,4 @@
-#include "likelihood/lgraph.h"
+#include "lgraph.h"
 #include <fstream>
 #include <string>
 #include <iostream>

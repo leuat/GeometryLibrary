@@ -1,4 +1,4 @@
-#include "misc/util.h"
+#include "util.h"
 
 void Util::Tokenize(const string& str,
                       vector<string>& tokens,

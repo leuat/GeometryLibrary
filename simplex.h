@@ -1,6 +1,6 @@
 #pragma once
 
-#include <noise.h>
+#include "noise.h"
 #include "simplexnoise.h"
 
 /*

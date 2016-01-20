@@ -1,5 +1,5 @@
 #pragma once
-#include "likelihood/spline.h"
+#include "spline.h"
 
 using namespace std;
 
@@ -8,9 +8,9 @@ using namespace std;
 #include <vector>
 #include <complex>
 #ifdef USE_FFTW
-#include <fftw3.h>
+#include "../fftw3.h"
 #endif
-#include <misc/util.h>
+#include "../misc/util.h"
 #include <vector>
 #include <string>
 
