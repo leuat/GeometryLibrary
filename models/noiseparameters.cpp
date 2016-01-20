@@ -3,7 +3,7 @@
 NoiseParameters::NoiseParameters(double octaves, double scale, double persistence, double threshold, double inverted, double seed, double absolute, double skewScale, double skewAmplitude)
 {
     createParameter("Octaves", octaves, 1, 7, 1);
-    createParameter("Scale", scale, 0.01, 5, 0.1);
+    createParameter("Scale", scale, 0.01, 2.0, 0.1);
     createParameter("Persistence", persistence, 0.1, 3, 0.1);
     createParameter("Threshold", threshold, -1, 1, 0.1);
     createParameter("Inverted", inverted, 1, 1);
@@ -16,7 +16,7 @@ NoiseParameters::NoiseParameters(double octaves, double scale, double persistenc
 NoiseParameters::NoiseParameters(double octaves, double scale, double persistence, double threshold, double inverted, double seed, double absolute)
 {
     createParameter("Octaves", octaves, 1, 7, 1);
-    createParameter("Scale", scale, 0.01, 5, 0.1);
+    createParameter("Scale", scale, 0.01, 2, 0.1);
     createParameter("Persistence", persistence, 0.1, 3, 0.1);
     createParameter("Threshold", threshold, -1, 1, 0.1);
     createParameter("Inverted", inverted, 1, 1);
@@ -27,7 +27,7 @@ NoiseParameters::NoiseParameters(double octaves, double scale, double persistenc
 }
 
 NoiseParameters::NoiseParameters() :
-    NoiseParameters::NoiseParameters(1.0, 1.0, 1.0, 0.1, 1.0, 13.0, 0.0)
+    NoiseParameters::NoiseParameters(1.0, 0.05, 1.0, 0.1, 0.0, 13.0, 0.0)
 {
 
 }

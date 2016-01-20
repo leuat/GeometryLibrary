@@ -1,7 +1,8 @@
 #include "regularmodel.h"
 #include "../simplex.h"
 #include "../perlin.h"
-
+#include <iostream>
+using namespace std;
 RegularModel::RegularModel()
 {
 

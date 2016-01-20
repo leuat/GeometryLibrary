@@ -101,7 +101,7 @@ void LGraph::fromQVector(QVector<QPointF>& points) {
         QPointF& p = points[i];
         Val[i] = p.y();
         Index[i] = p.x();
-        IndexScaled[i] = p.y();
+        IndexScaled[i] = p.x();
     }
 
 }
@@ -124,11 +124,11 @@ void LGraph::normalizeArea()
         //QPointF &p1 = m_points[i];
         //QPointF &p2 = m_points[i+1];
         double dx = Index[i+1] - Index[i];
-        double dy = Val[i+1] - Val[i];
+        double dy = Val[i+1] + Val[i];
         integralSum += dx*dy;
     }
     integralSum *= 0.5;
-    for(int i=0; i<Val.size()-1; i++)
+    for(int i=0; i<Val.size(); i++)
         Val[i] /= integralSum;
 
 
@@ -429,19 +429,13 @@ float LGraph::getValAtScaledIndex(double& index) {
 
 double LGraph::ChiSQ(LGraph& temp, LGraph& two) {
   double chisq = 0;
-
+  if (temp.Bins!=two.Bins)
+      return 0;
   for (int i=0;i<temp.Bins;i++) {
-    
-    double val = two.getValAtScaledIndex(temp.Index[i]);
-
-    if (val!=NONE) {
-      chisq += abs(pow((temp.Val[i] - val), 2.0));
-    }
+      chisq += abs(pow((temp.Val[i] - two.Val[i]), 2.0));
   }
   return chisq;
 }
-
-
 
 
 int LGraph::getIndexAtScaledIndex(double& index) {

@@ -1,5 +1,5 @@
 #include "likelihood.h"
-
+#include <qdebug.h>
 
 LGraph Likelihood::data() const
 {
@@ -39,14 +39,35 @@ Likelihood::Likelihood()
 void Likelihood::BruteForce1D(int bins, Parameter* p, Parameters* params)
 {
     m_likelihood.Initialize(bins);
-    float step = (p->max() - p->min())/(float)bins;
-    float val = p->min();
+/*    p->setMax(1.4);
+    p->setMin(0.01);*/
+    m_stepSize = (p->max() - p->min())/(float)(bins+0);
+    m_currentVal = p->min();
     for (int i=0;i<bins;i++) {
-        p->setValue(val);
-        CalculateModel(params);
-        m_likelihood.Val[i] = m_data.ChiSQ(m_data, m_model);
-        m_likelihood.Index[i] = val;
-        m_likelihood.IndexScaled[i] = val;
-        val+=step;
+        m_likelihood.Val[i] = 0;
+        m_likelihood.Index[i] = m_currentVal + m_stepSize*i;
     }
+
+    m_ready = true;
+    m_bins = bins;
+    m_currentBin = 0;
+    m_parameter = p;
+    m_parameters = params;
+}
+
+bool Likelihood::Tick()
+{
+    if (!m_ready)
+        return false;
+
+    m_parameter->setValue(m_currentVal);
+    CalculateModel(m_parameters);
+    m_likelihood.Val[m_currentBin] = LGraph::ChiSQ(m_data, m_model);
+    m_currentVal += m_stepSize;
+    m_currentBin++;
+    if (m_currentBin == m_bins) {
+        m_likelihood.LikelihoodFromChisq();
+        m_ready = false;
+    }
+    return true;
 }

@@ -70,13 +70,11 @@ class LGraph {
     Index.resize(bins);
     IndexScaled.resize(bins);
     ValFFT.resize(bins);
-    
-
 
     for (int i=0;i<bins;i++) {
       Val[i] = 0.0;
-      Index[i] = i;
-      IndexScaled[i] = i;
+      Index[i] = 0;
+      IndexScaled[i] = 0;
       ValFFT[i] = 0.0;
     }
 
