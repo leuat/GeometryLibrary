@@ -31,6 +31,21 @@ void Likelihood::setLikelihood(const LGraph &likelihood)
     m_likelihood = likelihood;
 }
 
+QPointF Likelihood::getMinVal() const
+{
+    return m_minVal;
+}
+
+bool Likelihood::getDone() const
+{
+    return m_done;
+}
+
+void Likelihood::setDone(bool done)
+{
+    m_done = done;
+}
+
 Likelihood::Likelihood()
 {
 
@@ -66,7 +81,11 @@ bool Likelihood::Tick()
     m_currentVal += m_stepSize;
     m_currentBin++;
     if (m_currentBin == m_bins) {
-        m_likelihood.LikelihoodFromChisq();
+        //m_likelihood.LikelihoodFromChisq();
+        //m_likelihood.fitSpline(m_likelihood,100);
+        m_minVal = m_likelihood.getMin();
+        m_parameter->setValue(m_minVal.x());
+        m_done = true;
         m_ready = false;
     }
     return true;

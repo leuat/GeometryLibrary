@@ -6,12 +6,15 @@ NoiseParameters::NoiseParameters(double octaves, double scale, double persistenc
     createParameter("Scale", scale, 0.01, 2.0, 0.1);
     createParameter("Persistence", persistence, 0.1, 3, 0.1);
     createParameter("Threshold", threshold, -1, 1, 0.1);
-    createParameter("Inverted", inverted, 1, 1);
+    createParameter("Inverted", inverted, 0, 1);
     createParameter("Seed", seed, 1, 100, 1);
     createParameter("Absolute", absolute, 0, 1, 1);
-    createParameter("SkewScale", skewScale, 1,3,0.1);
-    createParameter("SkewAmplitude", skewAmplitude, 0, 5, 0.1);
+    createParameter("SkewScale", skewScale, 0,1,0.1);
+    createParameter("SkewAmplitude", skewAmplitude, 0, 1, 0.1);
 }
+
+
+
 
 NoiseParameters::NoiseParameters(double octaves, double scale, double persistence, double threshold, double inverted, double seed, double absolute)
 {
@@ -19,11 +22,11 @@ NoiseParameters::NoiseParameters(double octaves, double scale, double persistenc
     createParameter("Scale", scale, 0.01, 2, 0.1);
     createParameter("Persistence", persistence, 0.1, 3, 0.1);
     createParameter("Threshold", threshold, -1, 1, 0.1);
-    createParameter("Inverted", inverted, 1, 1);
+    createParameter("Inverted", inverted, 0, 1);
     createParameter("Seed", seed, 1, 100, 1);
     createParameter("Absolute", absolute, 0, 1, 1);
-    createParameter("SkewScale", 1.0, 1,3,0.1);
-    createParameter("SkewAmplitude", 0.0, 0, 5, 0.1);
+    createParameter("SkewScale", 1.0, 0,1,0.1);
+    createParameter("SkewAmplitude", 0.0, 0, 1, 0.1);
 }
 
 NoiseParameters::NoiseParameters() :

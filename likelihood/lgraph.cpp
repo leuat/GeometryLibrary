@@ -155,23 +155,34 @@ float LGraph::getAverageValueAt(int idx, int N) {
 	cnt++;
       }
   }
-    return val / cnt;
+  return val / cnt;
+}
+
+QPointF LGraph::getMin() {
+    QPointF min(0, 1E30);
+    for (int i=0;i<Bins;i++) {
+        if (Val[i]<min.y() && Val[i]!=0) {
+            min.setX(Index[i]);
+            min.setY(Val[i]);
+        }
+    }
+    return min;
+
 }
 
 
-void LGraph::fitSpline(LGraph& fit) {
+void LGraph::fitSpline(LGraph& fit, int N) {
 
 
   vector<double> x,y;
 
-  int N = 4;
 
   LGraph sm;
   sm.Copy(*this);
-  sm.Smooth(50);
+  //sm.Smooth(50);
 
   for (int i=0;i<=N;i++) {
-    int b = i*Bins/(N);
+    int b = i*Bins/((double)N);
     if (b==Bins) b--;
     x.push_back(i/(double)N);
     y.push_back(sm.getAverageValueAt(b, 250));
@@ -180,9 +191,10 @@ void LGraph::fitSpline(LGraph& fit) {
 
   Spline<double, double> sp(x, y);
 
-  fit.Copy(*this);
-  for (int i=0;i<Bins;i++)  {
+  fit.Initialize(N);
+  for (int i=0;i<N;i++)  {
     fit.Val[i] = sp[(double)i/(double)Bins]; 
+    fit.Index[i] = x[i];
   }
   
 }

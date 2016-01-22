@@ -120,7 +120,7 @@ class LGraph {
   void dampLargeModes(double v);
 
 
-  void fitSpline(LGraph& spline);
+  void fitSpline(LGraph& spline, int N);
 
   void Mul(LGraph& o) {
     for (int i=0;i<min(Bins, o.Bins);i++) {
@@ -148,6 +148,8 @@ class LGraph {
       ValFFT[i] *= o.ValFFT[i];
     }
   }
+
+  QPointF getMin();
 
 
   void Gaussian(double B);

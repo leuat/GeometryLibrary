@@ -18,13 +18,13 @@ double Noise::Get( const double x, const double y, const double z, const double 
     double maxAmplitude = 0;
 
     for( int i=0; i < octaves; i++ ) {
-            double v = raw_3d( (x+0.1231*i) * freq, (y+0.6123*i) * freq, (z+1.539127*i) * freq );
-     
-      total += v*amplitude;
+        double v = raw_3d( (x+0.1231*i) * freq, (y+0.6123*i) * freq, (z+1.539127*i) * freq );
+
+        total += v*amplitude;
         freq *= 2;
         maxAmplitude += amplitude;
-	amplitude *= p;
-	p = sqrt(p);
+        amplitude *= p;
+        p = sqrt(p);
     }
 
     return total / maxAmplitude;
