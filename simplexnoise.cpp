@@ -79,7 +79,6 @@ double octave_noise_3d( const double octaves, const double persistence, const do
     double total = 0;
     double frequency = scale;
     double amplitude = 1;
-
     // We have to keep track of the largest possible amplitude,
     // because each octave adds more, and we need a value in [-1, 1].
     double maxAmplitude = 0;

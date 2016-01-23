@@ -51,7 +51,7 @@ Likelihood::Likelihood()
 
 }
 
-void Likelihood::BruteForce1D(int bins, Parameter* p, Parameters* params)
+void Likelihood::bruteForce1D(int bins, Parameter* p, Parameters* params)
 {
     m_likelihood.Initialize(bins);
 /*    p->setMax(1.4);
@@ -70,13 +70,13 @@ void Likelihood::BruteForce1D(int bins, Parameter* p, Parameters* params)
     m_parameters = params;
 }
 
-bool Likelihood::Tick()
+bool Likelihood::tick()
 {
     if (!m_ready)
         return false;
 
     m_parameter->setValue(m_currentVal);
-    CalculateModel(m_parameters);
+    calculateModel(m_parameters);
     m_likelihood.Val[m_currentBin] = LGraph::ChiSQ(m_data, m_model);
     m_currentVal += m_stepSize;
     m_currentBin++;
@@ -85,6 +85,7 @@ bool Likelihood::Tick()
         //m_likelihood.fitSpline(m_likelihood,100);
         m_minVal = m_likelihood.getMin();
         m_parameter->setValue(m_minVal.x());
+        calculateModel(m_parameters);
         m_done = true;
         m_ready = false;
     }

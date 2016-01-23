@@ -1,5 +1,7 @@
 #include "parameters.h"
 #include <qdebug.h>
+#include <QUrl>
+#include <QFile>
 
 QVariantList Parameters::parameters() const
 {
@@ -51,6 +53,58 @@ QMap<QString, Parameter *> Parameters::parametersMap() const
 void Parameters::setParametersMap(const QMap<QString, Parameter *> &parametersMap)
 {
     m_parametersMap = parametersMap;
+}
+
+void Parameters::save(QString filename)
+{
+    QFile file(QUrl(filename).toLocalFile());
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qWarning() << "Could not open file "+filename;
+        return;
+    }
+
+    QTextStream out(&file);
+
+    for(Parameter *parameter : parameterList()) {
+        out << parameter->name() << " " << parameter->min() << " " << parameter->max() << " " << parameter->stepSize() << " " << parameter->value() << "\n";
+    }
+
+    file.close();
+}
+
+void Parameters::load(QString filename)
+{
+    QFile file(QUrl(filename).toLocalFile());
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Could not open file "+filename;
+        return;
+    }
+
+    QTextStream in(&file);
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        QStringList words = line.split(" ");
+        if(words.length() != 5) continue;
+        QString name = words[0];
+
+        bool castOk;
+        float min = QString(words[1]).toFloat(&castOk);
+        if(!castOk) continue;
+        float max = QString(words[2]).toFloat(&castOk);
+        if(!castOk) continue;
+        float stepSize = QString(words[3]).toFloat(&castOk);
+        if(!castOk) continue;
+        float value = QString(words[4]).toFloat(&castOk);
+        if(!castOk) continue;
+        if(m_parametersMap.find(name.toLower()) != m_parametersMap.end()) {
+            Parameter *parameter = m_parametersMap[name.toLower()];
+            parameter->setValue(value);
+            parameter->setMin(min);
+            parameter->setMax(max);
+            parameter->setStepSize(stepSize);
+        }
+    }
+    file.close();
 }
 
 Parameters::Parameters()

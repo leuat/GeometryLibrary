@@ -23,10 +23,10 @@ protected:
 public:
     Likelihood();
 
-    virtual void CalculateModel(Parameters* p) = 0;
+    virtual void calculateModel(Parameters* p) = 0;
 
-    void BruteForce1D(int bins, Parameter* p, Parameters* params);
-    bool Tick();
+    void bruteForce1D(int bins, Parameter* p, Parameters* params);
+    bool tick();
 
     LGraph data() const;
     void setData(const LGraph &data);
