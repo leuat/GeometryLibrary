@@ -12,6 +12,7 @@ class Parameter : public QObject {
     Q_PROPERTY(double value READ value WRITE setValue NOTIFY valueChanged)
     Q_PROPERTY(double min READ min WRITE setMin NOTIFY minChanged)
     Q_PROPERTY(double max READ max WRITE setMax NOTIFY maxChanged)
+    Q_PROPERTY(double stepSize READ stepSize WRITE setStepSize NOTIFY stepSizeChanged)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
 
 private:
@@ -45,6 +46,7 @@ signals:
     void minChanged(double min);
     void maxChanged(double max);
     void nameChanged(QString name);
+    void stepSizeChanged(double stepSize);
 };
 
 class Parameters : public QObject

@@ -65,7 +65,11 @@ double Parameter::stepSize() const
 
 void Parameter::setStepSize(double stepSize)
 {
+    if (m_stepSize == stepSize)
+        return;
+
     m_stepSize = stepSize;
+    emit stepSizeChanged(stepSize);
 }
 
 QString Parameter::getName() const
@@ -142,5 +146,9 @@ double Parameter::value() const
 
 void Parameter::setValue(double value)
 {
+    if (m_value == value)
+        return;
+
     m_value = value;
+    emit valueChanged(value);
 }
