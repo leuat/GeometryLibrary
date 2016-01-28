@@ -51,13 +51,13 @@ Likelihood::Likelihood()
 
 }
 
-void Likelihood::bruteForce1D(int bins, Parameter* p, Parameters* params)
+void Likelihood::bruteForce1D(int bins, Parameter* parameter, Parameters* parameters)
 {
     m_likelihood.Initialize(bins);
 /*    p->setMax(1.4);
     p->setMin(0.01);*/
-    m_stepSize = (p->max() - p->min())/(float)(bins+0);
-    m_currentVal = p->min();
+    m_stepSize = (parameter->max() - parameter->min())/(float)(bins+0);
+    m_currentVal = parameter->min();
     for (int i=0;i<bins;i++) {
         m_likelihood.Val[i] = 0;
         m_likelihood.Index[i] = m_currentVal + m_stepSize*i;
@@ -66,8 +66,8 @@ void Likelihood::bruteForce1D(int bins, Parameter* p, Parameters* params)
     m_ready = true;
     m_bins = bins;
     m_currentBin = 0;
-    m_parameter = p;
-    m_parameters = params;
+    m_parameter = parameter;
+    m_parameters = parameters;
 }
 
 bool Likelihood::tick()

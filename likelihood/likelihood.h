@@ -25,7 +25,7 @@ public:
 
     virtual void calculateModel(Parameters* p) = 0;
 
-    void bruteForce1D(int bins, Parameter* p, Parameters* params);
+    void bruteForce1D(int bins, Parameter* parameter, Parameters* parameters);
     bool tick();
 
     LGraph data() const;
