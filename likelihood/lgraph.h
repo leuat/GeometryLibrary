@@ -73,8 +73,8 @@ class LGraph {
 
     for (int i=0;i<bins;i++) {
       Val[i] = 0.0;
-      Index[i] = 0;
-      IndexScaled[i] = 0;
+      Index[i] = i;
+      IndexScaled[i] = i;
       ValFFT[i] = 0.0;
     }
 

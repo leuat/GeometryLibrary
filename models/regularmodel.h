@@ -6,6 +6,7 @@ class RegularModel : public Model
 {
 protected:
     double m_scale = 1;
+    double m_seed = 0;
     double m_threshold = 0;
     double m_skewScale = 1;
     double m_skewAmplitude = 0;

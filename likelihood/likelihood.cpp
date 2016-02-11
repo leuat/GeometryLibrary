@@ -46,8 +46,59 @@ void Likelihood::setDone(bool done)
     m_done = done;
 }
 
+void Likelihood::tickLikelihood()
+{
+    m_parameter->setValue(m_currentVal);
+    calculateModel(m_parameters);
+    m_likelihood.Val[m_currentBin] = LGraph::ChiSQ(m_data, m_model);
+    m_currentVal += m_stepSize;
+    m_currentBin++;
+    if (m_currentBin == m_bins) {
+        //m_likelihood.LikelihoodFromChisq();
+        //m_likelihood.fitSpline(m_likelihood,100);
+        m_minVal = m_likelihood.getMin();
+        m_parameter->setValue(m_minVal.x());
+        calculateModel(m_parameters);
+        m_done = true;
+        m_ready = false;
+    }
+
+}
+
+void Likelihood::tickModelStatistics()
+{
+    if (m_done)
+        return;
+    if (!m_ready)
+        return;
+    if (m_parameters == nullptr) {
+        qDebug() << "m_parameters is null, should not happen";
+        return;
+    }
+
+    m_parameters->getParameter("seed")->setValue(rand()%10000);
+    calculateModel(m_parameters);
+    m_statistics.add(m_model);
+    m_statistics.calculate();
+    qDebug() << "average: " << m_statistics.average().Bins;
+    m_model.Copy(m_statistics.average());
+    m_data.Copy(m_statistics.average_plus_sigma());
+
+    if (m_currentBin++ == m_bins) {
+        m_ready = false;
+        m_done = true;
+    }
+
+}
+
 Likelihood::Likelihood()
 {
+
+    if (m_currentBin++ == m_bins) {
+        m_ready = false;
+        m_done = true;
+    }
+
 
 }
 
@@ -68,26 +119,32 @@ void Likelihood::bruteForce1D(int bins, Parameter* p, Parameters* params)
     m_currentBin = 0;
     m_parameter = p;
     m_parameters = params;
+    m_analysisType = AnalysisType::LikelihoodStatistics;
 }
+
+void Likelihood::modelAnalysis(int count, Parameters *params)
+{
+    m_bins = count;
+    m_currentBin = 0;
+    m_ready = true;
+    m_analysisType = AnalysisType::ModelStatistics;
+    m_parameters = params;
+    m_likelihood.Initialize(80);
+
+}
+
+
 
 bool Likelihood::tick()
 {
     if (!m_ready)
         return false;
 
-    m_parameter->setValue(m_currentVal);
-    calculateModel(m_parameters);
-    m_likelihood.Val[m_currentBin] = LGraph::ChiSQ(m_data, m_model);
-    m_currentVal += m_stepSize;
-    m_currentBin++;
-    if (m_currentBin == m_bins) {
-        //m_likelihood.LikelihoodFromChisq();
-        //m_likelihood.fitSpline(m_likelihood,100);
-        m_minVal = m_likelihood.getMin();
-        m_parameter->setValue(m_minVal.x());
-        calculateModel(m_parameters);
-        m_done = true;
-        m_ready = false;
-    }
+    if (m_analysisType == AnalysisType::LikelihoodStatistics)
+        tickLikelihood();
+    if (m_analysisType == AnalysisType::ModelStatistics)
+        tickModelStatistics();
+
+
     return true;
 }
