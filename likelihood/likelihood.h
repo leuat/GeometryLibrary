@@ -35,8 +35,8 @@ public:
     enum AnalysisType { LikelihoodStatistics, ModelStatistics };
     AnalysisType m_analysisType = AnalysisType::LikelihoodStatistics;
 
-    void bruteForce1D(int bins, Parameter* p, Parameters* params);
-    void modelAnalysis(int count, Parameters* params);
+    void bruteForce1D(int bins, Parameter* parameter, Parameters* parameterrs);
+    void modelAnalysis(int count, Parameters* parameters);
 
     bool tick();
 
