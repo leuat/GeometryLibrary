@@ -45,7 +45,7 @@ void GraphStatistics::calculate()
             m_average[i]+=m_data[d][i];
 
     for (int i=0;i<m_length;i++)
-        m_average[i] /=(float)m_length;
+        m_average[i] /=(float)m_data.length();
 
     // Calculate exp (e - d)^2
     for (int d=0;d<m_data.length();d++)
@@ -53,7 +53,7 @@ void GraphStatistics::calculate()
             m_sigma[i]+=pow(m_data[d][i]- m_average[i],2);
 
     for (int i=0;i<m_length;i++) {
-        m_sigma[i] = sqrt(m_sigma[i])/(float)m_length;
+        m_sigma[i] = sqrt(m_sigma[i]/(float)m_data.length());
         m_average.Index[i] = m_data[0].Index[i];
         m_average_plus_sigma.Index[i] = m_data[0].Index[i];
         m_average_plus_sigma[i] = m_average[i] + m_sigma[i];

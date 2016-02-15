@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <iostream>
+#include <random>
 
 using namespace std;
 
@@ -27,6 +28,13 @@ class Util {
   static void verify_file(string filename);
   static bool verify_file_bool(string filename);
   static string trim(string s);
+
+  static float floatRandom(const float & min, const float & max) {
+      static std::mt19937 generator;
+      std::uniform_real_distribution<float> distribution(min, max);
+      return distribution(generator);
+  }
+
 
 };
 

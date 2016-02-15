@@ -80,7 +80,6 @@ void Likelihood::tickModelStatistics()
     calculateModel(m_parameters);
     m_statistics.add(m_model);
     m_statistics.calculate();
-    qDebug() << "average: " << m_statistics.average().Bins;
     m_model.Copy(m_statistics.average());
     m_data.Copy(m_statistics.average_plus_sigma());
 
@@ -148,3 +147,6 @@ bool Likelihood::tick()
 
     return true;
 }
+
+
+
