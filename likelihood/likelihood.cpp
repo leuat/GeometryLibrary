@@ -46,6 +46,11 @@ void Likelihood::setDone(bool done)
     m_done = done;
 }
 
+GraphStatistics Likelihood::getStatistics() const
+{
+    return m_statistics;
+}
+
 void Likelihood::tickLikelihood()
 {
     m_parameter->setValue(m_currentVal);
@@ -75,7 +80,6 @@ void Likelihood::tickModelStatistics()
         qDebug() << "m_parameters is null, should not happen";
         return;
     }
-
     m_parameters->getParameter("seed")->setValue(rand()%10000);
     calculateModel(m_parameters);
     m_statistics.add(m_model);

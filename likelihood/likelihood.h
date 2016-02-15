@@ -41,6 +41,8 @@ public:
     bool tick();
 
 
+
+
     LGraph data() const;
     void setData(const LGraph &data);
     LGraph model() const;
@@ -50,6 +52,7 @@ public:
     QPointF getMinVal() const;
     bool getDone() const;
     void setDone(bool done);
+    GraphStatistics getStatistics() const;
 };
 
 #endif // LIKELIHOOD_H
