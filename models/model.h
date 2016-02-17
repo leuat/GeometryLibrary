@@ -1,6 +1,6 @@
 #ifndef GEOMETRYMODEL_H
 #define GEOMETRYMODEL_H
-#include "parameters.h"
+#include "../parameters.h"
 #include <QObject>
 #include <QVector3D>
 
@@ -16,10 +16,8 @@ public:
     Model();
     Parameters* parameters() const;
     bool isInVoid(const QVector3D &point);
-
-    virtual void initialize(Noise::NoiseType noiseType, Parameters* np) = 0;
     virtual bool isInVoid(float x, float y, float z) = 0;
-
+    virtual void parametersUpdated() = 0;
 
 public slots:
     void setParameters(Parameters* parameters);

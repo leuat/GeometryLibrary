@@ -4,12 +4,12 @@
 #include <QDebug>
 #include <iostream>
 using namespace std;
-RegularModel::RegularModel()
+RegularNoiseModel::RegularNoiseModel()
 {
 
 }
 
-void RegularModel::initialize(Noise::NoiseType noiseType, Parameters* np)
+void RegularNoiseModel::initialize(Noise::NoiseType noiseType, Parameters* np)
 {
     m_parameters = np;
     if (noiseType == Noise::NoiseType::Simplex)
@@ -32,7 +32,7 @@ void RegularModel::initialize(Noise::NoiseType noiseType, Parameters* np)
     m_initialized = true;
 }
 
-bool RegularModel::isInVoid(const QVector3D &p)
+bool RegularNoiseModel::isInVoid(const QVector3D &p)
 {
     if (!m_initialized)
         return false;

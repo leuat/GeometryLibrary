@@ -58,7 +58,7 @@ private:
     QVariantList m_parameters;
 
 public:
-    Parameters();
+    Parameters() { }
     QVariantList parameters() const;
     QVector<Parameter*> parameterList() const;
     Parameter* getParameter(QString name);
@@ -73,6 +73,7 @@ public slots:
 
 signals:
     void parametersChanged(QVariantList parameters);
+    void parameterUpdated();
 
 public:
     friend std::ostream& operator<<(std::ostream& out, const Parameters& params)

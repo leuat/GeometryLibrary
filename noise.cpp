@@ -1,14 +1,19 @@
-#include "Noise.h"
+#include "noise.h"
 
+Noise::Noise(int o, double f, double p, int s) {
+    octaves = o;
+    persistence = p;
+    frequency = f;
+    seed = s;
+    weights = 0;
+}
 
-
-
-double Noise::Get( const double x, const double y, const double z ) {
-    return Get(x,y,z, persistence, frequency);
+double Noise::get( const double x, const double y, const double z ) {
+    return get(x,y,z, persistence, frequency);
 }
 
 
-double Noise::Get( const double x, const double y, const double z, const double per, const double f ) {
+double Noise::get( const double x, const double y, const double z, const double per, const double f ) {
     double total = 0;
     double freq = f;
     double amplitude = 1.0;
@@ -30,7 +35,7 @@ double Noise::Get( const double x, const double y, const double z, const double 
     return total / maxAmplitude;
 }
 
-double Noise::Get( const double x, const double y) {
+double Noise::get( const double x, const double y) {
     double total = 0;
     double freq = frequency;
     double amplitude = 1;
@@ -47,7 +52,6 @@ double Noise::Get( const double x, const double y) {
 
     return total / maxAmplitude;
 }
-
 
 double* Noise::generateSpectralWeights (double lacunarity,
                                         int octaves, double h, double frequency) {
@@ -114,3 +118,34 @@ double Noise::getRidgedMf(QVector3D p, float frequency, int octaves, float lacun
     return (value * 1.25) - 1.0;
 }
 
+
+
+void Noise::calculate_statistics(double N, std::string filename) {
+    average = 0;
+    double s = 0.01123;
+    standard_deviation = 0;
+    for (int i=0;i<N;i++) {
+
+        double val = get(i*s+0.1, i*s+0.211, i*s+0.123);
+        average += val;
+    }
+    average /= N;
+    for (int i=0;i<N;i++) {
+        double val = get(i*s+0.1, i*s+0.211, i*s+0.123);
+        standard_deviation += (average-val)*(average-val);
+    }
+    standard_deviation = sqrt(standard_deviation/N);
+
+    if (filename != "") {
+        ofstream f( filename.c_str(), ios::out);
+        for (int i=0;i<50000;i++) {
+            double s = 0.159516413;
+            double val = get((double)i*s, 0.121+i*s*0.341,0.4312+i*s*0.1231 + 0.64123);
+            f << i << " " << val << endl;
+        }
+        f.close();
+
+
+    }
+
+}

@@ -2,7 +2,7 @@
 #define REGULARMODEL_H
 #include "model.h"
 
-class RegularModel : public Model
+class RegularNoiseModel : public Model
 {
 protected:
     double m_scale = 1;
@@ -14,9 +14,12 @@ protected:
     bool m_absolute = false;
 
 public:
-    RegularModel();
-    virtual void initialize(Noise::NoiseType noiseType, Parameters* np) override;
-    virtual bool isInVoid(const QVector3D& pos) override;
+    RegularNoiseModel();
+
+    // Model interface
+public:
+    virtual bool isInVoid(float x, float y, float z) override;
+    virtual void parametersUpdated() override;
 };
 
 class NoiseParameters : public Parameters

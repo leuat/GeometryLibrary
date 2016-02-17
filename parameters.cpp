@@ -34,6 +34,7 @@ void Parameters::createParameter(QString name, float value, float min, float max
     Parameter *parameter = new Parameter(name, value, min, max, stepSize);
     m_parameters.append(QVariant::fromValue(parameter));
     m_parametersMap.insert(name.toLower(), parameter);
+    connect(parameter, &Parameter::valueChanged, this, &Parameters::parameterUpdated);
 }
 
 void Parameters::setParameters(QVariantList parameters)
@@ -105,11 +106,6 @@ void Parameters::load(QString filename)
         }
     }
     file.close();
-}
-
-Parameters::Parameters()
-{
-
 }
 
 double Parameter::stepSize() const

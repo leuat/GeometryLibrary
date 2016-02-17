@@ -22,4 +22,5 @@ void Model::setParameters(Parameters *parameters)
 
     m_parameters = parameters;
     emit parametersChanged(parameters);
+    parametersUpdated();
 }
