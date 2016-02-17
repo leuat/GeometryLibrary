@@ -1,6 +1,8 @@
 #ifndef GEOMETRYMODEL_H
 #define GEOMETRYMODEL_H
 #include "../parameters.h"
+#include "../../cinifile.h"
+
 #include <QObject>
 #include <QVector3D>
 
@@ -18,6 +20,8 @@ public:
     bool isInVoid(const QVector3D &point);
     virtual bool isInVoid(float x, float y, float z) = 0;
     virtual void parametersUpdated() = 0;
+    virtual void createParameters();
+    virtual void loadParameters(class CIniFile *iniFile);
 
 public slots:
     void setParameters(Parameters* parameters);

@@ -31,10 +31,42 @@ Parameter* Parameters::getParameter(QString name)
 
 void Parameters::createParameter(QString name, float value, float min, float max, float stepSize)
 {
-    Parameter *parameter = new Parameter(name, value, min, max, stepSize);
-    m_parameters.append(QVariant::fromValue(parameter));
-    m_parametersMap.insert(name.toLower(), parameter);
-    connect(parameter, &Parameter::valueChanged, this, &Parameters::parameterUpdated);
+    auto parameterIterator = m_parametersMap.find(name);
+    if(parameterIterator == m_parametersMap.end()) {
+        // Create new
+        Parameter *parameter = new Parameter(name, value, min, max, stepSize);
+        m_parameters.append(QVariant::fromValue(parameter));
+        m_parametersMap.insert(name.toLower(), parameter);
+        connect(parameter, &Parameter::valueChanged, this, &Parameters::parameterUpdated);
+    } else {
+        // We already have it. Update instead.
+        Parameter *parameter = parameterIterator.value();
+        parameter->setMin(min);
+        parameter->setMax(max);
+        parameter->setStepSize(stepSize);
+        parameter->setValue(value);
+    }
+}
+
+bool Parameters::removeParameter(QString name)
+{
+    // Check if it exists
+    auto parameterIterator = m_parametersMap.find(name);
+
+    if(parameterIterator != m_parametersMap.end()) {
+        // Find the QVariant version and remove it
+        for(const QVariant &variant : m_parameters) {
+            Parameter *parameter = variant.value<Parameter*>();
+            if(parameter->name().compare(name) == 0) {
+                m_parameters.removeOne(variant);
+                m_parametersMap.remove(name);
+                delete parameter;
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 void Parameters::setParameters(QVariantList parameters)
@@ -54,6 +86,13 @@ QMap<QString, Parameter *> Parameters::parametersMap() const
 void Parameters::setParametersMap(const QMap<QString, Parameter *> &parametersMap)
 {
     m_parametersMap = parametersMap;
+}
+
+double Parameters::getValue(QString name)
+{
+    Parameter *parameter = getParameter(name);
+    if(parameter) return parameter->value();
+    else return 0;
 }
 
 void Parameters::save(QString filename)

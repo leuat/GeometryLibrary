@@ -63,8 +63,10 @@ public:
     QVector<Parameter*> parameterList() const;
     Parameter* getParameter(QString name);
     void createParameter(QString name, float value = 0, float min = 0, float max = 0, float stepSize = 0);
+    bool removeParameter(QString name);
     QMap<QString, Parameter *> parametersMap() const;
     void setParametersMap(const QMap<QString, Parameter *> &parametersMap);
+    double getValue(QString name);
     Q_INVOKABLE void save(QString filename);
     Q_INVOKABLE void load(QString filename);
 

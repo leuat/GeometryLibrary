@@ -2,7 +2,8 @@
 
 Model::Model()
 {
-
+    m_parameters = new Parameters();
+    createParameters();
 }
 
 Parameters *Model::parameters() const
@@ -13,6 +14,16 @@ Parameters *Model::parameters() const
 bool Model::isInVoid(const QVector3D &point)
 {
     return isInVoid(point.x(), point.y(), point.z());
+}
+
+void Model::createParameters()
+{
+
+}
+
+void Model::loadParameters(CIniFile *iniFile)
+{
+    Q_UNUSED(iniFile);
 }
 
 void Model::setParameters(Parameters *parameters)

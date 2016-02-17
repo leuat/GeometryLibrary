@@ -1,9 +1,15 @@
 #include "regularnoisemodel.h"
-
-RegularNoiseModel::RegularNoiseModel()
+#include "../../cinifile.h"
+#include "../simplex.h"
+#include "../perlin.h"
+RegularNoiseModel::RegularNoiseModel() : Model()
 {
+    // m_noise = new Simplex();
+    // NoiseParameters *parameters = new NoiseParameters(iniFile->getdouble("octaves"), iniFile->getdouble("scale"), iniFile->getdouble("persistence"), iniFile->getdouble("threshold"), iniFile->getdouble("inverted"), iniFile->getdouble("seed"), iniFile->getdouble("absolute"));
 
 }
+
+
 
 bool RegularNoiseModel::isInVoid(float x, float y, float z)
 {
@@ -15,14 +21,15 @@ bool RegularNoiseModel::isInVoid(float x, float y, float z)
 
     double val = m_noise->get(x*m_scale*p1 + add, y*m_scale*p1,z*m_scale*p1);
 
-    if (m_absolute)
+    if (m_absolute) {
         val = fabs(val);
+    }
 
     if (m_inverted) {
-        if (val>m_threshold)
+        if (val>m_threshold) {
             return true;
-    }
-    else {
+        }
+    } else {
         if (val<m_threshold)
             return true;
     }
@@ -31,64 +38,35 @@ bool RegularNoiseModel::isInVoid(float x, float y, float z)
 
 void RegularNoiseModel::parametersUpdated()
 {
+    if(m_noise) delete m_noise;
     m_noise = nullptr;
-    Parameter *parameter = m_parameters->getParameter("octaves");
-    if(parameter) m_octaves = parameter->value();
-
-    parameter = m_parameters->getParameter("scale");
-    if(parameter) m_scale = parameter->value();
-
-    parameter = m_parameters->getParameter("persistence");
-    if(parameter) m_persistence = parameter->value();
-
-    parameter = m_parameters->getParameter("threshold");
-    if(parameter) m_threshold = parameter->value();
-
-    parameter = m_parameters->getParameter("inverted");
-    if(parameter) m_inverted = parameter->value();
-
-    parameter = m_parameters->getParameter("seed");
-    if(parameter) m_seed = parameter->value();
-
-    parameter = m_parameters->getParameter("absolute");
-    if(parameter) m_absolute = parameter->value();
-
-    parameter = m_parameters->getParameter("skewScale");
-    if(parameter) m_skewScale = parameter->value();
-
-    parameter = m_parameters->getParameter("skewAmplitude");
-    if(parameter) m_skewAmplitude = parameter->value();
+    m_octaves = m_parameters->getValue("octaves");
+    m_scale = m_parameters->getValue("scale");
+    m_persistence = m_parameters->getValue("persistence");
+    m_threshold = m_parameters->getValue("threshold");
+    m_inverted = m_parameters->getValue("inverted");
+    m_seed = m_parameters->getValue("seed");
+    m_absolute = m_parameters->getValue("absolute");
+    m_skewScale = m_parameters->getValue("skewScale");
+    m_skewAmplitude = m_parameters->getValue("skewAmplitude");
 
 }
 
-NoiseParameters::NoiseParameters(double octaves, double scale, double persistence, double threshold, double inverted, double seed, double absolute, double skewScale, double skewAmplitude)
+void RegularNoiseModel::createParameters()
 {
-    createParameter("Octaves", octaves, 1, 7, 1);
-    createParameter("Scale", scale, 0.01, 2.0, 0.025);
-    createParameter("Persistence", persistence, 0.1, 3, 0.1);
-    createParameter("Threshold", threshold, -1, 1, 0.1);
-    createParameter("Inverted", inverted, 0, 1);
-    createParameter("Seed", seed, 1, 100, 1);
-    createParameter("Absolute", absolute, 0, 1, 1);
-    createParameter("SkewScale", skewScale, 0,1,0.1);
-    createParameter("SkewAmplitude", skewAmplitude, 0, 1, 0.1);
+    m_parameters->createParameter("Octaves", 1, 1, 7, 1);
+    m_parameters->createParameter("Scale", 0.05, 0.01, 2.0, 0.025);
+    m_parameters->createParameter("Persistence", 1.0, 0.1, 3, 0.1);
+    m_parameters->createParameter("Threshold", 0.1, -1, 1, 0.1);
+    m_parameters->createParameter("Inverted", 0.0, 0, 1);
+    m_parameters->createParameter("Seed", 13.0, 1, 100, 1);
+    m_parameters->createParameter("Absolute", 0.0, 0, 1, 1);
+    m_parameters->createParameter("SkewScale", 1.0, 0,1,0.1);
+    m_parameters->createParameter("SkewAmplitude", 0.0, 0, 1, 0.1);
+    parametersUpdated();
 }
 
-NoiseParameters::NoiseParameters(double octaves, double scale, double persistence, double threshold, double inverted, double seed, double absolute)
-{
-    createParameter("Octaves", octaves, 1, 7, 1);
-    createParameter("Scale", scale, 0.01, 2, 0.025);
-    createParameter("Persistence", persistence, 0.1, 3, 0.1);
-    createParameter("Threshold", threshold, -1, 1, 0.1);
-    createParameter("Inverted", inverted, 0, 1);
-    createParameter("Seed", seed, 1, 100, 1);
-    createParameter("Absolute", absolute, 0, 1, 1);
-    createParameter("SkewScale", 1.0, 0,1,0.1);
-    createParameter("SkewAmplitude", 0.0, 0, 1, 0.1);
-}
-
-NoiseParameters::NoiseParameters() :
-    NoiseParameters::NoiseParameters(1.0, 0.05, 1.0, 0.1, 0.0, 13.0, 0.0)
+void RegularNoiseModel::loadParameters(CIniFile *iniFile)
 {
 
 }
