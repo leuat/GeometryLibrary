@@ -49,69 +49,69 @@ all look identical.
 // For each octave, a higher frequency/lower amplitude function will be added to the original.
 // The higher the persistence [0-1], the more of each succeeding octave will be added.
 double octave_noise_2d(const double octaves,
-                    const double persistence,
-                    const double scale,
-                    const double x,
-                    const double y);
+                       const double persistence,
+                       const double scale,
+                       const double x,
+                       const double y);
 double octave_noise_3d(const double octaves,
-                    const double persistence,
-                    const double scale,
-                    const double x,
-                    const double y,
-                    const double z);
+                       const double persistence,
+                       const double scale,
+                       const double x,
+                       const double y,
+                       const double z);
 double octave_noise_4d(const double octaves,
-                    const double persistence,
-                    const double scale,
-                    const double x,
-                    const double y,
-                    const double z,
-                    const double w);
+                       const double persistence,
+                       const double scale,
+                       const double x,
+                       const double y,
+                       const double z,
+                       const double w);
 
 
 // Scaled Multi-octave Simplex noise
 // The result will be between the two parameters passed.
 double scaled_octave_noise_2d(  const double octaves,
-                            const double persistence,
-                            const double scale,
-                            const double loBound,
+                                const double persistence,
+                                const double scale,
+                                const double loBound,
+                                const double hiBound,
+                                const double x,
+                                const double y);
+double scaled_octave_noise_3d(  const double octaves,
+                                const double persistence,
+                                const double scale,
+                                const double loBound,
+                                const double hiBound,
+                                const double x,
+                                const double y,
+                                const double z);
+double scaled_octave_noise_4d(  const double octaves,
+                                const double persistence,
+                                const double scale,
+                                const double loBound,
+                                const double hiBound,
+                                const double x,
+                                const double y,
+                                const double z,
+                                const double w);
+
+// Scaled Raw Simplex noise
+// The result will be between the two parameters passed.
+double scaled_raw_noise_2d( const double loBound,
                             const double hiBound,
                             const double x,
                             const double y);
-double scaled_octave_noise_3d(  const double octaves,
-                            const double persistence,
-                            const double scale,
-                            const double loBound,
+double scaled_raw_noise_3d( const double loBound,
                             const double hiBound,
                             const double x,
                             const double y,
                             const double z);
-double scaled_octave_noise_4d(  const double octaves,
-                            const double persistence,
-                            const double scale,
-                            const double loBound,
+double scaled_raw_noise_4d( const double loBound,
                             const double hiBound,
                             const double x,
                             const double y,
                             const double z,
                             const double w);
-
-// Scaled Raw Simplex noise
-// The result will be between the two parameters passed.
-double scaled_raw_noise_2d( const double loBound,
-                        const double hiBound,
-                        const double x,
-                        const double y);
-double scaled_raw_noise_3d( const double loBound,
-                        const double hiBound,
-                        const double x,
-                        const double y,
-                        const double z);
-double scaled_raw_noise_4d( const double loBound,
-                        const double hiBound,
-                        const double x,
-                        const double y,
-                        const double z,
-                        const double w);
 
 
 // Raw Simplex noise - a single noise value.

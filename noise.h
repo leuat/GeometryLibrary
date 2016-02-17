@@ -1,15 +1,13 @@
 #pragma once
-#include <math.h>
+#include <QObject>
+#include <cmath>
 #include <fstream>
 #include <string>
 #include <iostream>
 #include <QVector>
 #include <QVector3D>
 
-
 using namespace std;
-
-
 
 /*
  * Parent class for noise modules. Currently only implemented as perlin & simplex noise.
@@ -18,7 +16,9 @@ using namespace std;
  *
  *
 */
-class Noise {
+class Noise : public QObject {
+    Q_OBJECT
+    Q_ENUMS(NoiseType)
 public:
     enum NoiseType { Simplex, Perlin};
 

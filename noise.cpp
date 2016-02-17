@@ -4,7 +4,7 @@
 
 
 double Noise::Get( const double x, const double y, const double z ) {
-  return Get(x,y,z, persistence, frequency);
+    return Get(x,y,z, persistence, frequency);
 }
 
 
@@ -50,15 +50,15 @@ double Noise::Get( const double x, const double y) {
 
 
 double* Noise::generateSpectralWeights (double lacunarity,
-     int octaves, double h, double frequency) {
-  double* weights = new double[octaves];
-  
-  for (int octave = 0; octave < octaves; ++octave) {
-    weights[octave] = pow (frequency, h);
-    frequency *= lacunarity;
-  }
-  
-  return weights;
+                                        int octaves, double h, double frequency) {
+    double* weights = new double[octaves];
+
+    for (int octave = 0; octave < octaves; ++octave) {
+        weights[octave] = pow (frequency, h);
+        frequency *= lacunarity;
+    }
+
+    return weights;
 }
 
 
@@ -67,50 +67,50 @@ double* Noise::generateSpectralWeights (double lacunarity,
 //
 double Noise::getRidgedMf(QVector3D p, float frequency, int octaves, float lacunarity, float warp, float offset, float gain)
 {
-  double value = 0.0;
-  double weight = 1.0;
+    double value = 0.0;
+    double weight = 1.0;
 
-  double w = -0.05f;
-  
-  if (weights == 0)
-    weights = generateSpectralWeights(lacunarity, octaves, w, frequency);
+    double w = -0.05f;
 
-  QVector3D vt = p;
-  for (int octave = 0; octave < octaves; octave++) {
-    double signal = raw_3d(vt.x(), vt.y(), vt.z());
+    if (weights == 0)
+        weights = generateSpectralWeights(lacunarity, octaves, w, frequency);
 
-    // Make the ridges.
-    signal = fabs (signal);
-    signal = offset - signal;
+    QVector3D vt = p;
+    for (int octave = 0; octave < octaves; octave++) {
+        double signal = raw_3d(vt.x(), vt.y(), vt.z());
 
-              // Square the signal to increase the sharpness of the ridges.
-    signal *= signal;
+        // Make the ridges.
+        signal = fabs (signal);
+        signal = offset - signal;
 
-              // The weighting from the previous octave is applied to the signal.
-              // Larger values have higher weights, producing sharp points along the
-              // ridges.
-    signal *= weight;
+        // Square the signal to increase the sharpness of the ridges.
+        signal *= signal;
 
-              // Weight successive contributions by the previous signal.
-    weight = signal * gain;
-    if (weight > 1.0) {
-      weight = 1.0;
+        // The weighting from the previous octave is applied to the signal.
+        // Larger values have higher weights, producing sharp points along the
+        // ridges.
+        signal *= weight;
+
+        // Weight successive contributions by the previous signal.
+        weight = signal * gain;
+        if (weight > 1.0) {
+            weight = 1.0;
+        }
+        if (weight < 0.0) {
+            weight = 0.0;
+        }
+
+        // Add the signal to the output value.
+
+
+        value += (signal * pow (frequency, w));
+        //value += (signal * weights[octave]);
+
+        // Go to the next octave.
+        vt = vt * lacunarity;
+        frequency *= lacunarity;
     }
-    if (weight < 0.0) {
-      weight = 0.0;
-    }
 
-    // Add the signal to the output value.
-
-
-    value += (signal * pow (frequency, w));
-    //value += (signal * weights[octave]);
-
-    // Go to the next octave.
-    vt = vt * lacunarity;
-    frequency *= lacunarity;
-  }
-
-  return (value * 1.25) - 1.0;
+    return (value * 1.25) - 1.0;
 }
 

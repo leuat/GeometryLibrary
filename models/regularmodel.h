@@ -16,10 +16,16 @@ protected:
 public:
     RegularModel();
     virtual void initialize(Noise::NoiseType noiseType, Parameters* np) override;
-
     virtual bool isInVoid(const QVector3D& pos) override;
+};
 
-
+class NoiseParameters : public Parameters
+{
+    Q_OBJECT
+public:
+    NoiseParameters();
+    NoiseParameters(double octaves, double scale, double persistence, double threshold, double inverted, double seed, double absolute, double skewScale, double skewAmplitude);
+    NoiseParameters(double octaves, double scale, double persistence, double threshold, double inverted, double seed, double absolute);
 };
 
 #endif // REGULARMODEL_H
