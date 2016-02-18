@@ -30,6 +30,7 @@ Parameter* Parameters::getParameter(QString name)
 }
 
 void Parameters::setParameter(QString name, float value, float min, float max, float stepSize) {
+    name = name.toLower();
     auto parameterIterator = m_parametersMap.find(name);
     if(parameterIterator != m_parametersMap.end()) {
         Parameter *parameter = parameterIterator.value();
@@ -42,14 +43,17 @@ void Parameters::setParameter(QString name, float value, float min, float max, f
 
 void Parameters::setParameter(QString name, QString string)
 {
+    name = name.toLower();
     auto parameterIterator = m_parametersMap.find(name);
     if(parameterIterator != m_parametersMap.end()) {
         Parameter *parameter = parameterIterator.value();
         parameter->setString(string);
     }
 }
+
 void Parameters::createParameter(QString name, float value, float min, float max, float stepSize)
 {
+    name = name.toLower();
     auto parameterIterator = m_parametersMap.find(name);
     if(parameterIterator == m_parametersMap.end()) {
         // Create new
@@ -69,13 +73,14 @@ void Parameters::createParameter(QString name, float value, float min, float max
 
 void Parameters::createParameter(QString name, QString string)
 {
+    name = name.toLower();
     auto parameterIterator = m_parametersMap.find(name);
     if(parameterIterator == m_parametersMap.end()) {
         // Create new
         Parameter *parameter = new Parameter(name, string);
         m_parameters.append(QVariant::fromValue(parameter));
         m_parametersMap.insert(name.toLower(), parameter);
-        connect(parameter, &Parameter::valueChanged, this, &Parameters::parameterUpdated);
+        connect(parameter, &Parameter::stringChanged, this, &Parameters::parameterUpdated);
     } else {
         // We already have it. Update instead.
         Parameter *parameter = parameterIterator.value();
@@ -85,6 +90,7 @@ void Parameters::createParameter(QString name, QString string)
 
 bool Parameters::removeParameter(QString name)
 {
+    name = name.toLower();
     // Check if it exists
     auto parameterIterator = m_parametersMap.find(name);
 
@@ -125,6 +131,7 @@ void Parameters::setParametersMap(const QMap<QString, Parameter *> &parametersMa
 
 double Parameters::getValue(QString name)
 {
+    name = name.toLower();
     Parameter *parameter = getParameter(name);
     if(parameter) return parameter->value();
     else return 0;
@@ -132,6 +139,7 @@ double Parameters::getValue(QString name)
 
 QString Parameters::getString(QString name)
 {
+    name = name.toLower();
     Parameter *parameter = getParameter(name);
     if(parameter) return parameter->string();
     else return QString("");
@@ -251,14 +259,6 @@ void Parameter::setMax(double max)
     emit maxChanged(max);
 }
 
-void Parameter::setString(QString string)
-{
-    if (m_string == string)
-        return;
-
-    m_string = string;
-    emit stringChanged(string);
-}
 
 Parameter::Parameter(QObject *parent) : QObject(parent)
 {
@@ -293,6 +293,15 @@ Parameter::Parameter(QString name, QString string)
 double Parameter::value() const
 {
     return m_value;
+}
+
+void Parameter::setString(QString string)
+{
+    if (m_string == string)
+        return;
+
+    m_string = string;
+    emit stringChanged(string);
 }
 
 void Parameter::setValue(double value)

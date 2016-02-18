@@ -1,9 +1,9 @@
 #include "model.h"
-
+#include <QDebug>
 Model::Model()
 {
     m_parameters = new Parameters();
-    createParameters();
+    connect(m_parameters, &Parameters::parameterUpdated, this, &Model::parametersUpdated);
 }
 
 Parameters *Model::parameters() const

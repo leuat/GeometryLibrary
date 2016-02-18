@@ -12,8 +12,7 @@ class Simplex : public Noise {
     Q_OBJECT
 public:
 
-    Simplex(int o,double f,double p,int s) : Noise( o,f,p,s)  {
-    }
+    Simplex(int o,double f,double p,int s) : Noise( o,f,p,s)  { }
 
 
     double raw_2d(const double& x, const double& y);

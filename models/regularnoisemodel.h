@@ -15,6 +15,7 @@ protected:
     double m_absolute = 1;
     double m_skewScale = 1;
     double m_skewAmplitude = 1;
+    QString m_noiseType;
 public:
     RegularNoiseModel();
 

@@ -32,11 +32,8 @@ public:
     Parameter(QString name, QString string);
 
     double value() const;
-    void setValue(double value);
     double stepSize() const;
-    void setStepSize(double stepSize);
     QString getName() const;
-    void setName(const QString &value);
     double min() const;
     double max() const;
     QString name() const;
@@ -46,6 +43,9 @@ public slots:
     void setMin(double min);
     void setMax(double max);
     void setString(QString string);
+    void setValue(double value);
+    void setStepSize(double stepSize);
+    void setName(const QString &value);
 
 signals:
     void valueChanged(double value);
