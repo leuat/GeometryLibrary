@@ -41,7 +41,6 @@ bool RegularNoiseModel::isInVoid(float x, float y, float z)
 
 void RegularNoiseModel::parametersUpdated()
 {
-    qDebug() << "Parameters updated";
     m_octaves = m_parameters->getValue("octaves");
     m_scale = m_parameters->getValue("scale");
     m_persistence = m_parameters->getValue("persistence");
@@ -51,18 +50,15 @@ void RegularNoiseModel::parametersUpdated()
     m_absolute = m_parameters->getValue("absolute");
     m_skewScale = m_parameters->getValue("skewscale");
     m_skewAmplitude = m_parameters->getValue("skewamplitude");
-    /* if(m_noise) delete m_noise;
-    m_noise = nullptr; */
+
     QString newNoiseType = m_parameters->getString("noisetype");
     if(newNoiseType.compare(m_noiseType) != 0) {
         // The string has changed
         if(newNoiseType.compare("simplex") == 0) {
-            qDebug() << "New noise type: " << newNoiseType;
             m_noiseType = newNoiseType;
             if(m_noise) delete m_noise;
             m_noise = new Simplex(m_octaves, 1, m_persistence, m_seed);
         } else if(newNoiseType.compare("perlin") == 0) {
-            qDebug() << "New noise type: " << newNoiseType;
             m_noiseType = newNoiseType;
             if(m_noise) delete m_noise;
             m_noise = new Perlin(m_octaves, 1, m_persistence, m_seed);
@@ -72,7 +68,6 @@ void RegularNoiseModel::parametersUpdated()
 
 void RegularNoiseModel::createParameters()
 {
-    qDebug() << "Creating parameters in RegularNoiseModel";
     m_parameters->createParameter("octaves", 1, 1, 7, 1);
     m_parameters->createParameter("scale", 0.05, 0.01, 2.0, 0.025);
     m_parameters->createParameter("persistence", 1.0, 0.1, 3.0, 0.1);

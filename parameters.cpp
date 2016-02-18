@@ -1,5 +1,5 @@
 #include "parameters.h"
-#include <qdebug.h>
+#include <QDebug.h>
 #include <QUrl>
 #include <QFile>
 
