@@ -14,6 +14,7 @@ class Parameter : public QObject {
     Q_PROPERTY(double max READ max WRITE setMax NOTIFY maxChanged)
     Q_PROPERTY(double stepSize READ stepSize WRITE setStepSize NOTIFY stepSizeChanged)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    Q_PROPERTY(QString string READ string WRITE setString NOTIFY stringChanged)
 
 private:
     double m_value;
@@ -21,11 +22,14 @@ private:
     double m_max;
     double m_stepSize;
     QString m_name;
+    QString m_string;
+
 public:
 
     explicit Parameter(QObject* parent = nullptr);
     Parameter(const Parameter& param);
     Parameter(QString name, float value = 0, float min = 0, float max = 0, float stepSize = 0);
+    Parameter(QString name, QString string);
 
     double value() const;
     void setValue(double value);
@@ -36,10 +40,12 @@ public:
     double min() const;
     double max() const;
     QString name() const;
+    QString string() const;
 
 public slots:
     void setMin(double min);
     void setMax(double max);
+    void setString(QString string);
 
 signals:
     void valueChanged(double value);
@@ -47,6 +53,7 @@ signals:
     void maxChanged(double max);
     void nameChanged(QString name);
     void stepSizeChanged(double stepSize);
+    void stringChanged(QString string);
 };
 
 class Parameters : public QObject
@@ -62,11 +69,15 @@ public:
     QVariantList parameters() const;
     QVector<Parameter*> parameterList() const;
     Parameter* getParameter(QString name);
+    void setParameter(QString name, float value, float min, float max, float stepSize);
+    void setParameter(QString name, QString string);
     void createParameter(QString name, float value = 0, float min = 0, float max = 0, float stepSize = 0);
+    void createParameter(QString name, QString string);
     bool removeParameter(QString name);
     QMap<QString, Parameter *> parametersMap() const;
     void setParametersMap(const QMap<QString, Parameter *> &parametersMap);
     double getValue(QString name);
+    QString getString(QString name);
     Q_INVOKABLE void save(QString filename);
     Q_INVOKABLE void load(QString filename);
 

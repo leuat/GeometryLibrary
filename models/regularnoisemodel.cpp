@@ -40,6 +40,7 @@ void RegularNoiseModel::parametersUpdated()
 {
     if(m_noise) delete m_noise;
     m_noise = nullptr;
+
     m_octaves = m_parameters->getValue("octaves");
     m_scale = m_parameters->getValue("scale");
     m_persistence = m_parameters->getValue("persistence");
@@ -47,26 +48,35 @@ void RegularNoiseModel::parametersUpdated()
     m_inverted = m_parameters->getValue("inverted");
     m_seed = m_parameters->getValue("seed");
     m_absolute = m_parameters->getValue("absolute");
-    m_skewScale = m_parameters->getValue("skewScale");
-    m_skewAmplitude = m_parameters->getValue("skewAmplitude");
+    m_skewScale = m_parameters->getValue("skewscale");
+    m_skewAmplitude = m_parameters->getValue("skewamplitude");
 
 }
 
 void RegularNoiseModel::createParameters()
 {
-    m_parameters->createParameter("Octaves", 1, 1, 7, 1);
-    m_parameters->createParameter("Scale", 0.05, 0.01, 2.0, 0.025);
-    m_parameters->createParameter("Persistence", 1.0, 0.1, 3, 0.1);
-    m_parameters->createParameter("Threshold", 0.1, -1, 1, 0.1);
-    m_parameters->createParameter("Inverted", 0.0, 0, 1);
-    m_parameters->createParameter("Seed", 13.0, 1, 100, 1);
-    m_parameters->createParameter("Absolute", 0.0, 0, 1, 1);
-    m_parameters->createParameter("SkewScale", 1.0, 0,1,0.1);
-    m_parameters->createParameter("SkewAmplitude", 0.0, 0, 1, 0.1);
+    m_parameters->createParameter("octaves", 1, 1, 7, 1);
+    m_parameters->createParameter("scale", 0.05, 0.01, 2.0, 0.025);
+    m_parameters->createParameter("persistence", 1.0, 0.1, 3, 0.1);
+    m_parameters->createParameter("threshold", 0.1, -1, 1, 0.1);
+    m_parameters->createParameter("inverted", 0.0, 0, 1);
+    m_parameters->createParameter("seed", 13.0, 1, 100, 1);
+    m_parameters->createParameter("absolute", 0.0, 0, 1, 1);
+    m_parameters->createParameter("skewscale", 1.0, 0,1,0.1);
+    m_parameters->createParameter("skewamplitude", 0.0, 0, 1, 0.1);
     parametersUpdated();
 }
 
 void RegularNoiseModel::loadParameters(CIniFile *iniFile)
 {
-
+    m_parameters->setParameter("octaves", iniFile->getdouble("octaves"), 1, 7, 1);
+    m_parameters->setParameter("scale", iniFile->getdouble("scale"), 0.01, 2.0, 0.025);
+    m_parameters->setParameter("persistence", iniFile->getdouble("persistence"), 0.1, 3, 0.1);
+    m_parameters->setParameter("threshold", iniFile->getdouble("threshold"), -1, 1, 0.1);
+    m_parameters->setParameter("inverted", iniFile->getdouble("inverted"), 0, 1, 1);
+    m_parameters->setParameter("seed", iniFile->getdouble("seed"), 1, 100, 1);
+    m_parameters->setParameter("absolute", iniFile->getdouble("absolute"), 0, 1, 1);
+    m_parameters->setParameter("skewscale", iniFile->getdouble("skewscale"), 0,1, 0.1);
+    m_parameters->setParameter("skewamplitude", iniFile->getdouble("skewamplitude"), 0, 1, 0.1);
+    parametersUpdated();
 }

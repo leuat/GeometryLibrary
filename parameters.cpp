@@ -29,6 +29,25 @@ Parameter* Parameters::getParameter(QString name)
     return *iterator;
 }
 
+void Parameters::setParameter(QString name, float value, float min, float max, float stepSize) {
+    auto parameterIterator = m_parametersMap.find(name);
+    if(parameterIterator != m_parametersMap.end()) {
+        Parameter *parameter = parameterIterator.value();
+        parameter->setMin(min);
+        parameter->setMax(max);
+        parameter->setStepSize(stepSize);
+        parameter->setValue(value);
+    }
+}
+
+void Parameters::setParameter(QString name, QString string)
+{
+    auto parameterIterator = m_parametersMap.find(name);
+    if(parameterIterator != m_parametersMap.end()) {
+        Parameter *parameter = parameterIterator.value();
+        parameter->setString(string);
+    }
+}
 void Parameters::createParameter(QString name, float value, float min, float max, float stepSize)
 {
     auto parameterIterator = m_parametersMap.find(name);
@@ -45,6 +64,22 @@ void Parameters::createParameter(QString name, float value, float min, float max
         parameter->setMax(max);
         parameter->setStepSize(stepSize);
         parameter->setValue(value);
+    }
+}
+
+void Parameters::createParameter(QString name, QString string)
+{
+    auto parameterIterator = m_parametersMap.find(name);
+    if(parameterIterator == m_parametersMap.end()) {
+        // Create new
+        Parameter *parameter = new Parameter(name, string);
+        m_parameters.append(QVariant::fromValue(parameter));
+        m_parametersMap.insert(name.toLower(), parameter);
+        connect(parameter, &Parameter::valueChanged, this, &Parameters::parameterUpdated);
+    } else {
+        // We already have it. Update instead.
+        Parameter *parameter = parameterIterator.value();
+        parameter->setString(string);
     }
 }
 
@@ -93,6 +128,13 @@ double Parameters::getValue(QString name)
     Parameter *parameter = getParameter(name);
     if(parameter) return parameter->value();
     else return 0;
+}
+
+QString Parameters::getString(QString name)
+{
+    Parameter *parameter = getParameter(name);
+    if(parameter) return parameter->string();
+    else return QString("");
 }
 
 void Parameters::save(QString filename)
@@ -145,6 +187,11 @@ void Parameters::load(QString filename)
         }
     }
     file.close();
+}
+
+QString Parameter::string() const
+{
+    return m_string;
 }
 
 double Parameter::stepSize() const
@@ -204,6 +251,15 @@ void Parameter::setMax(double max)
     emit maxChanged(max);
 }
 
+void Parameter::setString(QString string)
+{
+    if (m_string == string)
+        return;
+
+    m_string = string;
+    emit stringChanged(string);
+}
+
 Parameter::Parameter(QObject *parent) : QObject(parent)
 {
 
@@ -226,6 +282,12 @@ Parameter::Parameter(QString name, float value, float min, float max, float step
     m_stepSize(stepSize)
 {
 
+}
+
+Parameter::Parameter(QString name, QString string)
+{
+    m_name = name;
+    m_string = string;
 }
 
 double Parameter::value() const
