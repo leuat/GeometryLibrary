@@ -18,197 +18,190 @@ using namespace std;
 #define NONE -1E20
 
 class LGraph {
- public:
-  vector<double> Val;
-  vector<double> Index;
-  vector<double> IndexScaled;
+public:
+    vector<double> val;
+    vector<double> index;
+    vector<double> IndexScaled;
 
-  LGraph* chisq;
+    LGraph* chisq;
 
-  LGraph(QVector<QPointF>& points);
-  void fromQVector(QVector<QPointF>& points);
-  QVector<QPointF> toQVector();
-  
-  double mean, std;
+    LGraph(QVector<QPointF>& points);
+    void fromQVector(QVector<QPointF>& points);
+    QVector<QPointF> toQVector();
 
-  string name;
+    double mean, std;
 
-  vector<complex<double> > ValFFT;
-  int Bins;
+    string name;
 
-  LGraph() {
-    chisq = 0;
-  }
+    vector<complex<double> > ValFFT;
+    int Bins;
 
-  void normalizeArea();
-
-  void Copy(const LGraph& copy) {
-   Initialize(copy.Bins);
-   for (int i=0;i<Bins;i++) {
-     Val[i] = copy.Val[i];
-     Index[i] = copy.Index[i];
-     IndexScaled[i] = copy.IndexScaled[i];
-   }
- }
-
- ~LGraph() {
-   Delete();
-  }
-
-  void Delete() {
-  }
-
-
-  double& operator[](int i) {
-    return Val[i];
-  }
-
-  void Initialize(int bins) {
-    Delete();
-    Bins = bins;
-    Val.resize(bins);
-    Index.resize(bins);
-    IndexScaled.resize(bins);
-    ValFFT.resize(bins);
-
-    for (int i=0;i<bins;i++) {
-      Val[i] = 0.0;
-      Index[i] = i;
-      IndexScaled[i] = i;
-      ValFFT[i] = 0.0;
+    LGraph() {
+        chisq = 0;
     }
 
-  }
+    void normalizeArea();
 
-
-
-  void WashHaakon() {
-    for (int i=0;i<Bins/2;i++) {
-      double a = Index[i];
-      double b = Val[i];
-      int j = Bins - i - 1;
-      Index[i] = Index[j];
-      Val[i] = Val[j];
-      
-      Index[j] = a;
-      Val[j] = b;
+    void Copy(const LGraph& copy) {
+        initialize(copy.Bins);
+        for (int i=0;i<Bins;i++) {
+            val[i] = copy.val[i];
+            index[i] = copy.index[i];
+            IndexScaled[i] = copy.IndexScaled[i];
+        }
     }
-    scaleX(1.0);
-    vector<double>::iterator itI = Index.begin();
-    for (vector<double>::iterator it = Val.begin(); it != Val.end(); it) {
-      
-      vector<double>::iterator a = it;
-      vector<double>::iterator b = itI;
-      if (it != Val.end()) {
-	if (abs(*a)> 1e+12) {
-	  Val.erase (it);
-	  Index.erase (itI);
 
-	}
-	else
-	  {
-
-	    it++;
-	    itI++;
-	  }
-
-      }
+    ~LGraph() {
+        Delete();
     }
-    Bins = Val.size();
-  }
 
-  void dampLargeModes(double v);
-
-
-  void fitSpline(LGraph& spline, int N);
-
-  void Mul(LGraph& o) {
-    for (int i=0;i<min(Bins, o.Bins);i++) {
-      Val[i] *= o.Val[i];
+    void Delete() {
     }
-  }
 
-  void Add(double v) {
-    for (int i=0;i<Bins;i++) {
-      Val[i] += v;
+
+    double& operator[](int i) {
+        return val[i];
     }
-  }
 
+    void initialize(int bins) {
+        Delete();
+        Bins = bins;
+        val.resize(bins);
+        index.resize(bins);
+        IndexScaled.resize(bins);
+        ValFFT.resize(bins);
 
-  void Add(LGraph& o, double v) {
-    for (int i=0;i<min(Bins, o.Bins);i++) {
-      Val[i] += v*o.Val[i];
+        for (int i=0;i<bins;i++) {
+            val[i] = 0.0;
+            index[i] = i;
+            IndexScaled[i] = i;
+            ValFFT[i] = 0.0;
+        }
+
     }
-  }
 
-  float getAverageValueAt(int idx, int spread);
 
-  void MulFFT(LGraph& o) {
-    for (int i=0;i<Bins;i++) {
-      ValFFT[i] *= o.ValFFT[i];
+
+    void WashHaakon() {
+        for (int i=0;i<Bins/2;i++) {
+            double a = index[i];
+            double b = val[i];
+            int j = Bins - i - 1;
+            index[i] = index[j];
+            val[i] = val[j];
+
+            index[j] = a;
+            val[j] = b;
+        }
+        scaleX(1.0);
+        vector<double>::iterator itI = index.begin();
+        for (vector<double>::iterator it = val.begin(); it != val.end(); it) {
+            vector<double>::iterator a = it;
+            if (it != val.end()) {
+                if (abs(*a)> 1e+12) {
+                    val.erase (it);
+                    index.erase (itI);
+                } else {
+                    it++;
+                    itI++;
+                }
+            }
+        }
+        Bins = val.size();
     }
-  }
 
-  QPointF getMin();
-
-
-  void Gaussian(double B);
-  void Smooth(double B);
+    void dampLargeModes(double v);
 
 
-  void LikelihoodFromChisq() {
-    // find min
-    double m = 1E20;
-    for (int i=0;i<Bins;i++)
-      m = min(Val[i], m);
+    void fitSpline(LGraph& spline, int N);
 
-    for (int i=0;i<Bins;i++) {
-      Val[i] = exp(-(Val[i]-m));
+    void Mul(LGraph& o) {
+        for (int i=0;i<min(Bins, o.Bins);i++) {
+            val[i] *= o.val[i];
+        }
     }
-  }
+
+    void Add(double v) {
+        for (int i=0;i<Bins;i++) {
+            val[i] += v;
+        }
+    }
 
 
-  void calculateStatistics();
+    void Add(LGraph& o, double v) {
+        for (int i=0;i<min(Bins, o.Bins);i++) {
+            val[i] += v*o.val[i];
+        }
+    }
 
-  void cutModes(int from, int to);
+    float getAverageValueAt(int idx, int spread);
 
-  static double ChiSQ(LGraph& temp, LGraph& two);
+    void MulFFT(LGraph& o) {
+        for (int i=0;i<Bins;i++) {
+            ValFFT[i] *= o.ValFFT[i];
+        }
+    }
 
-  void loadWeirdFormat(string flux, string lambda);
-
-  void Normalize();
+    QPointF getMin();
 
 
-  void scaleX(double);
+    void Gaussian(double B);
+    void Smooth(double B);
+
+
+    void LikelihoodFromChisq() {
+        // find min
+        double m = 1E20;
+        for (int i=0;i<Bins;i++)
+            m = min(val[i], m);
+
+        for (int i=0;i<Bins;i++) {
+            val[i] = exp(-(val[i]-m));
+        }
+    }
+
+
+    void calculateStatistics();
+
+    void cutModes(int from, int to);
+
+    static double ChiSQ(LGraph& temp, LGraph& two);
+
+    void loadWeirdFormat(string flux, string lambda);
+
+    void Normalize();
+
+
+    void scaleX(double);
 
 #ifdef USE_FFT
-  void FFT();
-  void FFTInv();
+    void FFT();
+    void FFTInv();
 #endif
-  void SaveBin(string Filename);
-  void LoadBin(string Filename);
+    void SaveBin(string Filename);
+    void LoadBin(string Filename);
 
-  void LoadText(string Filename);
-  void SaveText(string Filename);
+    void LoadText(string Filename);
+    void SaveText(string Filename);
 
-  void Mean();
-  void Std();
+    void Mean();
+    void Std();
 
-  void Scale(double v);
-  void InvertStats();
+    void Scale(double v);
+    void InvertStats();
 
-  void dampNoise(double A, double B);
+    void dampNoise(double A, double B);
 
-  void SaveTextFFT(string Filename);
+    void SaveTextFFT(string Filename);
 
-  void RenderGauss(double position, double sigma, double amp, int poww);
+    void RenderGauss(double position, double sigma, double amp, int poww);
 
 
 
-  float getValAtScaledIndex(double& index);
+    float getValAtScaledIndex(double& index);
 
-  int getIndexAtScaledIndex(double& index);
+    int getIndexAtScaledIndex(double& index);
 
-  void MulWithIndex(LGraph& o);
+    void MulWithIndex(LGraph& o);
 
 };

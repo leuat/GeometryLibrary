@@ -1,6 +1,5 @@
 #include <QDebug>
 #include "regularnoisemodel.h"
-#include "../../cinifile.h"
 #include "../simplex.h"
 #include "../perlin.h"
 RegularNoiseModel::RegularNoiseModel() : Model()

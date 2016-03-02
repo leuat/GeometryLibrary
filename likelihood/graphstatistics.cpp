@@ -34,9 +34,9 @@ void GraphStatistics::add(LGraph &graph)
 
 void GraphStatistics::calculate()
 {
-    m_average.Initialize(m_length);
-    m_sigma.Initialize(m_length);
-    m_average_plus_sigma.Initialize(m_length);
+    m_average.initialize(m_length);
+    m_sigma.initialize(m_length);
+    m_average_plus_sigma.initialize(m_length);
 
     for (int d=0;d<m_data.length();d++)
         for (int i=0;i<m_length;i++)
@@ -53,9 +53,9 @@ void GraphStatistics::calculate()
     for (int i=0;i<m_length;i++) {
   //      qDebug() << m_sigma[i];
         m_sigma[i] = sqrt(m_sigma[i]/(float)m_data.length());
-        m_average.Index[i] = m_data[0].Index[i];
-        m_sigma.Index[i] = m_data[0].Index[i];
-        m_average_plus_sigma.Index[i] = m_data[0].Index[i];
+        m_average.index[i] = m_data[0].index[i];
+        m_sigma.index[i] = m_data[0].index[i];
+        m_average_plus_sigma.index[i] = m_data[0].index[i];
         m_average_plus_sigma[i] = m_average[i] + m_sigma[i];
     }
 

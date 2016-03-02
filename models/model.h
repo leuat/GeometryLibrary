@@ -1,7 +1,7 @@
 #ifndef GEOMETRYMODEL_H
 #define GEOMETRYMODEL_H
 #include "../parameters.h"
-#include "../../cinifile.h"
+#include "../misc/cinifile.h"
 
 #include <QObject>
 #include <QVector3D>

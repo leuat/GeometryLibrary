@@ -1,7 +1,7 @@
 #ifndef LIKELIHOOD_H
 #define LIKELIHOOD_H
 #include "lgraph.h"
-#include "../models/parameters.h"
+#include "../parameters.h"
 #include "graphstatistics.h"
 
 #include <QVector>
@@ -10,18 +10,17 @@ class Likelihood
 {
 protected:
     LGraph m_data;
-    LGraph m_model;
+    LGraph m_modelData;
     GraphStatistics m_statistics;
-
     LGraph m_likelihood;
-    Parameters* m_parameters;
-    Parameter* m_parameter;
+    QString m_currentParameter;
+    class Model *m_model = nullptr;
+
     QPointF m_minVal;
-    double m_currentVal;
-    double m_stepSize;
+    double m_currentVal=0;
+    double m_stepSize=1;
 
-    int m_bins, m_currentBin;
-
+    int m_bins=0, m_currentBin=0;
     bool m_ready = false;
     bool m_done = false;
 
@@ -31,22 +30,17 @@ protected:
 public:
     Likelihood();
 
-    virtual void calculateModel(Parameters* p) = 0;
+    virtual void calculateModel(class Model* modelData) = 0;
     enum AnalysisType { LikelihoodStatistics, ModelStatistics };
     AnalysisType m_analysisType = AnalysisType::LikelihoodStatistics;
-
-    void bruteForce1D(int bins, Parameter* parameter, Parameters* parameterrs);
-    void modelAnalysis(int count, Parameters* parameters);
-
+    void bruteForce1D(int bins, QString parameterKey, Model *modelData);
+    void modelAnalysis(int count, Model *modelData);
     bool tick();
-
-
-
 
     LGraph data() const;
     void setData(const LGraph &data);
-    LGraph model() const;
-    void setModel(const LGraph &model);
+    LGraph modelData() const;
+    void setModelData(const LGraph &modelData);
     LGraph likelihood() const;
     void setLikelihood(const LGraph &likelihood);
     QPointF getMinVal() const;
