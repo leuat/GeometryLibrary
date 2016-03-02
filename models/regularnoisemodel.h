@@ -4,6 +4,7 @@
 #include "model.h"
 class RegularNoiseModel : public Model
 {
+    Q_OBJECT
 protected:
     class Noise *m_noise = nullptr;
     double m_octaves = 1;

@@ -2,7 +2,6 @@
 
 #include "noise.h"
 #include "simplexnoise.h"
-
 /*
  * Simplex noise class. From Ken Perlin.
  *
