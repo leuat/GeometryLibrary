@@ -1,6 +1,7 @@
 #include "likelihood.h"
 #include <qdebug.h>
 #include "../models/model.h"
+
 LGraph Likelihood::data() const
 {
     return m_data;
@@ -95,10 +96,11 @@ void Likelihood::tickModelStatistics()
 
 Likelihood::Likelihood()
 {
-    if (m_currentBin++ == m_bins) {
-        m_ready = false;
-        m_done = true;
-    }
+    // This is probably wrong? Since in the constructor, this if test doesn't make any sense since it is defined in the h-file.
+//    if (m_currentBin++ == m_bins) {
+//        m_ready = false;
+//        m_done = true;
+//    }
 }
 
 void Likelihood::bruteForce1D(int bins, QString parameterKey, Model *model)
