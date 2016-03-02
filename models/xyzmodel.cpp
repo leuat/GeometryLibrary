@@ -1,4 +1,14 @@
 #include "xyzmodel.h"
+#include <QFile>
+#include <QString>
+#include <QRegExp>
+#include <QDebug>
+
+template < typename Type >
+inline bool checkRange( const Type& x, const Type& max, const Type& min )
+{
+    return ( min <= x ) && ( x <= max );
+}
 
 XYZModel::XYZModel()
 {
@@ -32,7 +42,7 @@ void XYZModel::createParameters()
 
 void XYZModel::loadParameters(CIniFile *iniFile)
 {
-    m_file = iniFile->getstring("filename_xyz");
+    m_file = QString::fromStdString(iniFile->getstring("filename_xyz"));
     m_voxelsPerDimension = iniFile->getint("voxels_per_dimension");
     m_threshold = iniFile->getdouble("threshold");
     m_maxDistance = iniFile->getdouble("max_distance");
@@ -66,8 +76,8 @@ void XYZModel::readFile()
     while (!file.atEnd()) {
         if(++lineNumber == 1) continue;
 
-        QByteArray line = file.readLine();
-        QStringList splitted = line.split(" ");
+        QString line = file.readLine();
+        QStringList splitted = line.split(QRegExp("\\s+"));
         if(splitted.count() == 1) {
             bool ok;
             numberOfAtoms = splitted[0].toDouble(&ok);
@@ -118,15 +128,16 @@ CellList XYZModel::buildCellList(QVector3D cellSize, int numCellsX, int numCells
 {
     CellList cellList;
 
-    QVector3D oneOverCellSize = 1.0 / cellSize;
+    QVector3D oneOverCellSize;
+    oneOverCellSize[0] = 1.0 / cellSize[0]; oneOverCellSize[1] = 1.0 / cellSize[1]; oneOverCellSize[2] = 1.0 / cellSize[2];
     cellList.resize(numCellsX, vector<vector<vector<QVector3D> > >(numCellsY, vector<vector<QVector3D> >(numCellsZ)));
 
     for(int i=0; i<m_points.size(); i++) {
-        const QVector3D &p = points[i];
+        const QVector3D &p = m_points[i];
         int ci = p[0] * oneOverCellSize[0];
         int cj = p[1] * oneOverCellSize[1];
         int ck = p[2] * oneOverCellSize[2];
-        if(!checkRange<int>(ci, 0, numCells-1) || !checkRange<int>(cj, 0, numCells-1) || !checkRange<int>(ck, 0, numCells-1)) {
+        if(!checkRange<int>(ci, 0, numCellsX-1) || !checkRange<int>(cj, 0, numCellsY-1) || !checkRange<int>(ck, 0, numCellsZ-1)) {
             qFatal("XYZModel::buildCellList() error: point %d is out of cell list bounds.", i);
             exit(1);
         }
@@ -152,7 +163,8 @@ void XYZModel::updateDistanceToAtomField() {
     if(numCellsZ < 3) numCellsZ = 3;
 
     QVector3D cellSize(m_lx / numCellsX, m_ly / numCellsY, m_lz / numCellsZ);
-    QVector3D oneOverCellSize = 1.0 / cellSize;
+    QVector3D oneOverCellSize;
+    oneOverCellSize[0] = 1.0 / cellSize[0]; oneOverCellSize[1] = 1.0 / cellSize[1]; oneOverCellSize[2] = 1.0 / cellSize[2];
 
     QVector3D voxelSize = QVector3D(m_lx, m_ly, m_lz) / QVector3D(m_nx, m_ny, m_nz);
 
@@ -168,9 +180,9 @@ void XYZModel::updateDistanceToAtomField() {
                 for(int dx = -1; dx <= 1; dx++) {
                     for(int dy = -1; dy <= 1; dy++) {
                         for(int dz = -1; dz <= 1; dz++) {
-                            int cx = (cellListCoordinate.x() + numCellsX) % numCellsX;
-                            int cy = (cellListCoordinate.y() + numCellsY) % numCellsY;
-                            int cz = (cellListCoordinate.z() + numCellsZ) % numCellsZ;
+                            int cx = (int(cellListCoordinate.x()) + numCellsX) % numCellsX;
+                            int cy = (int(cellListCoordinate.y()) + numCellsY) % numCellsY;
+                            int cz = (int(cellListCoordinate.z()) + numCellsZ) % numCellsZ;
                             vector<QVector3D> &points = cellList[cx][cy][cz];
                             for(const QVector3D &point : points) {
                                 float distanceSquared = (point - voxelCenter).lengthSquared();
