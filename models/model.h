@@ -23,6 +23,7 @@ public:
     virtual void parametersUpdated() = 0;
     virtual void createParameters();
     virtual void loadParameters(class CIniFile *iniFile);
+    virtual void randomWalk();
 
 public slots:
     void setParameters(Parameters* parameters);

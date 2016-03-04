@@ -77,6 +77,10 @@ public:
     QMap<QString, Parameter *> parametersMap() const;
     void setParametersMap(const QMap<QString, Parameter *> &parametersMap);
     double getValue(QString name);
+    double getMax(QString name);
+    double getMin(QString name);
+    double getStepSize(QString name);
+    void setValue(QString name, double value);
     QString getString(QString name);
     Q_INVOKABLE void save(QString filename);
     Q_INVOKABLE void load(QString filename);

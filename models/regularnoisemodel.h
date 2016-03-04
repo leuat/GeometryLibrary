@@ -28,5 +28,6 @@ public:
     virtual void loadParameters(class CIniFile *iniFile) override;
     virtual void start() override;
     virtual void stop() override;
+    virtual void randomWalk() override;
 };
 #endif // REGULARNOISEMODEL_H

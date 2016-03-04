@@ -2,12 +2,11 @@
 #include "regularnoisemodel.h"
 #include "../simplex.h"
 #include "../perlin.h"
+#include "../misc/random.h"
 RegularNoiseModel::RegularNoiseModel() : Model()
 {
     createParameters();
 }
-
-
 
 bool RegularNoiseModel::isInVoid(float x, float y, float z)
 {
@@ -103,3 +102,20 @@ void RegularNoiseModel::stop()
     }
 }
 
+void RegularNoiseModel::randomWalk()
+{
+    double delta = Random::nextDouble(-m_parameters->getStepSize("scale"), m_parameters->getStepSize("scale"));
+    m_parameters->setValue("scale", m_parameters->getValue("scale") + delta);
+
+    delta = Random::nextDouble(-m_parameters->getStepSize("persistence"), m_parameters->getStepSize("persistence"));
+    m_parameters->setValue("persistence", m_parameters->getValue("persistence") + delta);
+
+    delta = Random::nextDouble(-m_parameters->getStepSize("threshold"), m_parameters->getStepSize("threshold"));
+    m_parameters->setValue("threshold", m_parameters->getValue("threshold") + delta);
+
+    delta = Random::nextDouble(-m_parameters->getStepSize("skewScale"), m_parameters->getStepSize("skewScale"));
+    m_parameters->setValue("skewScale", m_parameters->getValue("skewScale") + delta);
+
+    delta = Random::nextDouble(-m_parameters->getStepSize("skewAmplitude"), m_parameters->getStepSize("skewAmplitude"));
+    m_parameters->setValue("skewAmplitude", m_parameters->getValue("skewAmplitude") + delta);
+}

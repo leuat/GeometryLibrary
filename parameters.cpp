@@ -137,6 +137,37 @@ double Parameters::getValue(QString name)
     else return 0;
 }
 
+void Parameters::setValue(QString name, double value)
+{
+    name = name.toLower();
+    Parameter *parameter = getParameter(name);
+    if(parameter) parameter->setValue(value);
+}
+
+double Parameters::getStepSize(QString name)
+{
+    name = name.toLower();
+    Parameter *parameter = getParameter(name);
+    if(parameter) return parameter->stepSize();
+    else return 0;
+}
+
+double Parameters::getMin(QString name)
+{
+    name = name.toLower();
+    Parameter *parameter = getParameter(name);
+    if(parameter) return parameter->min();
+    else return 0;
+}
+
+double Parameters::getMax(QString name)
+{
+    name = name.toLower();
+    Parameter *parameter = getParameter(name);
+    if(parameter) return parameter->max();
+    else return 0;
+}
+
 QString Parameters::getString(QString name)
 {
     name = name.toLower();
@@ -310,5 +341,7 @@ void Parameter::setValue(double value)
         return;
 
     m_value = value;
+    if(m_value < m_min) m_value = m_min;
+    if(m_value > m_max) m_value = m_max;
     emit valueChanged(value);
 }

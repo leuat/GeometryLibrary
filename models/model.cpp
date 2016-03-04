@@ -36,6 +36,11 @@ void Model::loadParameters(CIniFile *iniFile)
     Q_UNUSED(iniFile);
 }
 
+void Model::randomWalk()
+{
+
+}
+
 void Model::setParameters(Parameters *parameters)
 {
     if (m_parameters == parameters)
