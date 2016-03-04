@@ -16,6 +16,16 @@ bool Model::isInVoid(const QVector3D &point)
     return isInVoid(point.x(), point.y(), point.z());
 }
 
+void Model::start()
+{
+
+}
+
+void Model::stop()
+{
+
+}
+
 void Model::createParameters()
 {
 

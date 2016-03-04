@@ -12,9 +12,10 @@ RegularNoiseModel::RegularNoiseModel() : Model()
 bool RegularNoiseModel::isInVoid(float x, float y, float z)
 {
     if(!m_noise) {
-        qDebug() << "Warning, tried to call RegularNoiseModel::isInVoid(float x, float y, float z) with no noise type chosen.";
+        qDebug() << "Warning, tried to call RegularNoiseModel::isInVoid(float x, float y, float z), but no noise type is chosen. Maybe you didn't call start()?";
         return false;
     }
+
     double add = m_seed;
     double sx = 0.1245;
     double sy = 1.2312;
@@ -28,12 +29,9 @@ bool RegularNoiseModel::isInVoid(float x, float y, float z)
     }
 
     if (m_inverted) {
-        if (val>m_threshold) {
-            return true;
-        }
+        if (val>m_threshold) return true;
     } else {
-        if (val<m_threshold)
-            return true;
+        if (val<m_threshold)  return true;
     }
     return false;
 }
@@ -53,14 +51,8 @@ void RegularNoiseModel::parametersUpdated()
     QString newNoiseType = m_parameters->getString("noisetype");
     if(newNoiseType.compare(m_noiseType) != 0) {
         // The string has changed
-        if(newNoiseType.compare("simplex") == 0) {
+        if(newNoiseType.compare("simplex") == 0 || newNoiseType.compare("perlin") == 0) {
             m_noiseType = newNoiseType;
-            if(m_noise) delete m_noise;
-            m_noise = new Simplex(m_octaves, 1, m_persistence, m_seed);
-        } else if(newNoiseType.compare("perlin") == 0) {
-            m_noiseType = newNoiseType;
-            if(m_noise) delete m_noise;
-            m_noise = new Perlin(m_octaves, 1, m_persistence, m_seed);
         }
     }
 }
@@ -94,3 +86,20 @@ void RegularNoiseModel::loadParameters(CIniFile *iniFile)
     m_parameters->setParameter("noisetype", QString::fromStdString(iniFile->getstring("noisetype")));
     parametersUpdated();
 }
+
+void RegularNoiseModel::start()
+{
+    if(m_noiseType.compare("perlin") == 0) {
+        m_noise = new Perlin(m_octaves, 1, m_persistence, m_seed);
+    } else if(m_noiseType.compare("simplex") == 0) {
+        m_noise = new Simplex(m_octaves, 1, m_persistence, m_seed);
+    }
+}
+
+void RegularNoiseModel::stop()
+{
+    if(m_noise) {
+        delete m_noise;
+    }
+}
+
