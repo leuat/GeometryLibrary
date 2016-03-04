@@ -165,7 +165,6 @@ void XYZModel::updateDistanceToAtomField() {
     QVector3D cellSize(m_lx / numCellsX, m_ly / numCellsY, m_lz / numCellsZ);
     QVector3D oneOverCellSize;
     oneOverCellSize[0] = 1.0 / cellSize[0]; oneOverCellSize[1] = 1.0 / cellSize[1]; oneOverCellSize[2] = 1.0 / cellSize[2];
-
     QVector3D voxelSize = QVector3D(m_lx, m_ly, m_lz) / QVector3D(m_nx, m_ny, m_nz);
 
     CellList cellList = buildCellList(cellSize, numCellsX, numCellsY, numCellsZ);
@@ -176,6 +175,7 @@ void XYZModel::updateDistanceToAtomField() {
                 QVector3D voxelCenter = (QVector3D(i,j,k) + QVector3D(0.5f, 0.5f, 0.5f)) * voxelSize;
                 QVector3D cellListCoordinate = voxelCenter * oneOverCellSize;
                 float minDistanceSquared = 1e10;
+                float minDistanceSquaredStartValue = 1e10;
 
                 for(int dx = -1; dx <= 1; dx++) {
                     for(int dy = -1; dy <= 1; dy++) {
@@ -192,7 +192,11 @@ void XYZModel::updateDistanceToAtomField() {
                     }
                 }
 
-                m_voxels[index(i,j,k)] = sqrtf(minDistanceSquared);
+                if(minDistanceSquared != minDistanceSquaredStartValue) {
+                    m_voxels[index(i,j,k)] = sqrtf(minDistanceSquared);
+                } else {
+                    m_voxels[index(i,j,k)] = 0;
+                }
             }
         }
     }
