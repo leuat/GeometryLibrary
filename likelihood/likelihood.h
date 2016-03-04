@@ -9,31 +9,41 @@
 class Likelihood
 {
 protected:
+    struct MCData {
+        QString parametersFilename;
+        int currentStep = 0;
+        int totalSteps = 100;
+        float currentChiSquared = 0;
+    };
+
     LGraph m_data;
     LGraph m_modelData;
     GraphStatistics m_statistics;
     LGraph m_likelihood;
     QString m_currentParameter;
     class Model *m_model = nullptr;
-
+    MCData *m_mcData = nullptr;
     QPointF m_minVal;
     double m_currentVal=0;
     double m_stepSize=1;
 
     int m_bins=0, m_currentBin=0;
-    bool m_ready = false;
     bool m_done = false;
 
-    void tickLikelihood();
+    void tickLikelihoodMonteCarlo();
+    void tickLikelihoodBruteforce1D();
     void tickModelStatistics();
 
 public:
     Likelihood();
 
     virtual void calculateModel(class Model* modelData) = 0;
-    enum AnalysisType { LikelihoodStatistics, ModelStatistics };
-    AnalysisType m_analysisType = AnalysisType::LikelihoodStatistics;
+    enum AnalysisType { LikelihoodStatistics, ModelStatistics, None };
+    enum AnalysisAlgorithm { Bruteforce1D, MonteCarlo };
+    AnalysisType m_analysisType = AnalysisType::None;
+    AnalysisAlgorithm m_analysisAlgorithm = AnalysisAlgorithm::Bruteforce1D;
     void bruteForce1D(int bins, QString parameterKey, Model *modelData);
+    void monteCarlo(Model *model, int steps);
     void modelAnalysis(int count, Model *modelData);
     bool tick();
 
