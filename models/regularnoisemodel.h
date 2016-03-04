@@ -26,5 +26,7 @@ public:
     virtual void parametersUpdated() override;
     virtual void createParameters() override;
     virtual void loadParameters(class CIniFile *iniFile) override;
+    virtual void start() override;
+    virtual void stop() override;
 };
 #endif // REGULARNOISEMODEL_H

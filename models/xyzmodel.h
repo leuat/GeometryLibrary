@@ -33,15 +33,17 @@ private:
 public:
     XYZModel();
     QString file() const;
-    bool isInVoid(float x, float y, float z) override;
-    void parametersUpdated() override;
-    void createParameters() override;
-    void loadParameters(CIniFile *iniFile) override;
     int voxelsPerDimension() const;
     float threshold() const;
     float maxDistance() const;
     void readFile();
     void updateDistanceToAtomField();
+
+    bool isInVoid(float x, float y, float z) override;
+    void parametersUpdated() override;
+    void createParameters() override;
+    void loadParameters(CIniFile *iniFile) override;
+
 
 public slots:
     void setFile(QString file);

@@ -12,12 +12,13 @@ class Model : public QObject
     Q_PROPERTY(Parameters* parameters READ parameters WRITE setParameters NOTIFY parametersChanged)
 protected:
     Parameters* m_parameters = nullptr;
-    bool m_initialized = false;
 
 public:
     Model();
     Parameters* parameters() const;
     bool isInVoid(const QVector3D &point);
+    virtual void start();
+    virtual void stop();
     virtual bool isInVoid(float x, float y, float z) = 0;
     virtual void parametersUpdated() = 0;
     virtual void createParameters();
