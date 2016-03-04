@@ -201,12 +201,12 @@ void Parameters::load(QString filename)
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         file.setFileName(QUrl(filename).toLocalFile());
-        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             qWarning() << "Could not open file "+filename;
             return;
         }
     }
-
+    qDebug() << "Loading " << filename;
     QTextStream in(&file);
     while (!in.atEnd()) {
         QString line = in.readLine();
@@ -225,10 +225,10 @@ void Parameters::load(QString filename)
         if(!castOk) continue;
         if(m_parametersMap.find(name.toLower()) != m_parametersMap.end()) {
             Parameter *parameter = m_parametersMap[name.toLower()];
-            parameter->setValue(value);
             parameter->setMin(min);
             parameter->setMax(max);
             parameter->setStepSize(stepSize);
+            parameter->setValue(value);
         }
     }
     file.close();
