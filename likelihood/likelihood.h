@@ -11,9 +11,10 @@ class Likelihood
 protected:
     struct MCData {
         QString parametersFilename;
+        QString bestFarametersFilename;
         int currentStep = 0;
         int totalSteps = 100;
-        float currentChiSquared = 0;
+        float chiSquared = 0;
     };
 
     LGraph m_data;

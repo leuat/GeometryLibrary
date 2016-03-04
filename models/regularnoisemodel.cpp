@@ -59,7 +59,7 @@ void RegularNoiseModel::parametersUpdated()
 void RegularNoiseModel::createParameters()
 {
     m_parameters->createParameter("octaves", 1, 1, 7, 1);
-    m_parameters->createParameter("scale", 0.05, 0.01, 2.0, 0.025);
+    m_parameters->createParameter("scale", 0.01, 0.001, 0.1, 0.001);
     m_parameters->createParameter("persistence", 1.0, 0.1, 3.0, 0.1);
     m_parameters->createParameter("threshold", 0.1, -1.0, 1.0, 0.1);
     m_parameters->createParameter("inverted", 0, 0, 1, 1.0);
@@ -74,7 +74,7 @@ void RegularNoiseModel::createParameters()
 void RegularNoiseModel::loadParameters(CIniFile *iniFile)
 {
     m_parameters->setParameter("octaves", iniFile->getdouble("octaves"), 1, 7, 1);
-    m_parameters->setParameter("scale", iniFile->getdouble("scale"), 0.01, 2.0, 0.025);
+    m_parameters->setParameter("scale", iniFile->getdouble("scale"), 0.001, 0.1, 0.001);
     m_parameters->setParameter("persistence", iniFile->getdouble("persistence"), 0.1, 3, 0.1);
     m_parameters->setParameter("threshold", iniFile->getdouble("threshold"), -1, 1, 0.1);
     m_parameters->setParameter("inverted", iniFile->getdouble("inverted"), 0, 1, 1);
@@ -104,18 +104,21 @@ void RegularNoiseModel::stop()
 
 void RegularNoiseModel::randomWalk()
 {
-    double delta = Random::nextDouble(-m_parameters->getStepSize("scale"), m_parameters->getStepSize("scale"));
+    double delta = Random::nextGaussian(0, m_parameters->getStepSize("scale"));
     m_parameters->setValue("scale", m_parameters->getValue("scale") + delta);
 
-    delta = Random::nextDouble(-m_parameters->getStepSize("persistence"), m_parameters->getStepSize("persistence"));
+    delta = Random::nextGaussian(0, 0.5*m_parameters->getStepSize("persistence"));
     m_parameters->setValue("persistence", m_parameters->getValue("persistence") + delta);
 
-    delta = Random::nextDouble(-m_parameters->getStepSize("threshold"), m_parameters->getStepSize("threshold"));
+    delta = Random::nextGaussian(0, 0.5*m_parameters->getStepSize("threshold"));
     m_parameters->setValue("threshold", m_parameters->getValue("threshold") + delta);
 
-    delta = Random::nextDouble(-m_parameters->getStepSize("skewScale"), m_parameters->getStepSize("skewScale"));
-    m_parameters->setValue("skewScale", m_parameters->getValue("skewScale") + delta);
+//    delta = Random::nextGaussian(0, m_parameters->getStepSize("skewScale"));
+//    m_parameters->setValue("skewScale", m_parameters->getValue("skewScale") + delta);
 
-    delta = Random::nextDouble(-m_parameters->getStepSize("skewAmplitude"), m_parameters->getStepSize("skewAmplitude"));
-    m_parameters->setValue("skewAmplitude", m_parameters->getValue("skewAmplitude") + delta);
+//    delta = Random::nextGaussian(0, m_parameters->getStepSize("skewAmplitude"));
+//    m_parameters->setValue("skewAmplitude", m_parameters->getValue("skewAmplitude") + delta);
+
+    qDebug() << "Setting scale: " << m_parameters->getValue("scale") << " persistence: " << m_parameters->getValue("persistence") << " threshold: " << m_parameters->getValue("threshold");
+    parametersUpdated();
 }

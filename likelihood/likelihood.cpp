@@ -1,6 +1,7 @@
 #include "likelihood.h"
 #include <qdebug.h>
 #include "../models/model.h"
+#include <QStandardPaths>
 
 LGraph Likelihood::data() const
 {
@@ -54,7 +55,26 @@ GraphStatistics Likelihood::getStatistics() const
 
 void Likelihood::tickLikelihoodMonteCarlo()
 {
+    m_model->parameters()->save(m_mcData->parametersFilename);
+    m_model->randomWalk();
+    calculateModel(m_model);
+    float chiSquared = LGraph::ChiSQ(m_data, m_modelData);
+    if(chiSquared < m_mcData->chiSquared) {
+        m_mcData->chiSquared = chiSquared;
+        m_model->parameters()->save(m_mcData->bestFarametersFilename);
+        qDebug() << "   Accepted move, current chi squared: " << chiSquared << endl;
+    } else {
+        m_model->parameters()->load(m_mcData->parametersFilename);
+    }
 
+    if(++m_mcData->currentStep == m_mcData->totalSteps) {
+        calculateModel(m_model);
+        chiSquared = m_mcData->chiSquared;
+        m_analysisType = AnalysisType::None;
+        m_done = true;
+        m_minVal = QPointF(0, m_mcData->chiSquared);
+        qDebug() << "   MC finished with chi squared: " << chiSquared << endl;
+    }
 }
 
 void Likelihood::tickLikelihoodBruteforce1D()
@@ -66,19 +86,16 @@ void Likelihood::tickLikelihoodBruteforce1D()
     m_currentVal += m_stepSize;
     m_currentBin++;
     if (m_currentBin == m_bins) {
-        //m_likelihood.LikelihoodFromChisq();
-        //m_likelihood.fitSpline(m_likelihood,100);
         m_minVal = m_likelihood.getMin();
         parameter->setValue(m_minVal.x());
         calculateModel(m_model);
+        m_analysisType = AnalysisType::None;
         m_done = true;
     }
 }
 
 void Likelihood::tickModelStatistics()
 {
-    if (m_done)
-        return;
     if (m_model == nullptr) {
         qDebug() << "m_model is null, should not happen";
         return;
@@ -91,6 +108,7 @@ void Likelihood::tickModelStatistics()
     m_data.Copy(m_statistics.average_plus_sigma());
 
     if (m_currentBin++ == m_bins) {
+        m_analysisType = AnalysisType::None;
         m_done = true;
     }
 }
@@ -107,7 +125,15 @@ void Likelihood::monteCarlo(Model *model, int steps)
         return;
     }
     m_mcData = new MCData();
+    m_mcData->totalSteps = steps;
+    m_mcData->parametersFilename = QString("/tmp/mcparams.txt");
+    m_mcData->bestFarametersFilename = QString("/tmp/mcparamsbest.txt");
     m_model = model;
+
+    calculateModel(m_model);
+    m_mcData->chiSquared = LGraph::ChiSQ(m_data, m_modelData);
+    qDebug() << "   Starting monte carlo with initial chi squared: " << m_mcData->chiSquared;
+
     m_analysisType = AnalysisType::LikelihoodStatistics;
     m_analysisAlgorithm = AnalysisAlgorithm::MonteCarlo;
 }

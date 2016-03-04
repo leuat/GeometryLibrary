@@ -178,10 +178,13 @@ QString Parameters::getString(QString name)
 
 void Parameters::save(QString filename)
 {
-    QFile file(QUrl(filename).toLocalFile());
+    QFile file(filename);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qWarning() << "Could not open file "+filename;
-        return;
+        file.setFileName(QUrl(filename).toLocalFile());
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            qWarning() << "Could not open file "+filename;
+            return;
+        }
     }
 
     QTextStream out(&file);
@@ -195,10 +198,13 @@ void Parameters::save(QString filename)
 
 void Parameters::load(QString filename)
 {
-    QFile file(QUrl(filename).toLocalFile());
+    QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "Could not open file "+filename;
-        return;
+        file.setFileName(QUrl(filename).toLocalFile());
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            qWarning() << "Could not open file "+filename;
+            return;
+        }
     }
 
     QTextStream in(&file);
