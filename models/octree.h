@@ -15,6 +15,7 @@ private:
 
     float m_value = 0;
     int m_depth = 0;
+    bool m_melted = false;
 
 
 public:

@@ -10,7 +10,9 @@ void Octree::build2DTriangleList()
     if (m_root==nullptr)
         return;
 
+    qDebug() << "Creating 2D Triangle list";
     m_vboData.clear();
+
     m_root->build2DTriangleList(m_vboData);
 
 }
@@ -18,22 +20,26 @@ void Octree::build2DTriangleList()
 void OctNode::build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData> &data)
 {
     if (hasChildren()) {
-        for (int i=0;i<m_children.size()/2;i++)
+        for (int i=0;i<m_children.size()/1;i++)
             m_children[i]->build2DTriangleList(data);
     }
-    else {
+     else {
+    //    qDebug() << m_depth << " value " << m_value;
         SimVis::TriangleCollectionVBOData tri;
         QVector3D color(0.8,0.2,0);
-        if (m_value!=0)
+        if (m_value==0) {
             color = QVector3D(0.1, 0.2, 0.8);
+        }
+        color.setY(rand()%100 / 100.0);
 
         data.append(tri);
         data.append(tri);
         data.append(tri);
         int i = data.count()-3;
-        data[i].vertex = QVector3D(m_corner1.x(), m_corner1.y(), 0);
-        data[i+1].vertex = QVector3D(m_corner1.x(), m_corner2.y(), 0);
-        data[i+2].vertex = QVector3D(m_corner2.x(), m_corner1.y(), 0);
+        float z = m_corner1.z();
+        data[i].vertex = QVector3D(m_corner1.x(), m_corner1.y(), z);
+        data[i+1].vertex = QVector3D(m_corner1.x(), m_corner2.y(), z);
+        data[i+2].vertex = QVector3D(m_corner2.x(), m_corner1.y(), z);
 
         QVector3D N = QVector3D::crossProduct((data[i].vertex-data[i+2].vertex), (data[i].vertex-data[i+1].vertex)).normalized();
 
@@ -49,9 +55,9 @@ void OctNode::build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData> &da
         data.append(tri);
         i = data.count()-3;
 
-        data[i].vertex = QVector3D(m_corner2.x(), m_corner2.y(), 0);
-        data[i+1].vertex = QVector3D(m_corner1.x(), m_corner2.y(), 0);
-        data[i+2].vertex = QVector3D(m_corner2.x(), m_corner1.y(), 0);
+        data[i].vertex = QVector3D(m_corner2.x(), m_corner2.y(), z);
+        data[i+1].vertex = QVector3D(m_corner1.x(), m_corner2.y(), z);
+        data[i+2].vertex = QVector3D(m_corner2.x(), m_corner1.y(), z);
 
         data[i].color = color;
         data[i+1].color = color;
@@ -59,6 +65,8 @@ void OctNode::build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData> &da
         data[i].normal = N;
         data[i+1].normal = N;
         data[i+2].normal = N;
+
+
 
     }
 }
@@ -71,7 +79,18 @@ void Octree::setMaxDepth(int maxDepth)
 
 bool Octree::isInVoid(float x, float y, float z)
 {
+    if (m_root == nullptr)
+        return true;
 
+    OctNode* on = m_root->findNodePoint(QVector3D(x,y,z));
+    if (on==nullptr) {
+        qDebug() << "Octree::isInVod outside bounds!";
+        return true;
+    }
+    if (on->getValue()!=0)
+        return false;
+
+    return true;
 }
 
 void Octree::parametersUpdated()
@@ -85,7 +104,7 @@ void Octree::parametersUpdated()
 void Octree::createParameters()
 {
     qDebug() << "Creating in octree";
-    m_parameters->createParameter("maxdepth", 4, 1, 12, 1);
+    m_parameters->createParameter("maxdepth", 6, 1, 12, 1);
     m_parameters->createParameter("threshold", 2,1 ,5, 0.1);
 }
 
@@ -96,7 +115,7 @@ QVector<SimVis::TriangleCollectionVBOData> Octree::vboData() const
 
 Octree::Octree() : XYZModel()
 {
-
+    createParameters();
 }
 
 void Octree::buildTree()
@@ -119,8 +138,13 @@ void Octree::buildTree()
 
     m_root = new OctNode(minVal, maxVal, 0, 0);
 
+    qDebug() << "Building octree with max depth : " << m_maxDepth << " and " << m_points.size() << " particles";
+
     for (QVector3D p : m_points)
         insertValueAtPoint(p, 1);
+
+//    for (int i=0;i<6;i++)
+        melt();
 
     build2DTriangleList();
 
@@ -195,6 +219,7 @@ void OctNode::melt()
 
     if (allSame) { // MELT!
         m_value = value;
+        m_melted = true;
         m_children.resize(0);
     }
 }
@@ -285,17 +310,21 @@ void OctNode::insertValueAtDeepestPoint(const QVector3D &p, float value, int max
     if (!pointIsWithin(p))
         return;
 
-    if (value == m_value)
-        return;
 
     if (m_depth<maxDepth) {
-        subdivide();
+        if (!hasChildren())
+            subdivide();
         OctNode* n = findNodePoint(p); // should always be found
         n->insertValueAtDeepestPoint(p,value, maxDepth);
     }
+/*    if (value == m_value)
+        return;
+*/
     // depth == maxdepth
-    if (m_depth == maxDepth)
+    if (m_depth == maxDepth) {
         m_value = value;
+//        qDebug() << m_depth << "with value" << value << endl;
+    }
 }
 
 // NOT USE YET
