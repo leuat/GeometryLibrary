@@ -11,16 +11,56 @@ QVector<SimVis::TriangleCollectionVBOData>* Octree::build2DTriangleList()
         return nullptr;
 
     QVector<SimVis::TriangleCollectionVBOData>* data = new QVector<SimVis::TriangleCollectionVBOData>();
-
-    m_root->build2DTriangleList(data);
+    data->clear();
+    m_root->build2DTriangleList(*data);
 
 }
 
-void OctNode::build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData> *data)
+void OctNode::build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData> &data)
 {
     if (hasChildren()) {
-//        for (int i=0;i<m_children.size()/2;i++)
- //           m_children[i]
+        for (int i=0;i<m_children.size()/2;i++)
+            m_children[i]->build2DTriangleList(data);
+    }
+    else {
+        SimVis::TriangleCollectionVBOData tri;
+        QVector3D color(0.8,0.2,0);
+        if (m_value!=0)
+            color = QVector3D(0.1, 0.2, 0.8);
+
+        data.append(tri);
+        data.append(tri);
+        data.append(tri);
+        int i = data.count()-3;
+        data[i].vertex = QVector3D(m_corner1.x(), m_corner1.y(), 0);
+        data[i+1].vertex = QVector3D(m_corner1.x(), m_corner2.y(), 0);
+        data[i+2].vertex = QVector3D(m_corner2.x(), m_corner1.y(), 0);
+
+        QVector3D N = QVector3D::crossProduct((data[i].vertex-data[i+2].vertex), (data[i].vertex-data[i+1].vertex)).normalized();
+
+        data[i].color = color;
+        data[i+1].color = color;
+        data[i+2].color = color;
+        data[i].normal = N;
+        data[i+1].normal = N;
+        data[i+2].normal = N;
+
+        data.append(tri);
+        data.append(tri);
+        data.append(tri);
+        i = data.count()-3;
+
+        data[i].vertex = QVector3D(m_corner2.x(), m_corner2.y(), 0);
+        data[i+1].vertex = QVector3D(m_corner1.x(), m_corner2.y(), 0);
+        data[i+2].vertex = QVector3D(m_corner2.x(), m_corner1.y(), 0);
+
+        data[i].color = color;
+        data[i+1].color = color;
+        data[i+2].color = color;
+        data[i].normal = N;
+        data[i+1].normal = N;
+        data[i+2].normal = N;
+
     }
 }
 

@@ -27,7 +27,7 @@ public:
     void subdivide();
     bool hasChildren();
 
-    void build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData>* data);
+    void build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData>& data);
 
 
     bool pointIsWithin(const QVector3D& p);
