@@ -31,6 +31,8 @@ void OctNode::build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData> &da
             color = QVector3D(0.1, 0.2, 0.8);
         }
         color.setY(rand()%100 / 100.0);
+        if (m_melted)
+            color*=0.3;
 
         data.append(tri);
         data.append(tri);
@@ -84,7 +86,7 @@ bool Octree::isInVoid(float x, float y, float z)
 
     OctNode* on = m_root->findNodePoint(QVector3D(x,y,z));
     if (on==nullptr) {
-        qDebug() << "Octree::isInVod outside bounds!";
+//        qDebug() << "Octree::isInVod outside bounds!";
         return true;
     }
     if (on->getValue()!=0)
@@ -144,7 +146,7 @@ void Octree::buildTree()
         insertValueAtPoint(p, 1);
 
 //    for (int i=0;i<6;i++)
-        melt();
+    melt();
 
     build2DTriangleList();
 
