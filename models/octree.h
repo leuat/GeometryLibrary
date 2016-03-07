@@ -1,9 +1,11 @@
 #pragma once
 
 #include "model.h"
+#include "xyzmodel.h"
 #include <QVector>
 #include <QVector3D>
 #include "GeometryLibrary/noise.h"
+#include <SimVis/TriangleCollection>
 
 class OctNode
 {
@@ -25,6 +27,9 @@ public:
     void subdivide();
     bool hasChildren();
 
+    void build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData>* data);
+
+
     bool pointIsWithin(const QVector3D& p);
     OctNode* findNodePoint(const QVector3D& p);
     // Use this
@@ -41,7 +46,7 @@ public:
 
 
 
-class Octree : public Model
+class Octree : public XYZModel
 {
     Q_OBJECT
 private:
@@ -53,10 +58,13 @@ public:
     Octree();
 
     // creates octtree structure from list of particles
-    void create(QVector<QVector3D>& particleList, int maxDepth);
+    Q_INVOKABLE void buildTree();
     // Load and save octtree states
-    void load(QString filename);
-    void save(QString filename);
+    Q_INVOKABLE void loadOctree(QString filename) ;
+    Q_INVOKABLE void saveOctree(QString filename);
+
+
+
     // inherited functions
     void initialize(Noise::NoiseType noiseType, Parameters* np);
 
@@ -64,12 +72,19 @@ public:
     void melt();
 
     int maxDepth() const;
+//    void build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData>& data);
+    QVector<SimVis::TriangleCollectionVBOData>* build2DTriangleList();
+
     void setMaxDepth(int maxDepth);
 
     // Model interface
 public:
-    bool isInVoid(float x, float y, float z);
+    bool isInVoid(float x, float y, float z) override;
 
-    void parametersUpdated();
+    void parametersUpdated() override;
+
+    // Model interface
+public:
+    void createParameters() override;
 };
 

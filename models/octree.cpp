@@ -5,6 +5,26 @@ int Octree::maxDepth() const
     return m_maxDepth;
 }
 
+QVector<SimVis::TriangleCollectionVBOData>* Octree::build2DTriangleList()
+{
+    if (m_root==nullptr)
+        return nullptr;
+
+    QVector<SimVis::TriangleCollectionVBOData>* data = new QVector<SimVis::TriangleCollectionVBOData>();
+
+    m_root->build2DTriangleList(data);
+
+}
+
+void OctNode::build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData> *data)
+{
+    if (hasChildren()) {
+//        for (int i=0;i<m_children.size()/2;i++)
+ //           m_children[i]
+    }
+}
+
+
 void Octree::setMaxDepth(int maxDepth)
 {
     m_maxDepth = maxDepth;
@@ -17,6 +37,16 @@ bool Octree::isInVoid(float x, float y, float z)
 
 void Octree::parametersUpdated()
 {
+//    XYZModel
+    m_maxDepth = m_parameters->getValue("maxdepth");
+    m_threshold = m_parameters->getValue("threshold");
+
+}
+
+void Octree::createParameters()
+{
+    m_parameters->createParameter("maxdepth", 4, 1, 12, 1);
+    m_parameters->createParameter("threshold", 2,1 ,5, 0.1);
 
 }
 
@@ -25,7 +55,7 @@ Octree::Octree()
 
 }
 
-void Octree::create(QVector<QVector3D>& particleList, int maxDepth)
+void Octree::buildTree()
 {
     double inf = 1E30;
 
@@ -33,23 +63,36 @@ void Octree::create(QVector<QVector3D>& particleList, int maxDepth)
     QVector3D minVal(inf, inf, inf);
     QVector3D maxVal(-inf, -inf, -inf);
     // Get min / Max values
-    for(int i=0;i<particleList.count();i++) {
-        minVal.setX(min(minVal.x(), particleList[i].x()));
-        minVal.setY(min(minVal.y(), particleList[i].y()));
-        minVal.setZ(min(minVal.z(), particleList[i].z()));
-        maxVal.setX(max(maxVal.x(), particleList[i].x()));
-        maxVal.setY(max(maxVal.y(), particleList[i].y()));
-        maxVal.setZ(max(maxVal.z(), particleList[i].z()));
+    m_maxDepth = m_parameters->getValue("maxdepth");
+    for(int i=0;i<m_points.count();i++) {
+        minVal.setX(min(minVal.x(), m_points[i].x()));
+        minVal.setY(min(minVal.y(), m_points[i].y()));
+        minVal.setZ(min(minVal.z(), m_points[i].z()));
+        maxVal.setX(max(maxVal.x(), m_points[i].x()));
+        maxVal.setY(max(maxVal.y(), m_points[i].y()));
+        maxVal.setZ(max(maxVal.z(), m_points[i].z()));
     }
 
     m_root = new OctNode(minVal, maxVal, 0, 0);
 
+    for (QVector3D p : m_points)
+        insertValueAtPoint(p, 1);
+
+}
+
+void Octree::loadOctree(QString filename)
+{
+
+}
+
+void Octree::saveOctree(QString filename)
+{
 
 }
 
 void Octree::insertValueAtPoint(const QVector3D &p, float value)
 {
-    if (m_root==nullptr)
+    if (m_root == nullptr)
         return;
     m_root->insertValueAtDeepestPoint(p,value,m_maxDepth);
 }
@@ -65,6 +108,9 @@ void Octree::initialize(Noise::NoiseType noiseType, Parameters *np)
 {
 
 }
+
+
+
 
 int OctNode::getValue() const
 {
@@ -160,6 +206,7 @@ bool OctNode::hasChildren()
 
 }
 
+
 bool OctNode::pointIsWithin(const QVector3D &p)
 {
     for (int i=0;i<3;i++)
@@ -204,7 +251,7 @@ void OctNode::insertValueAtDeepestPoint(const QVector3D &p, float value, int max
     m_value = value;
 }
 
-
+// NOT USE YET
 void OctNode::insertValueAtPoint(const QVector3D &p, float value, int maxDepth)
 {
     if (!pointIsWithin(p))

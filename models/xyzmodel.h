@@ -12,7 +12,7 @@ class XYZModel : public Model
     Q_PROPERTY(int voxelsPerDimension READ voxelsPerDimension WRITE setVoxelsPerDimension NOTIFY voxelsPerDimensionChanged)
     Q_PROPERTY(float threshold READ threshold WRITE setThreshold NOTIFY thresholdChanged)
     Q_PROPERTY(float maxDistance READ maxDistance WRITE setMaxDistance NOTIFY maxDistanceChanged)
-private:
+public:
     QString m_file;
     QVector<QVector3D> m_points;
     vector<int> m_voxels;
@@ -36,12 +36,12 @@ public:
     int voxelsPerDimension() const;
     float threshold() const;
     float maxDistance() const;
-    void readFile();
+    Q_INVOKABLE void readFile();
     void updateDistanceToAtomField();
 
-    bool isInVoid(float x, float y, float z) override;
-    void parametersUpdated() override;
-    void createParameters() override;
+    virtual bool isInVoid(float x, float y, float z) override;
+    virtual void parametersUpdated() override;
+    virtual void createParameters() override;
     void loadParameters(CIniFile *iniFile) override;
 
 
