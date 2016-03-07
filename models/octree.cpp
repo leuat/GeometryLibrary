@@ -85,12 +85,12 @@ void Octree::parametersUpdated()
 
 void Octree::createParameters()
 {
+    qDebug() << "Creating in octree";
     m_parameters->createParameter("maxdepth", 4, 1, 12, 1);
     m_parameters->createParameter("threshold", 2,1 ,5, 0.1);
-
 }
 
-Octree::Octree()
+Octree::Octree() : XYZModel()
 {
 
 }
@@ -122,12 +122,12 @@ void Octree::buildTree()
 
 void Octree::loadOctree(QString filename)
 {
-
+    qDebug() << "Load octree from " << filename;
 }
 
 void Octree::saveOctree(QString filename)
 {
-
+    qDebug() << "Saving octree to " << filename;
 }
 
 void Octree::insertValueAtPoint(const QVector3D &p, float value)

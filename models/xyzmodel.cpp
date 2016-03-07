@@ -10,9 +10,9 @@ inline bool checkRange( const Type& x, const Type& max, const Type& min )
     return ( min <= x ) && ( x <= max );
 }
 
-XYZModel::XYZModel()
+XYZModel::XYZModel() : Model()
 {
-
+    createParameters();
 }
 
 bool XYZModel::isInVoid(float x, float y, float z)
@@ -27,7 +27,6 @@ bool XYZModel::isInVoid(float x, float y, float z)
 void XYZModel::parametersUpdated()
 {
     m_voxelsPerDimension = m_parameters->getValue(QString("voxelsperdimension"));
-    m_file = m_parameters->getString(QString("file"));
     m_threshold = m_parameters->getValue(QString("threshold"));
     m_maxDistance = m_parameters->getValue(QString("maxdistance"));
 }
@@ -35,7 +34,6 @@ void XYZModel::parametersUpdated()
 void XYZModel::createParameters()
 {
     m_parameters->createParameter(QString("voxelsperdimension"), 128.0, 16.0, 512.0, 1.0);
-    m_parameters->createParameter(QString("file"), QString(""));
     m_parameters->createParameter(QString("threshold"), 3.0, 1.0, 5.0, 0.1);
     m_parameters->createParameter(QString("maxdistance"), 20.0, 10.0, 100.0, 2.0);
 }
@@ -60,6 +58,7 @@ float XYZModel::threshold() const
 
 void XYZModel::readFile()
 {
+    qDebug() << "Load xyz file from " << m_file;
     QFile file(m_file);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
@@ -214,8 +213,8 @@ void XYZModel::setFile(QString file)
 
     m_file = file;
     emit fileChanged(file);
-    readFile();
-    updateDistanceToAtomField();
+//    readFile();
+//    updateDistanceToAtomField();
 }
 
 void XYZModel::setVoxelsPerDimension(int voxelsPerDimension)

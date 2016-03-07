@@ -21,7 +21,7 @@ public:
     virtual void stop();
     virtual bool isInVoid(float x, float y, float z) = 0;
     virtual void parametersUpdated() = 0;
-    virtual void createParameters();
+    virtual void createParameters() = 0;
     virtual void loadParameters(class CIniFile *iniFile);
     virtual void randomWalk();
 

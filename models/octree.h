@@ -44,8 +44,6 @@ public:
     void melt();
 };
 
-
-
 class Octree : public XYZModel
 {
     Q_OBJECT

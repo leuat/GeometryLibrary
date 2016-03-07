@@ -26,11 +26,6 @@ void Model::stop()
 
 }
 
-void Model::createParameters()
-{
-
-}
-
 void Model::loadParameters(CIniFile *iniFile)
 {
     Q_UNUSED(iniFile);
