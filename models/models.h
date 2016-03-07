@@ -3,5 +3,5 @@
 #include "model.h"
 #include "multifractalmodel.h"
 #include "regularnoisemodel.h"
-
+#include "octree.h"
 #endif // MODELS_H
