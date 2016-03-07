@@ -250,8 +250,8 @@ bool OctNode::hasChildren()
 bool OctNode::pointIsWithin(const QVector3D &p)
 {
     for (int i=0;i<3;i++)
-    if (p[i]>=m_corner2[i] || p[i]<m_corner1[i])
-        return false;
+        if (p[i]>=m_corner2[i] || p[i]<m_corner1[i])
+            return false;
 
     return true;
 }
@@ -287,8 +287,8 @@ void OctNode::insertValueAtDeepestPoint(const QVector3D &p, float value, int max
         n->insertValueAtDeepestPoint(p,value, maxDepth);
     }
     // depth == maxdepth
-
-    m_value = value;
+    if (m_depth == maxDepth)
+        m_value = value;
 }
 
 // NOT USE YET
