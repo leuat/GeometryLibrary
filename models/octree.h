@@ -51,6 +51,7 @@ private:
 
     int m_maxDepth = 0;
     OctNode* m_root = nullptr;
+    QVector<SimVis::TriangleCollectionVBOData> m_vboData;
 
 public:
     Octree();
@@ -71,7 +72,7 @@ public:
 
     int maxDepth() const;
 //    void build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData>& data);
-    QVector<SimVis::TriangleCollectionVBOData>* build2DTriangleList();
+    void build2DTriangleList();
 
     void setMaxDepth(int maxDepth);
 
@@ -84,5 +85,6 @@ public:
     // Model interface
 public:
     void createParameters() override;
+    QVector<SimVis::TriangleCollectionVBOData> vboData() const;
 };
 

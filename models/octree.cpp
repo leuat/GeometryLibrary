@@ -5,14 +5,13 @@ int Octree::maxDepth() const
     return m_maxDepth;
 }
 
-QVector<SimVis::TriangleCollectionVBOData>* Octree::build2DTriangleList()
+void Octree::build2DTriangleList()
 {
     if (m_root==nullptr)
-        return nullptr;
+        return;
 
-    QVector<SimVis::TriangleCollectionVBOData>* data = new QVector<SimVis::TriangleCollectionVBOData>();
-    data->clear();
-    m_root->build2DTriangleList(*data);
+    m_vboData.clear();
+    m_root->build2DTriangleList(m_vboData);
 
 }
 
@@ -90,9 +89,14 @@ void Octree::createParameters()
     m_parameters->createParameter("threshold", 2,1 ,5, 0.1);
 }
 
+QVector<SimVis::TriangleCollectionVBOData> Octree::vboData() const
+{
+    return m_vboData;
+}
+
 Octree::Octree() : XYZModel()
 {
-    createParameters();
+
 }
 
 void Octree::buildTree()
@@ -117,6 +121,9 @@ void Octree::buildTree()
 
     for (QVector3D p : m_points)
         insertValueAtPoint(p, 1);
+
+    build2DTriangleList();
+
 
 }
 
