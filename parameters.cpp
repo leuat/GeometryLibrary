@@ -137,6 +137,37 @@ double Parameters::getValue(QString name)
     else return 0;
 }
 
+void Parameters::setValue(QString name, double value)
+{
+    name = name.toLower();
+    Parameter *parameter = getParameter(name);
+    if(parameter) parameter->setValue(value);
+}
+
+double Parameters::getStepSize(QString name)
+{
+    name = name.toLower();
+    Parameter *parameter = getParameter(name);
+    if(parameter) return parameter->stepSize();
+    else return 0;
+}
+
+double Parameters::getMin(QString name)
+{
+    name = name.toLower();
+    Parameter *parameter = getParameter(name);
+    if(parameter) return parameter->min();
+    else return 0;
+}
+
+double Parameters::getMax(QString name)
+{
+    name = name.toLower();
+    Parameter *parameter = getParameter(name);
+    if(parameter) return parameter->max();
+    else return 0;
+}
+
 QString Parameters::getString(QString name)
 {
     name = name.toLower();
@@ -147,10 +178,13 @@ QString Parameters::getString(QString name)
 
 void Parameters::save(QString filename)
 {
-    QFile file(QUrl(filename).toLocalFile());
+    QFile file(filename);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qWarning() << "Could not open file "+filename;
-        return;
+        file.setFileName(QUrl(filename).toLocalFile());
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            qWarning() << "Could not open file "+filename;
+            return;
+        }
     }
 
     QTextStream out(&file);
@@ -164,12 +198,15 @@ void Parameters::save(QString filename)
 
 void Parameters::load(QString filename)
 {
-    QFile file(QUrl(filename).toLocalFile());
+    QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "Could not open file "+filename;
-        return;
+        file.setFileName(QUrl(filename).toLocalFile());
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            qWarning() << "Could not open file "+filename;
+            return;
+        }
     }
-
+    qDebug() << "Loading " << filename;
     QTextStream in(&file);
     while (!in.atEnd()) {
         QString line = in.readLine();
@@ -188,10 +225,10 @@ void Parameters::load(QString filename)
         if(!castOk) continue;
         if(m_parametersMap.find(name.toLower()) != m_parametersMap.end()) {
             Parameter *parameter = m_parametersMap[name.toLower()];
-            parameter->setValue(value);
             parameter->setMin(min);
             parameter->setMax(max);
             parameter->setStepSize(stepSize);
+            parameter->setValue(value);
         }
     }
     file.close();
@@ -310,5 +347,7 @@ void Parameter::setValue(double value)
         return;
 
     m_value = value;
+    if(m_value < m_min) m_value = m_min;
+    if(m_value > m_max) m_value = m_max;
     emit valueChanged(value);
 }

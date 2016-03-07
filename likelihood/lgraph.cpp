@@ -126,9 +126,9 @@ void LGraph::normalizeArea()
         integralSum += dx*dy;
     }
     integralSum *= 0.5;
-    for(int i=0; i<val.size(); i++)
+    for(int i=0; i<val.size(); i++) {
         val[i] /= integralSum;
-
+    }
 
 }
 

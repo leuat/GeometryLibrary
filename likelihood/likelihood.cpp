@@ -1,6 +1,7 @@
 #include "likelihood.h"
 #include <qdebug.h>
 #include "../models/model.h"
+#include <QStandardPaths>
 
 LGraph Likelihood::data() const
 {
@@ -52,7 +53,31 @@ GraphStatistics Likelihood::getStatistics() const
     return m_statistics;
 }
 
-void Likelihood::tickLikelihood()
+void Likelihood::tickLikelihoodMonteCarlo()
+{
+    m_model->parameters()->save(m_mcData->parametersFilename);
+    m_model->randomWalk();
+    calculateModel(m_model);
+    float chiSquared = LGraph::ChiSQ(m_data, m_modelData);
+    if(chiSquared < m_mcData->chiSquared) {
+        m_mcData->chiSquared = chiSquared;
+        m_model->parameters()->save(m_mcData->bestFarametersFilename);
+        qDebug() << "   Accepted move, current chi squared: " << chiSquared << endl;
+    } else {
+        m_model->parameters()->load(m_mcData->parametersFilename);
+    }
+
+    if(++m_mcData->currentStep == m_mcData->totalSteps) {
+        calculateModel(m_model);
+        chiSquared = m_mcData->chiSquared;
+        m_analysisType = AnalysisType::None;
+        m_done = true;
+        m_minVal = QPointF(0, m_mcData->chiSquared);
+        qDebug() << "   MC finished with chi squared: " << chiSquared << endl;
+    }
+}
+
+void Likelihood::tickLikelihoodBruteforce1D()
 {
     Parameter *parameter = m_model->parameters()->getParameter(m_currentParameter);
     parameter->setValue(m_currentVal);
@@ -61,22 +86,16 @@ void Likelihood::tickLikelihood()
     m_currentVal += m_stepSize;
     m_currentBin++;
     if (m_currentBin == m_bins) {
-        //m_likelihood.LikelihoodFromChisq();
-        //m_likelihood.fitSpline(m_likelihood,100);
         m_minVal = m_likelihood.getMin();
         parameter->setValue(m_minVal.x());
         calculateModel(m_model);
+        m_analysisType = AnalysisType::None;
         m_done = true;
-        m_ready = false;
     }
 }
 
 void Likelihood::tickModelStatistics()
 {
-    if (m_done)
-        return;
-    if (!m_ready)
-        return;
     if (m_model == nullptr) {
         qDebug() << "m_model is null, should not happen";
         return;
@@ -89,18 +108,34 @@ void Likelihood::tickModelStatistics()
     m_data.Copy(m_statistics.average_plus_sigma());
 
     if (m_currentBin++ == m_bins) {
-        m_ready = false;
+        m_analysisType = AnalysisType::None;
         m_done = true;
     }
 }
 
 Likelihood::Likelihood()
 {
-    // This is probably wrong? Since in the constructor, this if test doesn't make any sense since it is defined in the h-file.
-//    if (m_currentBin++ == m_bins) {
-//        m_ready = false;
-//        m_done = true;
-//    }
+
+}
+
+void Likelihood::monteCarlo(Model *model, int steps)
+{
+    if(!model) {
+        qDebug() << "Likelihood::bruteForce1D: Error, model is nullptr";
+        return;
+    }
+    m_mcData = new MCData();
+    m_mcData->totalSteps = steps;
+    m_mcData->parametersFilename = QString("/tmp/mcparams.txt");
+    m_mcData->bestFarametersFilename = QString("/tmp/mcparamsbest.txt");
+    m_model = model;
+
+    calculateModel(m_model);
+    m_mcData->chiSquared = LGraph::ChiSQ(m_data, m_modelData);
+    qDebug() << "   Starting monte carlo with initial chi squared: " << m_mcData->chiSquared;
+
+    m_analysisType = AnalysisType::LikelihoodStatistics;
+    m_analysisAlgorithm = AnalysisAlgorithm::MonteCarlo;
 }
 
 void Likelihood::bruteForce1D(int bins, QString parameterKey, Model *model)
@@ -110,8 +145,6 @@ void Likelihood::bruteForce1D(int bins, QString parameterKey, Model *model)
         return;
     }
     m_likelihood.initialize(bins);
-/*    p->setMax(1.4);
-    p->setMin(0.01);*/
     Parameter *parameter = model->parameters()->getParameter(parameterKey);
     m_stepSize = (parameter->max() - parameter->min())/(float)(bins+0);
     m_currentVal = parameter->min();
@@ -125,14 +158,13 @@ void Likelihood::bruteForce1D(int bins, QString parameterKey, Model *model)
     m_model = model;
     m_currentParameter = parameterKey;
     m_analysisType = AnalysisType::LikelihoodStatistics;
-    m_ready = true;
+    m_analysisAlgorithm = AnalysisAlgorithm::Bruteforce1D;
 }
 
 void Likelihood::modelAnalysis(int count, Model *model)
 {
     m_bins = count;
     m_currentBin = 0;
-    m_ready = true;
     m_analysisType = AnalysisType::ModelStatistics;
     m_model = model;
     m_likelihood.initialize(80);
@@ -140,10 +172,14 @@ void Likelihood::modelAnalysis(int count, Model *model)
 
 bool Likelihood::tick()
 {
-    if (!m_ready) return false;
+    if(m_analysisType == AnalysisType::None) return false;
 
     if (m_analysisType == AnalysisType::LikelihoodStatistics) {
-        tickLikelihood();
+        if(m_analysisAlgorithm == AnalysisAlgorithm::Bruteforce1D) {
+            tickLikelihoodBruteforce1D();
+        } else if(m_analysisAlgorithm == AnalysisAlgorithm::MonteCarlo) {
+            tickLikelihoodMonteCarlo();
+        }
     }
 
     if (m_analysisType == AnalysisType::ModelStatistics) {
