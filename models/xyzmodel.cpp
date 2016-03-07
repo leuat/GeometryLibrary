@@ -3,6 +3,7 @@
 #include <QString>
 #include <QRegExp>
 #include <QDebug>
+#include <QUrl>
 
 template < typename Type >
 inline bool checkRange( const Type& x, const Type& max, const Type& min )
@@ -60,8 +61,13 @@ void XYZModel::readFile()
 {
     qDebug() << "Load xyz file from " << m_file;
     QFile file(m_file);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        file.setFileName(QUrl(m_file).toLocalFile());
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            qWarning() << "Could not open file "+m_file;
+            return;
+        }
+    }
 
     int numberOfAtoms = 0;
     int lineNumber = 0;
@@ -73,22 +79,23 @@ void XYZModel::readFile()
     m_ly = 0;
     m_lz = 0;
     while (!file.atEnd()) {
-        if(++lineNumber == 1) continue;
-
         QString line = file.readLine();
+        if(++lineNumber == 2) continue; // second line which is a comment, ignore.
+
         QStringList splitted = line.split(QRegExp("\\s+"));
-        if(splitted.count() == 1) {
+        if(splitted.count() == 2) {
             bool ok;
             numberOfAtoms = splitted[0].toDouble(&ok);
+            qDebug() << "Found " <<  numberOfAtoms << " atoms in file.";
+
             if(!ok) {
                 qDebug() << QString("Error, tried to read number of atoms, but line '%1' didn't cast well.").arg(line);
                 return;
             }
             foundNumberOfAtoms = true;
             m_points.resize(numberOfAtoms);
-        }
-        if(splitted.count() == 4 || splitted.count() == 7) {
-            // AtomType x y z [vx vy vz]
+        } else if(splitted.count() == 5) {
+            // AtomType x y z \n
             QString atomType = splitted[0];
             Q_UNUSED(atomType);
             bool x_ok, y_ok, z_ok;
@@ -105,6 +112,8 @@ void XYZModel::readFile()
                 m_ly = std::max(m_ly, y);
                 m_lz = std::max(m_lz, z);
             } else break; // If this is a multi timestep xyz-file, just ignore the rest
+        } else {
+            qDebug() << "Line " << line << " has " << splitted.count() << " words.";
         }
     }
 
