@@ -34,6 +34,7 @@ void XYZModel::parametersUpdated()
 
 void XYZModel::createParameters()
 {
+    qDebug() << "Creating in xyz";
     m_parameters->createParameter(QString("voxelsperdimension"), 128.0, 16.0, 512.0, 1.0);
     m_parameters->createParameter(QString("threshold"), 3.0, 1.0, 5.0, 0.1);
     m_parameters->createParameter(QString("maxdistance"), 20.0, 10.0, 100.0, 2.0);

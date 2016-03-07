@@ -92,7 +92,7 @@ void Octree::createParameters()
 
 Octree::Octree() : XYZModel()
 {
-
+    createParameters();
 }
 
 void Octree::buildTree()
