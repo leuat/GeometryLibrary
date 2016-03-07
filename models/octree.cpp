@@ -137,6 +137,13 @@ void Octree::buildTree()
         maxVal.setY(max(maxVal.y(), m_points[i].y()));
         maxVal.setZ(max(maxVal.z(), m_points[i].z()));
     }
+    QVector3D center = (maxVal + minVal)/2.0;
+
+    for (int i=0;i<m_points.count();i++)
+        m_points[i]-=center;
+
+    maxVal-=center;
+    minVal-=center;
 
     m_root = new OctNode(minVal, maxVal, 0, 0);
 
