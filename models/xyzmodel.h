@@ -37,6 +37,7 @@ public:
     float threshold() const;
     float maxDistance() const;
     Q_INVOKABLE void readFile();
+    Q_INVOKABLE void removeCylinder(float r);
     void updateDistanceToAtomField();
 
     virtual bool isInVoid(float x, float y, float z) override;

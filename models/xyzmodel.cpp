@@ -128,6 +128,37 @@ void XYZModel::readFile()
     qDebug() << QString("Added %1 particle positions").arg(numberOfAtoms);
 }
 
+void XYZModel::removeCylinder(float r)
+{
+    QVector<QVector3D> points;
+
+    double inf = 1E30;
+
+    QVector3D minVal(inf, inf, inf);
+    QVector3D maxVal(-inf, -inf, -inf);
+    // Get min / Max values
+    for(int i=0;i<m_points.count();i++) {
+        minVal.setX(min(minVal.x(), m_points[i].x()));
+        minVal.setY(min(minVal.y(), m_points[i].y()));
+        minVal.setZ(min(minVal.z(), m_points[i].z()));
+        maxVal.setX(max(maxVal.x(), m_points[i].x()));
+        maxVal.setY(max(maxVal.y(), m_points[i].y()));
+        maxVal.setZ(max(maxVal.z(), m_points[i].z()));
+    }
+    QVector3D center = (minVal + maxVal)/2;
+    float size = (maxVal - minVal).length();
+    float r2 = r*r;
+    for (QVector3D p : m_points) {
+        QVector3D d = (p-center)/size;
+        d.setZ(0);
+        if (d.lengthSquared()>r2)
+            points.append(p);
+
+    }
+    m_points = points;
+
+}
+
 float XYZModel::maxDistance() const
 {
     return m_maxDistance;
