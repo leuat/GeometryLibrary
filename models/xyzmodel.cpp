@@ -5,10 +5,24 @@
 #include <QDebug>
 #include <QUrl>
 
-template < typename Type >
-inline bool checkRange( const Type& x, const Type& max, const Type& min )
+float XYZModel::getLx() const
 {
-    return ( min <= x ) && ( x <= max );
+    return m_lx;
+}
+
+float XYZModel::getLy() const
+{
+    return m_ly;
+}
+
+float XYZModel::getLz() const
+{
+    return m_lz;
+}
+
+QVector<QVector3D> XYZModel::getPoints() const
+{
+    return m_points;
 }
 
 XYZModel::XYZModel() : Model()
@@ -162,7 +176,9 @@ CellList XYZModel::buildCellList(QVector3D cellSize, int numCellsX, int numCells
     CellList cellList;
 
     QVector3D oneOverCellSize;
-    oneOverCellSize[0] = 1.0 / cellSize[0]; oneOverCellSize[1] = 1.0 / cellSize[1]; oneOverCellSize[2] = 1.0 / cellSize[2];
+    oneOverCellSize[0] = 1.0 / cellSize[0];
+    oneOverCellSize[1] = 1.0 / cellSize[1];
+    oneOverCellSize[2] = 1.0 / cellSize[2];
     cellList.resize(numCellsX, vector<vector<vector<QVector3D> > >(numCellsY, vector<vector<QVector3D> >(numCellsZ)));
 
     for(int i=0; i<m_points.size(); i++) {
@@ -170,7 +186,12 @@ CellList XYZModel::buildCellList(QVector3D cellSize, int numCellsX, int numCells
         int ci = p[0] * oneOverCellSize[0];
         int cj = p[1] * oneOverCellSize[1];
         int ck = p[2] * oneOverCellSize[2];
-        if(!checkRange<int>(ci, 0, numCellsX-1) || !checkRange<int>(cj, 0, numCellsY-1) || !checkRange<int>(ck, 0, numCellsZ-1)) {
+        if(ci < 0 || ci >= numCellsX || cj < 0 || cj >= numCellsY || ck < 0 || ck >= numCellsZ) {
+            qDebug() << "Trouble with " << p;
+            qDebug() << "with indices: " << ci << ", " << cj << ", " << ck;
+            qDebug() << "and number of cells:: " << numCellsX << ", " << numCellsY << ", " << numCellsZ;
+            qDebug() << "Cell size: " << cellSize;
+            qDebug() << "Which gives systemSize: " << QVector3D(cellSize[0]*numCellsX, cellSize[1]*numCellsY, cellSize[2]*numCellsZ);
             qFatal("XYZModel::buildCellList() error: point %d is out of cell list bounds.", i);
             exit(1);
         }
