@@ -1,4 +1,5 @@
 #include "octree.h"
+#include <fstream>
 
 int Octree::maxDepth() const
 {
@@ -68,6 +69,20 @@ void OctNode::build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData> &da
         data[i].normal = N;
         data[i+1].normal = N;
         data[i+2].normal = N;
+    }
+}
+
+void OctNode::InsertNode(QStringList &list)
+{
+    if (list.length()==1)
+        m_value = list[0].toFloat();
+    else
+    {
+        int quadrant = list[0].toFloat();
+        if (!hasChildren())
+            subdivide();
+        list.removeAt(0);
+        m_children[quadrant]->InsertNode(list);
     }
 }
 
@@ -155,17 +170,69 @@ void Octree::buildTree()
 
     build2DTriangleList();
 
-
+//    saveOctree("octree.txt");
 }
 
 void Octree::loadOctree(QString filename)
 {
-    qDebug() << "Load octree from " << filename;
+    qDebug() << "Load octree from EHG" << filename;
+
+
+    QVector3D minVal, maxVal;
+    filename.remove(0,5);
+    QFile inputFile(filename);
+    if (inputFile.open(QIODevice::ReadOnly))
+    {
+       QTextStream in(&inputFile);
+       int cnt = 0;
+
+      while (!in.atEnd())
+       {
+          QStringList lst = in.readLine().split(",");
+          if (cnt==0) {// corner 0
+              minVal = QVector3D(lst[0].toFloat(),lst[1].toFloat(),lst[2].toFloat());
+          }
+          if (cnt==1) {// corner 1
+              maxVal = QVector3D(lst[0].toFloat(),lst[1].toFloat(),lst[2].toFloat());
+          }
+          if (cnt==2) {
+              m_root = new OctNode(minVal, maxVal,0,0);
+          }
+          if (cnt>=2) {
+              m_root->InsertNode(lst);
+          }
+          cnt++;
+
+       }
+       inputFile.close();
+    }
+    build2DTriangleList();
+
 }
 
 void Octree::saveOctree(QString filename)
 {
     qDebug() << "Saving octree to " << filename;
+    if (m_root == nullptr)
+        return;
+    ofstream file;
+
+    file.open(filename.toStdString().c_str(),std::ofstream::out);
+
+    if(file.is_open()) {
+        file << m_root->getCorner1().x() << ", " << m_root->getCorner1().y() << ", " <<  m_root->getCorner1().z() << endl;
+        file << m_root->getCorner2().x() << ", " << m_root->getCorner2().y() << ", " <<  m_root->getCorner2().z() << endl;
+        m_root->saveNode("", file);
+        file.close();
+    }
+
+/*    corner 1
+    corner 2
+
+    # quadrant, quadrant, quadrant value
+      1, 1
+      2, 1, 0
+*/
 }
 
 void Octree::insertValueAtPoint(const QVector3D &p, float value)
@@ -232,6 +299,16 @@ void OctNode::melt()
 }
 
 
+QVector3D OctNode::getCorner1() const
+{
+    return m_corner1;
+}
+
+QVector3D OctNode::getCorner2() const
+{
+    return m_corner2;
+}
+
 OctNode::OctNode(QVector3D corner1, QVector3D corner2, int level, float value)
 {
     m_corner1 = corner1;
@@ -254,6 +331,23 @@ OctNode *OctNode::getQuadrant(const int &index)
 QVector<OctNode *> OctNode::getChildren() const
 {
     return m_children;
+}
+
+void OctNode::saveNode(QString serialized, ofstream &file)
+{
+    if (hasChildren()) {
+        for (int i=0;i<m_children.count();i++)
+            m_children[i]->saveNode(serialized + QString::number(i) + ",", file);
+    }
+    else
+    if (m_value!=0)
+    {
+        serialized += QString::number(m_value);
+        file << serialized.toStdString() << std::endl;
+
+    }
+
+
 }
 
 void OctNode::subdivide()
