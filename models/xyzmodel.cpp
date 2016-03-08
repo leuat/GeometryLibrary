@@ -34,7 +34,6 @@ void XYZModel::parametersUpdated()
 
 void XYZModel::createParameters()
 {
-    qDebug() << "Creating in xyz";
     m_parameters->createParameter(QString("voxelsperdimension"), 128.0, 16.0, 512.0, 1.0);
     m_parameters->createParameter(QString("threshold"), 3.0, 1.0, 5.0, 0.1);
     m_parameters->createParameter(QString("maxdistance"), 20.0, 10.0, 100.0, 2.0);
@@ -60,7 +59,6 @@ float XYZModel::threshold() const
 
 void XYZModel::readFile()
 {
-    qDebug() << "Load xyz file from " << m_file;
     QFile file(m_file);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         file.setFileName(QUrl(m_file).toLocalFile());
@@ -87,7 +85,6 @@ void XYZModel::readFile()
         if(splitted.count() == 2) {
             bool ok;
             numberOfAtoms = splitted[0].toDouble(&ok);
-            qDebug() << "Found " <<  numberOfAtoms << " atoms in file.";
 
             if(!ok) {
                 qDebug() << QString("Error, tried to read number of atoms, but line '%1' didn't cast well.").arg(line);
@@ -113,8 +110,6 @@ void XYZModel::readFile()
                 m_ly = std::max(m_ly, y);
                 m_lz = std::max(m_lz, z);
             } else break; // If this is a multi timestep xyz-file, just ignore the rest
-        } else {
-            qDebug() << "Line " << line << " has " << splitted.count() << " words.";
         }
     }
 
@@ -124,8 +119,6 @@ void XYZModel::readFile()
     m_oneOverLx = 1.0 / m_lx;
     m_oneOverLy = 1.0 / m_ly;
     m_oneOverLz = 1.0 / m_lz;
-
-    qDebug() << QString("Added %1 particle positions").arg(numberOfAtoms);
 }
 
 float XYZModel::maxDistance() const
