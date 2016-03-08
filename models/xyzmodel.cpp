@@ -5,10 +5,24 @@
 #include <QDebug>
 #include <QUrl>
 
-template < typename Type >
-inline bool checkRange( const Type& x, const Type& max, const Type& min )
+float XYZModel::getLx() const
 {
-    return ( min <= x ) && ( x <= max );
+    return m_lx;
+}
+
+float XYZModel::getLy() const
+{
+    return m_ly;
+}
+
+float XYZModel::getLz() const
+{
+    return m_lz;
+}
+
+QVector<QVector3D> XYZModel::getPoints() const
+{
+    return m_points;
 }
 
 XYZModel::XYZModel() : Model()
@@ -34,7 +48,6 @@ void XYZModel::parametersUpdated()
 
 void XYZModel::createParameters()
 {
-    qDebug() << "Creating in xyz";
     m_parameters->createParameter(QString("voxelsperdimension"), 128.0, 16.0, 512.0, 1.0);
     m_parameters->createParameter(QString("threshold"), 3.0, 1.0, 5.0, 0.1);
     m_parameters->createParameter(QString("maxdistance"), 20.0, 10.0, 100.0, 2.0);
@@ -60,7 +73,6 @@ float XYZModel::threshold() const
 
 void XYZModel::readFile()
 {
-    qDebug() << "Load xyz file from " << m_file;
     QFile file(m_file);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         file.setFileName(QUrl(m_file).toLocalFile());
@@ -87,7 +99,6 @@ void XYZModel::readFile()
         if(splitted.count() == 2) {
             bool ok;
             numberOfAtoms = splitted[0].toDouble(&ok);
-            qDebug() << "Found " <<  numberOfAtoms << " atoms in file.";
 
             if(!ok) {
                 qDebug() << QString("Error, tried to read number of atoms, but line '%1' didn't cast well.").arg(line);
@@ -113,8 +124,6 @@ void XYZModel::readFile()
                 m_ly = std::max(m_ly, y);
                 m_lz = std::max(m_lz, z);
             } else break; // If this is a multi timestep xyz-file, just ignore the rest
-        } else {
-            qDebug() << "Line " << line << " has " << splitted.count() << " words.";
         }
     }
 
@@ -124,8 +133,6 @@ void XYZModel::readFile()
     m_oneOverLx = 1.0 / m_lx;
     m_oneOverLy = 1.0 / m_ly;
     m_oneOverLz = 1.0 / m_lz;
-
-    qDebug() << QString("Added %1 particle positions").arg(numberOfAtoms);
 }
 
 void XYZModel::removeCylinder(float r)
@@ -169,7 +176,9 @@ CellList XYZModel::buildCellList(QVector3D cellSize, int numCellsX, int numCells
     CellList cellList;
 
     QVector3D oneOverCellSize;
-    oneOverCellSize[0] = 1.0 / cellSize[0]; oneOverCellSize[1] = 1.0 / cellSize[1]; oneOverCellSize[2] = 1.0 / cellSize[2];
+    oneOverCellSize[0] = 1.0 / cellSize[0];
+    oneOverCellSize[1] = 1.0 / cellSize[1];
+    oneOverCellSize[2] = 1.0 / cellSize[2];
     cellList.resize(numCellsX, vector<vector<vector<QVector3D> > >(numCellsY, vector<vector<QVector3D> >(numCellsZ)));
 
     for(int i=0; i<m_points.size(); i++) {
@@ -177,7 +186,12 @@ CellList XYZModel::buildCellList(QVector3D cellSize, int numCellsX, int numCells
         int ci = p[0] * oneOverCellSize[0];
         int cj = p[1] * oneOverCellSize[1];
         int ck = p[2] * oneOverCellSize[2];
-        if(!checkRange<int>(ci, 0, numCellsX-1) || !checkRange<int>(cj, 0, numCellsY-1) || !checkRange<int>(ck, 0, numCellsZ-1)) {
+        if(ci < 0 || ci >= numCellsX || cj < 0 || cj >= numCellsY || ck < 0 || ck >= numCellsZ) {
+            qDebug() << "Trouble with " << p;
+            qDebug() << "with indices: " << ci << ", " << cj << ", " << ck;
+            qDebug() << "and number of cells:: " << numCellsX << ", " << numCellsY << ", " << numCellsZ;
+            qDebug() << "Cell size: " << cellSize;
+            qDebug() << "Which gives systemSize: " << QVector3D(cellSize[0]*numCellsX, cellSize[1]*numCellsY, cellSize[2]*numCellsZ);
             qFatal("XYZModel::buildCellList() error: point %d is out of cell list bounds.", i);
             exit(1);
         }

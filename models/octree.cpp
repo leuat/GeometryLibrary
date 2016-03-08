@@ -118,7 +118,6 @@ void Octree::parametersUpdated()
 
 void Octree::createParameters()
 {
-    qDebug() << "Creating in octree";
     m_parameters->createParameter("maxdepth", 6, 1, 12, 1);
     m_parameters->createParameter("threshold", 2,1 ,5, 0.1);
 }

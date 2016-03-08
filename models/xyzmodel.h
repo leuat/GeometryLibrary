@@ -39,6 +39,11 @@ public:
     Q_INVOKABLE void readFile();
     Q_INVOKABLE void removeCylinder(float r);
     void updateDistanceToAtomField();
+    float getLx() const;
+    float getLy() const;
+    float getLz() const;
+    QVector<QVector3D> getPoints() const;
+    CellList buildCellList(QVector3D cellSize, int numCellsX, int numCellsY, int numCellsZ);
 
     virtual bool isInVoid(float x, float y, float z) override;
     virtual void parametersUpdated() override;
@@ -57,8 +62,6 @@ signals:
     void voxelsPerDimensionChanged(int voxelsPerDimension);
     void thresholdChanged(float threshold);
     void maxDistanceChanged(float maxDistance);
-protected:
-    CellList buildCellList(QVector3D cellSize, int numCellsX, int numCellsY, int numCellsZ);
 };
 
 #endif // XYZMODEL_H
