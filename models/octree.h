@@ -17,7 +17,6 @@ private:
     int m_depth = 0;
     bool m_melted = false;
 
-
 public:
 
     OctNode(QVector3D corner1, QVector3D corner2, int level, float value);
@@ -55,6 +54,7 @@ private:
     QVector<SimVis::TriangleCollectionVBOData> m_vboData;
 
 public:
+    bool m_vboDirty = true;
     Octree();
 
     // creates octtree structure from list of particles
@@ -63,28 +63,18 @@ public:
     Q_INVOKABLE void loadOctree(QString filename) ;
     Q_INVOKABLE void saveOctree(QString filename);
 
-
-
     // inherited functions
     void initialize(Noise::NoiseType noiseType, Parameters* np);
-
     void insertValueAtPoint(const QVector3D& p, float value);
     void melt();
-
     int maxDepth() const;
-//    void build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData>& data);
     void build2DTriangleList();
-
     void setMaxDepth(int maxDepth);
 
     // Model interface
 public:
     bool isInVoid(float x, float y, float z) override;
-
     void parametersUpdated() override;
-
-    // Model interface
-public:
     void createParameters() override;
     QVector<SimVis::TriangleCollectionVBOData> vboData() const;
 };

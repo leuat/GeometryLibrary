@@ -14,7 +14,7 @@ void Octree::build2DTriangleList()
     m_vboData.clear();
 
     m_root->build2DTriangleList(m_vboData);
-
+    m_vboDirty = true;
 }
 
 void OctNode::build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData> &data)
@@ -26,9 +26,10 @@ void OctNode::build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData> &da
      else {
     //    qDebug() << m_depth << " value " << m_value;
         SimVis::TriangleCollectionVBOData tri;
-        QVector3D color(0.8,0.2,0);
+        QVector3D color(0.15, 0.2, 0.9);
         if (m_value==0) {
-            color = QVector3D(0.1, 0.2, 0.8);
+            color = QVector3D(0.8, 0.2, 0.1);
+            return;
         }
         color.setY(rand()%100 / 100.0);
         if (m_melted)
@@ -67,9 +68,6 @@ void OctNode::build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData> &da
         data[i].normal = N;
         data[i+1].normal = N;
         data[i+2].normal = N;
-
-
-
     }
 }
 
@@ -137,13 +135,13 @@ void Octree::buildTree()
         maxVal.setY(max(maxVal.y(), m_points[i].y()));
         maxVal.setZ(max(maxVal.z(), m_points[i].z()));
     }
-    QVector3D center = (maxVal + minVal)/2.0;
+    // QVector3D center = (maxVal + minVal)/2.0;
 
-    for (int i=0;i<m_points.count();i++)
-        m_points[i]-=center;
+//    for (int i=0;i<m_points.count();i++)
+//        m_points[i]-=center;
 
-    maxVal-=center;
-    minVal-=center;
+//    maxVal-=center;
+//    minVal-=center;
 
     m_root = new OctNode(minVal, maxVal, 0, 0);
 
