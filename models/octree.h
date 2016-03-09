@@ -44,6 +44,8 @@ public:
     void melt();
     QVector3D getCorner1() const;
     QVector3D getCorner2() const;
+    QVector3D getCorner(const int id) const;
+
 };
 
 class Octree : public XYZModel
@@ -60,7 +62,7 @@ public:
     Octree();
 
     // creates octtree structure from list of particles
-    Q_INVOKABLE void buildTree();
+    Q_INVOKABLE void buildTree(bool useCellList);
     // Load and save octtree states
     Q_INVOKABLE void loadOctree(QString filename) ;
     Q_INVOKABLE void saveOctree(QString filename);

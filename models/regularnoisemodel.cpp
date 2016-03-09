@@ -56,6 +56,7 @@ void RegularNoiseModel::parametersUpdated()
     }
 }
 
+
 void RegularNoiseModel::createParameters()
 {
     m_parameters->createParameter("octaves", 1, 1, 7, 1);

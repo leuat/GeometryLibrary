@@ -30,45 +30,28 @@ void OctNode::build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData> &da
         QVector3D color(0.15, 0.2, 0.9);
         if (m_value==0) {
             color = QVector3D(0.8, 0.2, 0.1);
-            return;
+            //return;
         }
         color.setY(rand()%100 / 100.0);
         if (m_melted)
             color*=0.3;
 
-        data.append(tri);
-        data.append(tri);
-        data.append(tri);
-        int i = data.count()-3;
         float z = m_corner1.z();
-        data[i].vertex = QVector3D(m_corner1.x(), m_corner1.y(), z);
-        data[i+1].vertex = QVector3D(m_corner1.x(), m_corner2.y(), z);
-        data[i+2].vertex = QVector3D(m_corner2.x(), m_corner1.y(), z);
 
-        QVector3D N = QVector3D::crossProduct((data[i].vertex-data[i+2].vertex), (data[i].vertex-data[i+1].vertex)).normalized();
 
-        data[i].color = color;
-        data[i+1].color = color;
-        data[i+2].color = color;
-        data[i].normal = N;
-        data[i+1].normal = N;
-        data[i+2].normal = N;
+/*        XYZModel::addQuad(data,    QVector3D(m_corner1.x(), m_corner1.y(), z),
+                         QVector3D(m_corner1.x(), m_corner2.y(), z),
+                         QVector3D(m_corner2.x(), m_corner1.y(), z),
+                         QVector3D(m_corner2.x(), m_corner2.y(), z), color);*/
 
-        data.append(tri);
-        data.append(tri);
-        data.append(tri);
-        i = data.count()-3;
+          XYZModel::addQuad(data, getCorner(0), getCorner(1), getCorner(3), getCorner(2),color);
+          XYZModel::addQuad(data, getCorner(4), getCorner(5), getCorner(7), getCorner(6),color);
+          XYZModel::addQuad(data, getCorner(1), getCorner(5), getCorner(2), getCorner(6),color);
+          XYZModel::addQuad(data, getCorner(0), getCorner(4), getCorner(3), getCorner(7),color);
+          XYZModel::addQuad(data, getCorner(3), getCorner(2), getCorner(7), getCorner(6),color);
+          XYZModel::addQuad(data, getCorner(0), getCorner(1), getCorner(4), getCorner(5),color);
 
-        data[i].vertex = QVector3D(m_corner2.x(), m_corner2.y(), z);
-        data[i+1].vertex = QVector3D(m_corner1.x(), m_corner2.y(), z);
-        data[i+2].vertex = QVector3D(m_corner2.x(), m_corner1.y(), z);
 
-        data[i].color = color;
-        data[i+1].color = color;
-        data[i+2].color = color;
-        data[i].normal = N;
-        data[i+1].normal = N;
-        data[i+2].normal = N;
     }
 }
 
@@ -132,7 +115,7 @@ Octree::Octree() : XYZModel()
     createParameters();
 }
 
-void Octree::buildTree()
+void Octree::buildTree(bool fromCellList)
 {
     double inf = 1E30;
 
@@ -159,17 +142,35 @@ void Octree::buildTree()
 
     m_root = new OctNode(minVal, maxVal, 0, 0);
 
-    qDebug() << "Building octree with max depth : " << m_maxDepth << " and " << m_points.size() << " particles";
+    if (!fromCellList) {
+        qDebug() << "Building octree with max depth : " << m_maxDepth << " and " << m_points.size() << " particles";
+        for (QVector3D p : m_points)
+            insertValueAtPoint(p, 1);
+    }
+    else {
+        // Based on cell list
+        int N = pow(2, m_maxDepth);
+        QVector3D size = (maxVal - minVal)/N;
+        qDebug() << "build octree from voxellist (test): cellsize = " << size;
+        qDebug() << "number of cells: " << N;
+        CellList cellList = buildCellList(size, N,N,N);
+/*        for (int i=0;i<N;i++)
+            for (int j=0;j<N;j++)
+                for (int k=0;k<N;k++)
+                    if (cellList[i][j][k]!=0) {
 
-    for (QVector3D p : m_points)
-        insertValueAtPoint(p, 1);
+                        QVector3D p( minVal.x + (i+0.5)*size.x,
+                                     minVal.y + (i+0.5)*size.y,
+                                     minVal.z + (i+0.5)*size.z );
 
-//    for (int i=0;i<6;i++)
+                        insertValueAtPoint(p, 1);
+                    }
+*/
+    }
     melt();
 
     build2DTriangleList();
 
-//    saveOctree("octree.txt");
 }
 
 void Octree::loadOctree(QString filename)
@@ -306,6 +307,26 @@ QVector3D OctNode::getCorner1() const
 QVector3D OctNode::getCorner2() const
 {
     return m_corner2;
+}
+
+QVector3D OctNode::getCorner(const int id) const
+{
+    if (id==0)
+        return m_corner1;
+    if (id==1)
+        return QVector3D(m_corner2.x(), m_corner1.y(), m_corner1.z());
+    if (id==2)
+        return QVector3D(m_corner2.x(), m_corner2.y(), m_corner1.z());
+    if (id==3)
+        return QVector3D(m_corner1.x(), m_corner2.y(), m_corner1.z());
+    if (id==4)
+        return QVector3D(m_corner1.x(), m_corner1.y(), m_corner2.z());
+    if (id==5)
+        return QVector3D(m_corner2.x(), m_corner1.y(), m_corner2.z());
+    if (id==6)
+        return m_corner2;
+    if (id==7)
+        return QVector3D(m_corner1.x(), m_corner2.y(), m_corner2.z());
 }
 
 OctNode::OctNode(QVector3D corner1, QVector3D corner2, int level, float value)

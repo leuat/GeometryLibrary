@@ -1,6 +1,7 @@
 #ifndef XYZMODEL_H
 #define XYZMODEL_H
 #include "model.h"
+#include <SimVis/TriangleCollection>
 #include <QVector>
 #include <QVector3D>
 
@@ -44,6 +45,8 @@ public:
     float getLz() const;
     QVector<QVector3D> getPoints() const;
     CellList buildCellList(QVector3D cellSize, int numCellsX, int numCellsY, int numCellsZ);
+
+    static void addQuad(QVector<SimVis::TriangleCollectionVBOData> &data, QVector3D c1,QVector3D c2,QVector3D c3, QVector3D c4, QVector3D color);
 
     virtual bool isInVoid(float x, float y, float z) override;
     virtual void parametersUpdated() override;

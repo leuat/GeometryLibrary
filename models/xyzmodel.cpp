@@ -192,13 +192,53 @@ CellList XYZModel::buildCellList(QVector3D cellSize, int numCellsX, int numCells
             qDebug() << "and number of cells:: " << numCellsX << ", " << numCellsY << ", " << numCellsZ;
             qDebug() << "Cell size: " << cellSize;
             qDebug() << "Which gives systemSize: " << QVector3D(cellSize[0]*numCellsX, cellSize[1]*numCellsY, cellSize[2]*numCellsZ);
-            qFatal("XYZModel::buildCellList() error: point %d is out of cell list bounds.", i);
-            exit(1);
+            //qFatal("XYZModel::buildCellList() error: point %d is out of cell list bounds.", i);
+            //exit(1);
         }
+        else
         cellList[ci][cj][ck].push_back(p);
     }
 
     return cellList;
+}
+
+void XYZModel::addQuad(QVector<SimVis::TriangleCollectionVBOData> &data, QVector3D c1,QVector3D c2,QVector3D c3, QVector3D c4, QVector3D color)
+{
+    SimVis::TriangleCollectionVBOData tri;
+
+    data.append(tri);
+    data.append(tri);
+    data.append(tri);
+    int i = data.count()-3;
+    data[i].vertex = c1;
+    data[i+1].vertex = c2;
+    data[i+2].vertex = c3;
+
+    QVector3D N = QVector3D::crossProduct((data[i].vertex-data[i+2].vertex), (data[i].vertex-data[i+1].vertex)).normalized();
+
+    data[i].color = color;
+    data[i+1].color = color;
+    data[i+2].color = color;
+    data[i].normal = N;
+    data[i+1].normal = N;
+    data[i+2].normal = N;
+
+    data.append(tri);
+    data.append(tri);
+    data.append(tri);
+    i = data.count()-3;
+
+    data[i].vertex = c4;
+    data[i+1].vertex = c2;
+    data[i+2].vertex = c3;
+
+    data[i].color = color;
+    data[i+1].color = color;
+    data[i+2].color = color;
+    data[i].normal = N;
+    data[i+1].normal = N;
+    data[i+2].normal = N;
+
 }
 
 void XYZModel::updateDistanceToAtomField() {
