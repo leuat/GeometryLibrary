@@ -32,11 +32,21 @@ XYZModel::XYZModel() : Model()
 
 bool XYZModel::isInVoid(float x, float y, float z)
 {
+    if(!m_isValid) {
+        qDebug() << "Warning, XYZModel is not valid.";
+        return true;
+    }
     if(m_file.isEmpty()) return true;
-    int i = x * m_oneOverLx * m_nx;
-    int j = y * m_oneOverLy * m_ny;
-    int k = z * m_oneOverLz * m_nz;
-    return m_voxels[index(i,j,k)] > m_threshold;
+    int i = x * m_oneOverLx * m_voxelsPerDimension;
+    int j = y * m_oneOverLy * m_voxelsPerDimension;
+    int k = z * m_oneOverLz * m_voxelsPerDimension;
+    if(i<0 || i >= m_voxelsPerDimension || j<0 || j>= m_voxelsPerDimension || k<0 || k>= m_voxelsPerDimension) {
+        qDebug() << "XYZModel::isInVoid error: point (" << x << ", " << y << ", " << z << ") was not within system boundaries";
+        qDebug() << "Indices: " << i << ", " << j << ", " << k;
+        qDebug() << "Voxels per dimension: " << m_voxelsPerDimension;
+        exit(1);
+    }
+    return m_voxels[index(i,j,k)]==0;
 }
 
 void XYZModel::parametersUpdated()
@@ -133,6 +143,7 @@ void XYZModel::readFile()
     m_oneOverLx = 1.0 / m_lx;
     m_oneOverLy = 1.0 / m_ly;
     m_oneOverLz = 1.0 / m_lz;
+    m_isValid = false;
 }
 
 void XYZModel::removeCylinder(float r)
@@ -141,29 +152,18 @@ void XYZModel::removeCylinder(float r)
 
     double inf = 1E30;
 
-    QVector3D minVal(inf, inf, inf);
-    QVector3D maxVal(-inf, -inf, -inf);
-    // Get min / Max values
-    for(int i=0;i<m_points.count();i++) {
-        minVal.setX(min(minVal.x(), m_points[i].x()));
-        minVal.setY(min(minVal.y(), m_points[i].y()));
-        minVal.setZ(min(minVal.z(), m_points[i].z()));
-        maxVal.setX(max(maxVal.x(), m_points[i].x()));
-        maxVal.setY(max(maxVal.y(), m_points[i].y()));
-        maxVal.setZ(max(maxVal.z(), m_points[i].z()));
-    }
-    QVector3D center = (minVal + maxVal)/2;
-    float size = (maxVal - minVal).length();
+    QVector3D center = QVector3D(0.5*m_lx, 0.5*m_ly, 0.0);
+    float size = std::min(0.5*m_lx, 0.5*m_ly); // Normalize so a cylinder of radius 1 is maximum radius of the smallest length of X and Y dir
     float r2 = r*r;
-    for (QVector3D p : m_points) {
-        QVector3D d = (p-center)/size;
-        d.setZ(0);
-        if (d.lengthSquared()>r2)
-            points.append(p);
-
+    for (const QVector3D &point : m_points) {
+        QVector3D delta = (point-center)/size;
+        delta.setZ(0);
+        if (delta.lengthSquared()>r2) {
+            points.append(point);
+        }
     }
+    m_points.clear();
     m_points = points;
-
 }
 
 float XYZModel::maxDistance() const
@@ -206,6 +206,7 @@ void XYZModel::updateDistanceToAtomField() {
         qDebug() << "Error, tried to update distance to atom field with no atoms.";
         return;
     }
+    m_isValid = false;
 
     int numCellsX = m_lx / m_maxDistance;
     int numCellsY = m_ly / m_maxDistance;
@@ -219,12 +220,13 @@ void XYZModel::updateDistanceToAtomField() {
     QVector3D cellSize(m_lx / numCellsX, m_ly / numCellsY, m_lz / numCellsZ);
     QVector3D oneOverCellSize;
     oneOverCellSize[0] = 1.0 / cellSize[0]; oneOverCellSize[1] = 1.0 / cellSize[1]; oneOverCellSize[2] = 1.0 / cellSize[2];
-    QVector3D voxelSize = QVector3D(m_lx, m_ly, m_lz) / QVector3D(m_nx, m_ny, m_nz);
-
+    QVector3D voxelSize = QVector3D(m_lx, m_ly, m_lz) / QVector3D(m_voxelsPerDimension, m_voxelsPerDimension, m_voxelsPerDimension);
     CellList cellList = buildCellList(cellSize, numCellsX, numCellsY, numCellsZ);
-    for(int i=0; i<m_nx; i++) {
-        for(int j=0; j<m_ny; j++) {
-            for(int k=0; k<m_nz; k++) {
+    m_voxels.resize(m_voxelsPerDimension*m_voxelsPerDimension*m_voxelsPerDimension, false);
+
+    for(int i=0; i<m_voxelsPerDimension; i++) {
+        for(int j=0; j<m_voxelsPerDimension; j++) {
+            for(int k=0; k<m_voxelsPerDimension; k++) {
                 // Now map this voxel
                 QVector3D voxelCenter = (QVector3D(i,j,k) + QVector3D(0.5f, 0.5f, 0.5f)) * voxelSize;
                 QVector3D cellListCoordinate = voxelCenter * oneOverCellSize;
@@ -234,6 +236,7 @@ void XYZModel::updateDistanceToAtomField() {
                 for(int dx = -1; dx <= 1; dx++) {
                     for(int dy = -1; dy <= 1; dy++) {
                         for(int dz = -1; dz <= 1; dz++) {
+                            // Loop through cell lists around this point to get atom positions
                             int cx = (int(cellListCoordinate.x()) + numCellsX) % numCellsX;
                             int cy = (int(cellListCoordinate.y()) + numCellsY) % numCellsY;
                             int cz = (int(cellListCoordinate.z()) + numCellsZ) % numCellsZ;
@@ -247,13 +250,15 @@ void XYZModel::updateDistanceToAtomField() {
                 }
 
                 if(minDistanceSquared != minDistanceSquaredStartValue) {
-                    m_voxels[index(i,j,k)] = sqrtf(minDistanceSquared);
+                    m_voxels.at(index(i,j,k)) = (minDistanceSquared<m_threshold*m_threshold);
                 } else {
-                    m_voxels[index(i,j,k)] = 0;
+                    m_voxels.at(index(i,j,k)) = 0;
                 }
             }
         }
     }
+
+    m_isValid = true;
 }
 
 QString XYZModel::file() const
@@ -268,8 +273,6 @@ void XYZModel::setFile(QString file)
 
     m_file = file;
     emit fileChanged(file);
-//    readFile();
-//    updateDistanceToAtomField();
 }
 
 void XYZModel::setVoxelsPerDimension(int voxelsPerDimension)

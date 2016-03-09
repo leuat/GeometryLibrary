@@ -16,7 +16,7 @@ protected:
 public:
     Model();
     Parameters* parameters() const;
-    bool isInVoid(const QVector3D &point);
+    bool isInVoid(QVector3D point);
     virtual void start();
     virtual void stop();
     virtual bool isInVoid(float x, float y, float z) = 0;
