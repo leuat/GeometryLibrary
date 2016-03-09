@@ -29,27 +29,21 @@ void OctNode::build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData> &da
         SimVis::TriangleCollectionVBOData tri;
         QVector3D color(0.15, 0.2, 0.9);
         if (m_value==0) {
-            color = QVector3D(0.8, 0.2, 0.1);
-            //return;
+            color = QVector3D(0.99, 0.2, 0.1);
+            return;
         }
-        color.setY(rand()%100 / 100.0);
+        color.setY(1.0*(rand()%100 / 100.0));
         if (m_melted)
             color*=0.3;
 
-        float z = m_corner1.z();
+//        float z = m_corner1.z();
 
-
-/*        XYZModel::addQuad(data,    QVector3D(m_corner1.x(), m_corner1.y(), z),
-                         QVector3D(m_corner1.x(), m_corner2.y(), z),
-                         QVector3D(m_corner2.x(), m_corner1.y(), z),
-                         QVector3D(m_corner2.x(), m_corner2.y(), z), color);*/
-
-          XYZModel::addQuad(data, getCorner(0), getCorner(1), getCorner(3), getCorner(2),color);
-          XYZModel::addQuad(data, getCorner(4), getCorner(5), getCorner(7), getCorner(6),color);
-          XYZModel::addQuad(data, getCorner(1), getCorner(5), getCorner(2), getCorner(6),color);
-          XYZModel::addQuad(data, getCorner(0), getCorner(4), getCorner(3), getCorner(7),color);
-          XYZModel::addQuad(data, getCorner(3), getCorner(2), getCorner(7), getCorner(6),color);
-          XYZModel::addQuad(data, getCorner(0), getCorner(1), getCorner(4), getCorner(5),color);
+        XYZModel::addQuad(data, getCorner(0), getCorner(1), getCorner(3), getCorner(2),color);
+        XYZModel::addQuad(data, getCorner(4), getCorner(5), getCorner(7), getCorner(6),color);
+        XYZModel::addQuad(data, getCorner(1), getCorner(5), getCorner(2), getCorner(6),color);
+        XYZModel::addQuad(data, getCorner(0), getCorner(4), getCorner(3), getCorner(7),color);
+        XYZModel::addQuad(data, getCorner(3), getCorner(2), getCorner(7), getCorner(6),color);
+        XYZModel::addQuad(data, getCorner(0), getCorner(1), getCorner(4), getCorner(5),color);
 
 
     }
@@ -96,6 +90,7 @@ void Octree::parametersUpdated()
 //    XYZModel
     m_maxDepth = m_parameters->getValue("maxdepth");
     m_threshold = m_parameters->getValue("threshold");
+    m_maxDistance = m_threshold;
 
 }
 
@@ -103,6 +98,7 @@ void Octree::createParameters()
 {
     m_parameters->createParameter("maxdepth", 6, 1, 12, 1);
     m_parameters->createParameter("threshold", 2,1 ,5, 0.1);
+
 }
 
 QVector<SimVis::TriangleCollectionVBOData> Octree::vboData() const
@@ -117,30 +113,9 @@ Octree::Octree() : XYZModel()
 
 void Octree::buildTree(bool fromCellList)
 {
-    double inf = 1E30;
 
-
-    QVector3D minVal(inf, inf, inf);
-    QVector3D maxVal(-inf, -inf, -inf);
-    // Get min / Max values
-    m_maxDepth = m_parameters->getValue("maxdepth");
-    for(int i=0;i<m_points.count();i++) {
-        minVal.setX(min(minVal.x(), m_points[i].x()));
-        minVal.setY(min(minVal.y(), m_points[i].y()));
-        minVal.setZ(min(minVal.z(), m_points[i].z()));
-        maxVal.setX(max(maxVal.x(), m_points[i].x()));
-        maxVal.setY(max(maxVal.y(), m_points[i].y()));
-        maxVal.setZ(max(maxVal.z(), m_points[i].z()));
-    }
-    // QVector3D center = (maxVal + minVal)/2.0;
-
-//    for (int i=0;i<m_points.count();i++)
-//        m_points[i]-=center;
-
-//    maxVal-=center;
-//    minVal-=center;
-
-    m_root = new OctNode(minVal, maxVal, 0, 0);
+    m_root = new OctNode(QVector3D(0,0,0), QVector3D(m_lx, m_ly, m_lz), 0, 0);
+    qDebug() << m_lx;
 
     if (!fromCellList) {
         qDebug() << "Building octree with max depth : " << m_maxDepth << " and " << m_points.size() << " particles";
@@ -150,22 +125,35 @@ void Octree::buildTree(bool fromCellList)
     else {
         // Based on cell list
         int N = pow(2, m_maxDepth);
-        QVector3D size = (maxVal - minVal)/N;
-        qDebug() << "build octree from voxellist (test): cellsize = " << size;
+//        qDebug() << "build octree from voxellist (test): cellsize = " << size;
         qDebug() << "number of cells: " << N;
-        CellList cellList = buildCellList(size, N,N,N);
-/*        for (int i=0;i<N;i++)
-            for (int j=0;j<N;j++)
-                for (int k=0;k<N;k++)
-                    if (cellList[i][j][k]!=0) {
 
-                        QVector3D p( minVal.x + (i+0.5)*size.x,
-                                     minVal.y + (i+0.5)*size.y,
-                                     minVal.z + (i+0.5)*size.z );
+        setVoxelsPerDimension(N);
 
-                        insertValueAtPoint(p, 1);
+        qDebug() << "updateDistance";
+        updateDistanceToAtomField();
+        qDebug() << "end";
+
+        //CellList cellList = buildCellList(size, N,N,N);
+        for (int i=0;i<N;i++) {
+            for (int j=0;j<N;j++) {
+ //               qDebug() << j;
+
+                for (int k=0;k<N;k++) {
+
+                    if (m_voxels[index(i,j,k)]!=0)
+                    {
+
+                        QVector3D p( (i+0.5)*m_lx/(float)N,
+                                     (j+0.5)*m_ly/(float)N,
+                                     (k+0.5)*m_lz/(float)N );
+
+                        insertValueAtPoint(p, m_voxels[index(i,j,k)]);
                     }
-*/
+                }
+            }
+        }
+//*/
     }
     melt();
 
