@@ -24,14 +24,14 @@ public:
     OctNode* getQuadrant(const int& index);
 
     QVector<OctNode *> getChildren() const;
+    void saveNode(QString serialized, ofstream& file);
     void subdivide();
     bool hasChildren();
-
     void build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData>& data);
-
-
     bool pointIsWithin(const QVector3D& p);
     OctNode* findNodePoint(const QVector3D& p);
+    void InsertNode(QStringList& list);
+
     // Use this
     void insertValueAtDeepestPoint(const QVector3D& p, float value, int maxDepth);
     // Do not use
@@ -42,6 +42,8 @@ public:
     bool getHasChildren() const;
     int getDepth() const;
     void melt();
+    QVector3D getCorner1() const;
+    QVector3D getCorner2() const;
 };
 
 class Octree : public XYZModel
