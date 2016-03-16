@@ -52,3 +52,10 @@ void CylinderModel::setInverted(bool inverted)
     m_inverted = inverted;
     emit invertedChanged(inverted);
 }
+
+
+void CylinderModel::loadParameters(CIniFile *iniFile)
+{
+    setRadius(iniFile->getdouble("cylinder_radius"));
+    setInverted(iniFile->getbool("cylinder_inverted"));
+}

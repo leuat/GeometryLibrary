@@ -80,6 +80,7 @@ public:
     bool isInVoid(float x, float y, float z) override;
     void parametersUpdated() override;
     void createParameters() override;
+    virtual void loadParameters(CIniFile *iniFile) override;
     QVector<SimVis::TriangleCollectionVBOData> vboData() const;
 };
 

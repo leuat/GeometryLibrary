@@ -4,7 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <QString>
-
+#include <QDebug>
 
 class CItem {
 public:
@@ -91,7 +91,8 @@ public:
     }
 
     bool find(QString key, QString value) {
-        return value.toLower().compare(QString::fromStdString(getstring(key.toLower().toStdString()))) == 0;
+        QString actualValue = QString::fromStdString(getstring(key.toLower().toStdString()));
+        return value.toLower().compare(actualValue) == 0;
     }
 
     bool find(QString key, int value) {

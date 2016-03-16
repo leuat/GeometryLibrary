@@ -65,10 +65,17 @@ void XYZModel::createParameters()
 
 void XYZModel::loadParameters(CIniFile *iniFile)
 {
-    m_file = QString::fromStdString(iniFile->getstring("filename_xyz"));
-    m_voxelsPerDimension = iniFile->getint("voxels_per_dimension");
-    m_threshold = iniFile->getdouble("threshold");
-    m_maxDistance = iniFile->getdouble("max_distance");
+    m_file = QString::fromStdString(iniFile->getstring("xyzfile_file"));
+    m_voxelsPerDimension = iniFile->getint("xyzfile_resolution");
+    m_threshold = iniFile->getdouble("xyzfile_threshold");
+    m_maxDistance = iniFile->getdouble("xyzfile_maxdistance");
+    readFile();
+    if(iniFile->find(QString("cut_cylinder"), true)) {
+        double radius = iniFile->getdouble("cylinder_radius");
+        double cutRadius = radius / (m_lx*0.5); // this radius is between 0 and 1
+        removeCylinder(cutRadius);
+    }
+    updateDistanceToAtomField();
 }
 
 int XYZModel::voxelsPerDimension() const

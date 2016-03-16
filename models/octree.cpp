@@ -451,3 +451,19 @@ void OctNode::insertValueAtPoint(const QVector3D &p, float value, int maxDepth)
     }
 }
 
+
+
+void Octree::loadParameters(CIniFile *iniFile)
+{
+    m_file = QString::fromStdString(iniFile->getstring("xyzfile_file"));
+
+    m_maxDepth = log2(iniFile->getdouble("xyzfile_resolution"));
+    m_threshold = iniFile->getdouble("xyzfile_threshold");
+    readFile();
+    if(iniFile->find(QString("cut_cylinder"), true)) {
+        double radius = iniFile->getdouble("cylinder_radius");
+        double cutRadius = radius / (m_lx*0.5); // this radius is between 0 and 1
+        removeCylinder(cutRadius);
+    }
+    this->buildTree(true);
+}

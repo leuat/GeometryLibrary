@@ -15,6 +15,7 @@ public:
     virtual bool isInVoid(float x, float y, float z) override;
     virtual void parametersUpdated() override;
     virtual void createParameters() override;
+    virtual void loadParameters(CIniFile *iniFile) override;
     float radius() const;
     bool inverted() const;
 
