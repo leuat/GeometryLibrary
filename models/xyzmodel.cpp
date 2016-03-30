@@ -284,9 +284,9 @@ void XYZModel::updateDistanceToAtomField() {
                     for(int dy = -1; dy <= 1; dy++) {
                         for(int dz = -1; dz <= 1; dz++) {
                             // Loop through cell lists around this point to get atom positions
-                            int cx = (int(cellListCoordinate.x()) + numCellsX) % numCellsX;
-                            int cy = (int(cellListCoordinate.y()) + numCellsY) % numCellsY;
-                            int cz = (int(cellListCoordinate.z()) + numCellsZ) % numCellsZ;
+                            int cx = (int(cellListCoordinate.x()) + dx + numCellsX) % numCellsX;
+                            int cy = (int(cellListCoordinate.y()) + dy + numCellsY) % numCellsY;
+                            int cz = (int(cellListCoordinate.z()) + dz + numCellsZ) % numCellsZ;
                             vector<QVector3D> &points = cellList[cx][cy][cz];
                             for(const QVector3D &point : points) {
                                 float distanceSquared = (point - voxelCenter).lengthSquared();
