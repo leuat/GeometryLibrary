@@ -56,6 +56,7 @@ public:
     void loadParameters(CIniFile *iniFile) override;
 
 
+    void removeFromModel(Model *model);
 public slots:
     void setFile(QString file);
     void setVoxelsPerDimension(int voxelsPerDimension);

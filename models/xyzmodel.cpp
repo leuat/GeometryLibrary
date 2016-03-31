@@ -34,7 +34,7 @@ bool XYZModel::isInVoid(float x, float y, float z)
 {
     if(!m_isValid) {
         qDebug() << "Warning, XYZModel is not valid.";
-        return true;
+        exit(1);
     }
     if(m_file.isEmpty()) return true;
     int i = x * m_oneOverLx * m_voxelsPerDimension;
@@ -151,6 +151,19 @@ void XYZModel::readFile()
     m_oneOverLy = 1.0 / m_ly;
     m_oneOverLz = 1.0 / m_lz;
     m_isValid = false;
+}
+
+void XYZModel::removeFromModel(Model *model) {
+    model->start();
+    QVector<QVector3D> points;
+    for (const QVector3D &point : m_points) {
+        if(!model->isInVoid(point)) {
+            points.append(point);
+        }
+    }
+    m_points.clear();
+    m_points = points;
+    model->stop();
 }
 
 void XYZModel::removeCylinder(float r)

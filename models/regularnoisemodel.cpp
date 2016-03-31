@@ -74,16 +74,16 @@ void RegularNoiseModel::createParameters()
 
 void RegularNoiseModel::loadParameters(CIniFile *iniFile)
 {
-    m_parameters->setParameter("octaves", iniFile->getdouble("regularnoise_octaves"), 1, 7, 1);
-    m_parameters->setParameter("scale", iniFile->getdouble("regularnoise_scale"), 0.001, 0.1, 0.001);
-    m_parameters->setParameter("persistence", iniFile->getdouble("regularnoise_persistence"), 0.1, 3, 0.1);
-    m_parameters->setParameter("threshold", iniFile->getdouble("regularnoise_threshold"), -1, 1, 0.1);
-    m_parameters->setParameter("inverted", iniFile->getdouble("regularnoise_inverted"), 0, 1, 1);
-    m_parameters->setParameter("seed", iniFile->getdouble("regularnoise_seed"), 1, 100, 1);
-    m_parameters->setParameter("absolute", iniFile->getdouble("regularnoise_absolute"), 0, 1, 1);
-    m_parameters->setParameter("skewscale", iniFile->getdouble("regularnoise_skewscale"), 0, 1, 0.1);
-    m_parameters->setParameter("skewamplitude", iniFile->getdouble("regularnoise_skewamplitude"), 0, 1, 0.1);
-    m_parameters->setParameter("noisetype", QString::fromStdString(iniFile->getstring("regularnoise_noisetype")));
+    m_parameters->setParameter("octaves", iniFile->getdouble("noise_octaves"), 1, 7, 1);
+    m_parameters->setParameter("scale", iniFile->getdouble("noise_scale"), 0.001, 0.1, 0.001);
+    m_parameters->setParameter("persistence", iniFile->getdouble("noise_persistence"), 0.1, 3, 0.1);
+    m_parameters->setParameter("threshold", iniFile->getdouble("noise_threshold"), -1, 1, 0.1);
+    m_parameters->setParameter("inverted", iniFile->getdouble("noise_inverted"), 0, 1, 1);
+    m_parameters->setParameter("seed", iniFile->getdouble("noise_seed"), 1, 100, 1);
+    m_parameters->setParameter("absolute", iniFile->getdouble("noise_absolute"), 0, 1, 1);
+    m_parameters->setParameter("skewscale", iniFile->getdouble("noise_skewscale"), 0, 1, 0.1);
+    m_parameters->setParameter("skewamplitude", iniFile->getdouble("noise_skewamplitude"), 0, 1, 0.1);
+    m_parameters->setParameter("noisetype", QString::fromStdString(iniFile->getstring("noise_noisetype")));
     parametersUpdated();
 }
 
