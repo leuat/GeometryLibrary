@@ -21,6 +21,7 @@ public:
 
     OctNode(QVector3D corner1, QVector3D corner2, int level, float value);
 
+
     OctNode* getQuadrant(const int& index);
 
     QVector<OctNode *> getChildren() const;
@@ -31,6 +32,7 @@ public:
     bool pointIsWithin(const QVector3D& p);
     OctNode* findNodePoint(const QVector3D& p);
     void InsertNode(QStringList& list);
+    void DepthHistogram(QVector<QPointF>& points);
 
     // Use this
     void insertValueAtDeepestPoint(const QVector3D& p, float value, int maxDepth);
@@ -74,6 +76,10 @@ public:
     int maxDepth() const;
     void build2DTriangleList();
     void setMaxDepth(int maxDepth);
+    void setPoints(QVector<QVector3D>& points);
+    void calculateOctreeMeasure(QVector<QPointF>& points);
+
+
 
     // Model interface
 public:

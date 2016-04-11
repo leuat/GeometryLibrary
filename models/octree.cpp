@@ -63,10 +63,34 @@ void OctNode::InsertNode(QStringList &list)
     }
 }
 
+void OctNode::DepthHistogram(QVector<QPointF>& points)
+{
+    if (!hasChildren())
+        points[m_depth].setY(points[m_depth].y()+1);
+    else
+        for (OctNode* octNode : m_children)
+            octNode->DepthHistogram(points);
+}
+
 
 void Octree::setMaxDepth(int maxDepth)
 {
     m_maxDepth = maxDepth;
+}
+
+void Octree::setPoints(QVector<QVector3D> &points)
+{
+    m_points = points;
+}
+
+void Octree::calculateOctreeMeasure(QVector<QPointF> &points)
+{
+    points.resize(m_maxDepth);
+    for (int i=0;i<points.size();i++)
+        points[i] = QPoint(i,0);
+
+    m_root->DepthHistogram(points);
+
 }
 
 bool Octree::isInVoid(float x, float y, float z)
@@ -160,6 +184,8 @@ void Octree::buildTree(bool fromCellList)
     build2DTriangleList();
 
 }
+
+
 
 void Octree::loadOctree(QString filename)
 {
