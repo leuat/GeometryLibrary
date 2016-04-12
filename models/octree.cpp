@@ -8,6 +8,8 @@ int Octree::maxDepth() const
 
 void Octree::build2DTriangleList()
 {
+    // return;
+
     if (m_root==nullptr)
         return;
 

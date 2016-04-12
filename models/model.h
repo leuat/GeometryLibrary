@@ -5,7 +5,7 @@
 
 #include <QObject>
 #include <QVector3D>
-
+#include "../logger.h"
 class Model : public QObject
 {
     Q_OBJECT
