@@ -25,7 +25,7 @@ QVector<QVector3D> XYZModel::getPoints() const
     return m_points;
 }
 
-void XYZModel::CalculateBoundingbox()
+void XYZModel::calculateBoundingbox()
 {
     m_lx = 0;
     m_ly = 0;
@@ -43,6 +43,67 @@ void XYZModel::CalculateBoundingbox()
     m_oneOverLy = 1.0 / m_ly;
     m_oneOverLz = 1.0 / m_lz;
 
+}
+
+void XYZModel::erode(int depth)
+{
+    for(int idx=0; idx<m_voxels.size(); idx++) {
+        if(m_voxels[idx] == 1) {
+            int i,j,k;
+            getIndexVectorFromIndex(idx, i, j, k);
+            int xMinus = index(i-1, j, k);
+            int xPlus = index(i+1, j, k);
+            int yMinus = index(i, j-1, k);
+            int yPlus = index(i, j+1, k);
+            int zMinus = index(i, j, k-1);
+            int zPlus = index(i, j, k+1);
+            if(xMinus==0) m_voxels[index(i-1, j, k)] = 2;
+            if(xPlus==0) m_voxels[index(i+1, j, k)] = 2;
+            if(yMinus==0) m_voxels[index(i, j-1, k)] = 2;
+            if(yPlus==0) m_voxels[index(i, j+1, k)] = 2;
+            if(zMinus==0) m_voxels[index(i, j, k-1)] = 2;
+            if(zPlus==0) m_voxels[index(i, j, k+1)] = 2;
+        }
+    }
+
+    for(int index=0; index<m_voxels.size(); index++) {
+        if(m_voxels[index]==2) m_voxels[index] = 1;
+    }
+
+    if(depth > 0) erode(depth-1);
+}
+
+void XYZModel::fill(int depth)
+{
+    for(int idx=0; idx<m_voxels.size(); idx++) {
+        if(m_voxels[idx] == 1) {
+            int i,j,k;
+            getIndexVectorFromIndex(idx, i, j, k);
+            int xMinus = index(i-1, j, k);
+            int xPlus = index(i+1, j, k);
+            int yMinus = index(i, j-1, k);
+            int yPlus = index(i, j+1, k);
+            int zMinus = index(i, j, k-1);
+            int zPlus = index(i, j, k+1);
+
+            int count = 0;
+            if(xMinus==1 || xMinus==2) count++;
+            if(xPlus==1 || xPlus==2)  count++;
+            if(yMinus==1 || yMinus==2) count++;
+            if(yPlus==1 || yPlus==2)  count++;
+            if(zMinus==1 || zMinus==2) count++;
+            if(zPlus==1 || zPlus==2)  count++;
+            if(count == 1) {
+                m_voxels[idx] = 2;
+            }
+        }
+    }
+
+    for(int index=0; index<m_voxels.size(); index++) {
+        if(m_voxels[index]==2) m_voxels[index] = 0;
+    }
+
+    if(depth > 0) erode(depth-1);
 }
 
 XYZModel::XYZModel() : Model()
@@ -157,7 +218,7 @@ void XYZModel::readFile()
             } else break; // If this is a multi timestep xyz-file, just ignore the rest
         }
     }
-    CalculateBoundingbox();
+    calculateBoundingbox();
     m_isValid = false;
 }
 
