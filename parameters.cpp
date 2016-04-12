@@ -206,7 +206,6 @@ void Parameters::load(QString filename)
             return;
         }
     }
-    qDebug() << "Loading " << filename;
     QTextStream in(&file);
     while (!in.atEnd()) {
         QString line = in.readLine();

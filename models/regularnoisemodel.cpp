@@ -113,11 +113,11 @@ void RegularNoiseModel::randomWalk()
     delta = Random::nextGaussian(0, 0.5*m_parameters->getStepSize("threshold"));
     m_parameters->setValue("threshold", m_parameters->getValue("threshold") + delta);
 
-//    delta = Random::nextGaussian(0, m_parameters->getStepSize("skewScale"));
-//    m_parameters->setValue("skewScale", m_parameters->getValue("skewScale") + delta);
+    delta = Random::nextGaussian(0, 0.5*m_parameters->getStepSize("skewScale"));
+    m_parameters->setValue("skewScale", m_parameters->getValue("skewScale") + delta);
 
-//    delta = Random::nextGaussian(0, m_parameters->getStepSize("skewAmplitude"));
-//    m_parameters->setValue("skewAmplitude", m_parameters->getValue("skewAmplitude") + delta);
+    delta = Random::nextGaussian(0, 0.5*m_parameters->getStepSize("skewAmplitude"));
+    m_parameters->setValue("skewAmplitude", m_parameters->getValue("skewAmplitude") + delta);
 
     qDebug() << "Setting scale: " << m_parameters->getValue("scale") << " persistence: " << m_parameters->getValue("persistence") << " threshold: " << m_parameters->getValue("threshold");
     parametersUpdated();
