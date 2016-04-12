@@ -64,7 +64,7 @@ public:
     Octree();
 
     // creates octtree structure from list of particles
-    Q_INVOKABLE void buildTree(bool useCellList);
+    Q_INVOKABLE void buildTree(bool useCellList, bool createTriangleList);
     // Load and save octtree states
     Q_INVOKABLE void loadOctree(QString filename) ;
     Q_INVOKABLE void saveOctree(QString filename);
