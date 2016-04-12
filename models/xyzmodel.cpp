@@ -25,6 +25,26 @@ QVector<QVector3D> XYZModel::getPoints() const
     return m_points;
 }
 
+void XYZModel::CalculateBoundingbox()
+{
+    m_lx = 0;
+    m_ly = 0;
+    m_lz = 0;
+
+    for (int i=0;i<m_points.size();i++) {
+        m_lx = std::max(m_lx, m_points[i].x());
+        m_ly = std::max(m_ly, m_points[i].y());
+        m_lz = std::max(m_lz, m_points[i].z());
+    }
+    m_lx += 0.001*m_lx;
+    m_ly += 0.001*m_ly;
+    m_lz += 0.001*m_lz;
+    m_oneOverLx = 1.0 / m_lx;
+    m_oneOverLy = 1.0 / m_ly;
+    m_oneOverLz = 1.0 / m_lz;
+
+}
+
 XYZModel::XYZModel() : Model()
 {
     createParameters();
@@ -105,9 +125,6 @@ void XYZModel::readFile()
     int positionCount = 0;
     // Set lengths to zero and update based on the maximum measured coordinate in the atoms. Add a small epsilon after we're done
     // so x / m_lx always is smaller than the number of voxels in that dimension.
-    m_lx = 0;
-    m_ly = 0;
-    m_lz = 0;
     while (!file.atEnd()) {
         QString line = file.readLine();
         if(++lineNumber == 2) continue; // second line which is a comment, ignore.
@@ -137,19 +154,10 @@ void XYZModel::readFile()
             }
             if(positionCount<m_points.size()) {
                 m_points[positionCount++] = QVector3D(x,y,z);
-                m_lx = std::max(m_lx, x);
-                m_ly = std::max(m_ly, y);
-                m_lz = std::max(m_lz, z);
             } else break; // If this is a multi timestep xyz-file, just ignore the rest
         }
     }
-
-    m_lx += 0.001*m_lx;
-    m_ly += 0.001*m_ly;
-    m_lz += 0.001*m_lz;
-    m_oneOverLx = 1.0 / m_lx;
-    m_oneOverLy = 1.0 / m_ly;
-    m_oneOverLz = 1.0 / m_lz;
+    CalculateBoundingbox();
     m_isValid = false;
 }
 
