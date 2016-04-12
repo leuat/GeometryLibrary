@@ -24,10 +24,11 @@ public:
     float m_maxDistance = 100;
     bool m_isValid = false;
     void calculateBoundingbox();
-    void erode(int depth = 1);
-    void fill(int depth = 1);
+    Q_INVOKABLE void erode(int depth = 1);
+    Q_INVOKABLE void fill(int depth = 1);
 
     inline int index(const int i, const int j, const int k) { return i*m_voxelsPerDimension*m_voxelsPerDimension + j*m_voxelsPerDimension + k; }
+    inline int indexPeriodic(const int i, const int j, const int k) { return ((i+m_voxelsPerDimension) % m_voxelsPerDimension)*m_voxelsPerDimension*m_voxelsPerDimension + ((j+m_voxelsPerDimension) % m_voxelsPerDimension)*m_voxelsPerDimension + ((k + m_voxelsPerDimension) % m_voxelsPerDimension); }
     inline void getIndexVectorFromIndex(const int &index, int &i, int &j, int &k) {
         i = index/(m_voxelsPerDimension*m_voxelsPerDimension);
         j = (index / m_voxelsPerDimension) % m_voxelsPerDimension;

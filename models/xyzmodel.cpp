@@ -47,44 +47,53 @@ void XYZModel::calculateBoundingbox()
 
 void XYZModel::erode(int depth)
 {
+    // http://se.mathworks.com/help/images/ref/imerode.html
     for(int idx=0; idx<m_voxels.size(); idx++) {
         if(m_voxels[idx] == 1) {
             int i,j,k;
             getIndexVectorFromIndex(idx, i, j, k);
-            int xMinus = index(i-1, j, k);
-            int xPlus = index(i+1, j, k);
-            int yMinus = index(i, j-1, k);
-            int yPlus = index(i, j+1, k);
-            int zMinus = index(i, j, k-1);
-            int zPlus = index(i, j, k+1);
-            if(xMinus==0) m_voxels[index(i-1, j, k)] = 2;
-            if(xPlus==0) m_voxels[index(i+1, j, k)] = 2;
-            if(yMinus==0) m_voxels[index(i, j-1, k)] = 2;
-            if(yPlus==0) m_voxels[index(i, j+1, k)] = 2;
-            if(zMinus==0) m_voxels[index(i, j, k-1)] = 2;
-            if(zPlus==0) m_voxels[index(i, j, k+1)] = 2;
+            int xMinus = m_voxels[indexPeriodic(i-1, j, k)];
+            int xPlus = m_voxels[indexPeriodic(i+1, j, k)];
+            int yMinus = m_voxels[indexPeriodic(i, j-1, k)];
+            int yPlus = m_voxels[indexPeriodic(i, j+1, k)];
+            int zMinus = m_voxels[indexPeriodic(i, j, k-1)];
+            int zPlus = m_voxels[indexPeriodic(i, j, k+1)];
+
+            if(xMinus==0) m_voxels[indexPeriodic(i-1, j, k)] = 2;
+            if(xPlus==0) m_voxels[indexPeriodic(i+1, j, k)] = 2;
+            if(yMinus==0) m_voxels[indexPeriodic(i, j-1, k)] = 2;
+            if(yPlus==0) m_voxels[indexPeriodic(i, j+1, k)] = 2;
+            if(zMinus==0) m_voxels[indexPeriodic(i, j, k-1)] = 2;
+            if(zPlus==0) m_voxels[indexPeriodic(i, j, k+1)] = 2;
         }
     }
 
-    for(int index=0; index<m_voxels.size(); index++) {
-        if(m_voxels[index]==2) m_voxels[index] = 1;
+    int count = 0;
+    for(int idx=0; idx<m_voxels.size(); idx++) {
+        if(m_voxels[idx]==2) {
+            count++;
+            m_voxels[idx] = 1;
+        }
     }
+
+    // qDebug() << "Eroding depth " << depth << " found " << count << " voxels fixed";
 
     if(depth > 0) erode(depth-1);
 }
 
 void XYZModel::fill(int depth)
 {
+    // http://se.mathworks.com/help/images/ref/imfill.html
     for(int idx=0; idx<m_voxels.size(); idx++) {
         if(m_voxels[idx] == 1) {
             int i,j,k;
             getIndexVectorFromIndex(idx, i, j, k);
-            int xMinus = index(i-1, j, k);
-            int xPlus = index(i+1, j, k);
-            int yMinus = index(i, j-1, k);
-            int yPlus = index(i, j+1, k);
-            int zMinus = index(i, j, k-1);
-            int zPlus = index(i, j, k+1);
+            int xMinus = m_voxels[indexPeriodic(i-1, j, k)];
+            int xPlus = m_voxels[indexPeriodic(i+1, j, k)];
+            int yMinus = m_voxels[indexPeriodic(i, j-1, k)];
+            int yPlus = m_voxels[indexPeriodic(i, j+1, k)];
+            int zMinus = m_voxels[indexPeriodic(i, j, k-1)];
+            int zPlus = m_voxels[indexPeriodic(i, j, k+1)];
 
             int count = 0;
             if(xMinus==1 || xMinus==2) count++;
@@ -93,17 +102,24 @@ void XYZModel::fill(int depth)
             if(yPlus==1 || yPlus==2)  count++;
             if(zMinus==1 || zMinus==2) count++;
             if(zPlus==1 || zPlus==2)  count++;
+
             if(count == 1) {
                 m_voxels[idx] = 2;
             }
         }
     }
 
+    int count = 0;
     for(int index=0; index<m_voxels.size(); index++) {
-        if(m_voxels[index]==2) m_voxels[index] = 0;
+        if(m_voxels[index]==2) {
+            count++;
+            m_voxels[index] = 0;
+        }
     }
 
-    if(depth > 0) erode(depth-1);
+    // qDebug() << "Filling depth " << depth << " found " << count << " voxels fixed";
+
+    if(depth > 0) fill(depth-1);
 }
 
 XYZModel::XYZModel() : Model()
@@ -386,6 +402,9 @@ void XYZModel::updateDistanceToAtomField() {
             }
         }
     }
+
+    erode(4);
+    fill(4);
 
     m_isValid = true;
 }
