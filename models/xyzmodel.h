@@ -23,18 +23,17 @@ public:
     float m_threshold = 0;
     float m_maxDistance = 100;
     bool m_isValid = false;
+    void calculateBoundingbox();
+    void erode(int depth = 1);
+    void fill(int depth = 1);
 
-    void CalculateBoundingbox();
-
-
-    inline int index(const int &i, const int &j, const int &k) { return i*m_voxelsPerDimension*m_voxelsPerDimension + j*m_voxelsPerDimension + k; }
-    void getIndexVectorFromIndex(const int &index, int &i, int &j, int &k) {
+    inline int index(const int i, const int j, const int k) { return i*m_voxelsPerDimension*m_voxelsPerDimension + j*m_voxelsPerDimension + k; }
+    inline void getIndexVectorFromIndex(const int &index, int &i, int &j, int &k) {
         i = index/(m_voxelsPerDimension*m_voxelsPerDimension);
         j = (index / m_voxelsPerDimension) % m_voxelsPerDimension;
         k = index % m_voxelsPerDimension;
     }
 
-public:
     XYZModel();
     QString file() const;
     int voxelsPerDimension() const;
