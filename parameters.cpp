@@ -2,6 +2,7 @@
 #include <QDebug.h>
 #include <QUrl>
 #include <QFile>
+#include "logger.h"
 
 QVariantList Parameters::parameters() const
 {
@@ -207,6 +208,8 @@ void Parameters::load(QString filename)
         }
     }
     QTextStream in(&file);
+    Logger::write(QString("Parameters::load: loading %1").arg(filename));
+
     while (!in.atEnd()) {
         QString line = in.readLine();
         QStringList words = line.split(" ");
@@ -228,6 +231,7 @@ void Parameters::load(QString filename)
             parameter->setMax(max);
             parameter->setStepSize(stepSize);
             parameter->setValue(value);
+            Logger::write(QString("Parameters::load: setting %1 to %2").arg(name.toLower()).arg(value));
         }
     }
     file.close();
@@ -346,7 +350,7 @@ void Parameter::setValue(double value)
         return;
 
     m_value = value;
-    if(m_value < m_min) m_value = m_min;
-    if(m_value > m_max) m_value = m_max;
+//    if(m_value < m_min) m_value = m_min;
+//    if(m_value > m_max) m_value = m_max;
     emit valueChanged(value);
 }

@@ -11,7 +11,7 @@ Parameters *Model::parameters() const
     return m_parameters;
 }
 
-bool Model::isInVoid(const QVector3D &point)
+bool Model::isInVoid(QVector3D point)
 {
     return isInVoid(point.x(), point.y(), point.z());
 }
@@ -22,11 +22,6 @@ void Model::start()
 }
 
 void Model::stop()
-{
-
-}
-
-void Model::createParameters()
 {
 
 }

@@ -5,7 +5,7 @@
 
 #include <QObject>
 #include <QVector3D>
-
+#include "../logger.h"
 class Model : public QObject
 {
     Q_OBJECT
@@ -16,12 +16,12 @@ protected:
 public:
     Model();
     Parameters* parameters() const;
-    bool isInVoid(const QVector3D &point);
+    bool isInVoid(QVector3D point);
     virtual void start();
     virtual void stop();
     virtual bool isInVoid(float x, float y, float z) = 0;
     virtual void parametersUpdated() = 0;
-    virtual void createParameters();
+    virtual void createParameters() = 0;
     virtual void loadParameters(class CIniFile *iniFile);
     virtual void randomWalk();
 

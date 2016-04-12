@@ -1,27 +1,20 @@
-//#ifndef MULTIFRACTALMODEL_H
-//#define MULTIFRACTALMODEL_H
-//#include "regularmodel.h"
+#ifndef MULTIFRACTALMODEL_H
+#define MULTIFRACTALMODEL_H
+#include "regularnoisemodel.h"
 
-//class MultiFractalModel : public RegularNoiseModel
-//{
-//protected:
-//    double m_lacunarity, m_octaves, m_gain, m_offset;
+class MultiFractalModel : public RegularNoiseModel
+{
+protected:
+    double m_lacunarity, m_gain, m_offset;
 
-//public:
-//    MultiFractalModel();
+    MultiFractalModel();
 
-//    bool isInVoid(const QVector3D& pos) override;
-//    void initialize(Noise::NoiseType noiseType, Parameters* np) override;
-//};
+    // Model interface
+public:
+    virtual bool isInVoid(float x, float y, float z) override;
+    virtual void parametersUpdated() override;
+    virtual void createParameters() override;
+    void loadParameters(CIniFile *iniFile) override;
 
-//class MultiFractalParameters : public Parameters
-//{
-//    Q_OBJECT
-//public:
-//    MultiFractalParameters();
-//    MultiFractalParameters(double octaves, double scale, double persistence, double threshold, double inverted, double seed, double absolute,
-//                           double lacunarity, double gain, double offset);
-
-//};
-
-//#endif // MULTIFRACTALMODEL_H
+};
+#endif // REGULARNOISEMODEL_H

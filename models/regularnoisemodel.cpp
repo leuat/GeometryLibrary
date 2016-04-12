@@ -3,6 +3,7 @@
 #include "../simplex.h"
 #include "../perlin.h"
 #include "../misc/random.h"
+
 RegularNoiseModel::RegularNoiseModel() : Model()
 {
     createParameters();
@@ -47,14 +48,26 @@ void RegularNoiseModel::parametersUpdated()
     m_skewScale = m_parameters->getValue("skewscale");
     m_skewAmplitude = m_parameters->getValue("skewamplitude");
 
+    Logger::write(QString("RegularNoiseModel::parametersUpdated: updating octaves=%1").arg(m_octaves));
+    Logger::write(QString("RegularNoiseModel::parametersUpdated: updating scale=%1").arg(m_scale));
+    Logger::write(QString("RegularNoiseModel::parametersUpdated: updating persistence=%1").arg(m_persistence));
+    Logger::write(QString("RegularNoiseModel::parametersUpdated: updating threshold=%1").arg(m_threshold));
+    Logger::write(QString("RegularNoiseModel::parametersUpdated: updating inverted=%1").arg(m_inverted));
+    Logger::write(QString("RegularNoiseModel::parametersUpdated: updating seed=%1").arg(m_seed));
+    Logger::write(QString("RegularNoiseModel::parametersUpdated: updating absolute=%1").arg(m_absolute));
+    Logger::write(QString("RegularNoiseModel::parametersUpdated: updating skewscale=%1").arg(m_skewScale));
+    Logger::write(QString("RegularNoiseModel::parametersUpdated: updating skewaplitude=%1").arg(m_skewAmplitude));
+
     QString newNoiseType = m_parameters->getString("noisetype");
     if(newNoiseType.compare(m_noiseType) != 0) {
         // The string has changed
         if(newNoiseType.compare("simplex") == 0 || newNoiseType.compare("perlin") == 0) {
             m_noiseType = newNoiseType;
+            Logger::write(QString("RegularNoiseModel::parametersUpdated: updating noisetype=%1").arg(m_noiseType));
         }
     }
 }
+
 
 void RegularNoiseModel::createParameters()
 {
@@ -68,21 +81,43 @@ void RegularNoiseModel::createParameters()
     m_parameters->createParameter("skewscale", 1.0, 0,1,0.1);
     m_parameters->createParameter("skewamplitude", 0.0, 0, 1, 0.1);
     m_parameters->createParameter("noisetype", "simplex");
+    Logger::write(QString("RegularNoiseModel::createParameters: creating octaves=%1").arg(m_parameters->getValue("octaves")));
+    Logger::write(QString("RegularNoiseModel::createParameters: creating scale=%1").arg(m_parameters->getValue("scale")));
+    Logger::write(QString("RegularNoiseModel::createParameters: creating persistence=%1").arg(m_parameters->getValue("persistence")));
+    Logger::write(QString("RegularNoiseModel::createParameters: creating threshold=%1").arg(m_parameters->getValue("threshold")));
+    Logger::write(QString("RegularNoiseModel::createParameters: creating inverted=%1").arg(m_parameters->getValue("inverted")));
+    Logger::write(QString("RegularNoiseModel::createParameters: creating seed=%1").arg(m_parameters->getValue("seed")));
+    Logger::write(QString("RegularNoiseModel::createParameters: creating absolute=%1").arg(m_parameters->getValue("absolute")));
+    Logger::write(QString("RegularNoiseModel::createParameters: creating skewscale=%1").arg(m_parameters->getValue("skewscale")));
+    Logger::write(QString("RegularNoiseModel::createParameters: creating skewaplitude=%1").arg(m_parameters->getValue("skewamplitude")));
+    Logger::write(QString("RegularNoiseModel::createParameters: creating noisetype=%1").arg(m_parameters->getValue("noisetype")));
     parametersUpdated();
 }
 
 void RegularNoiseModel::loadParameters(CIniFile *iniFile)
 {
-    m_parameters->setParameter("octaves", iniFile->getdouble("octaves"), 1, 7, 1);
-    m_parameters->setParameter("scale", iniFile->getdouble("scale"), 0.001, 0.1, 0.001);
-    m_parameters->setParameter("persistence", iniFile->getdouble("persistence"), 0.1, 3, 0.1);
-    m_parameters->setParameter("threshold", iniFile->getdouble("threshold"), -1, 1, 0.1);
-    m_parameters->setParameter("inverted", iniFile->getdouble("inverted"), 0, 1, 1);
-    m_parameters->setParameter("seed", iniFile->getdouble("seed"), 1, 100, 1);
-    m_parameters->setParameter("absolute", iniFile->getdouble("absolute"), 0, 1, 1);
-    m_parameters->setParameter("skewscale", iniFile->getdouble("skewscale"), 0, 1, 0.1);
-    m_parameters->setParameter("skewamplitude", iniFile->getdouble("skewamplitude"), 0, 1, 0.1);
-    m_parameters->setParameter("noisetype", QString::fromStdString(iniFile->getstring("noisetype")));
+    Logger::write(QString("RegularNoiseModel::loadParameters: loading parameters from file %1").arg(QString::fromStdString(iniFile->filename)));
+
+    m_parameters->setParameter("octaves", iniFile->getdouble("noise_octaves"), 1, 7, 1);
+    m_parameters->setParameter("scale", iniFile->getdouble("noise_scale"), 0.001, 0.1, 0.001);
+    m_parameters->setParameter("persistence", iniFile->getdouble("noise_persistence"), 0.1, 3, 0.1);
+    m_parameters->setParameter("threshold", iniFile->getdouble("noise_threshold"), -1, 1, 0.1);
+    m_parameters->setParameter("inverted", iniFile->getdouble("noise_inverted"), 0, 1, 1);
+    m_parameters->setParameter("seed", iniFile->getdouble("noise_seed"), 1, 100, 1);
+    m_parameters->setParameter("absolute", iniFile->getdouble("noise_absolute"), 0, 1, 1);
+    m_parameters->setParameter("skewscale", iniFile->getdouble("noise_skewscale"), 0, 1, 0.1);
+    m_parameters->setParameter("skewamplitude", iniFile->getdouble("noise_skewamplitude"), 0, 1, 0.1);
+    m_parameters->setParameter("noisetype", QString::fromStdString(iniFile->getstring("noise_noisetype")));
+    Logger::write(QString("RegularNoiseModel::loadParameters: setting octaves=%1").arg(m_parameters->getValue("octaves")));
+    Logger::write(QString("RegularNoiseModel::loadParameters: setting scale=%1").arg(m_parameters->getValue("scale")));
+    Logger::write(QString("RegularNoiseModel::loadParameters: setting persistence=%1").arg(m_parameters->getValue("persistence")));
+    Logger::write(QString("RegularNoiseModel::loadParameters: setting threshold=%1").arg(m_parameters->getValue("threshold")));
+    Logger::write(QString("RegularNoiseModel::loadParameters: setting inverted=%1").arg(m_parameters->getValue("inverted")));
+    Logger::write(QString("RegularNoiseModel::loadParameters: setting seed=%1").arg(m_parameters->getValue("seed")));
+    Logger::write(QString("RegularNoiseModel::loadParameters: setting absolute=%1").arg(m_parameters->getValue("absolute")));
+    Logger::write(QString("RegularNoiseModel::loadParameters: setting skewscale=%1").arg(m_parameters->getValue("skewscale")));
+    Logger::write(QString("RegularNoiseModel::loadParameters: setting skewaplitude=%1").arg(m_parameters->getValue("skewamplitude")));
+    Logger::write(QString("RegularNoiseModel::loadParameters: setting noisetype=%1").arg(m_parameters->getValue("noisetype")));
     parametersUpdated();
 }
 
@@ -104,14 +139,18 @@ void RegularNoiseModel::stop()
 
 void RegularNoiseModel::randomWalk()
 {
+    Logger::write(QString("RegularNoiseModel::randomWalk: starting random walk"));
     double delta = Random::nextGaussian(0, m_parameters->getStepSize("scale"));
     m_parameters->setValue("scale", m_parameters->getValue("scale") + delta);
+    Logger::write(QString("RegularNoiseModel::randomWalk: changing scale with %1 to %2").arg(delta, m_parameters->getValue("scale")));
 
     delta = Random::nextGaussian(0, 0.5*m_parameters->getStepSize("persistence"));
     m_parameters->setValue("persistence", m_parameters->getValue("persistence") + delta);
+    Logger::write(QString("RegularNoiseModel::randomWalk: changing persistence with %1 to %2").arg(delta, m_parameters->getValue("persistence")));
 
     delta = Random::nextGaussian(0, 0.5*m_parameters->getStepSize("threshold"));
     m_parameters->setValue("threshold", m_parameters->getValue("threshold") + delta);
+    Logger::write(QString("RegularNoiseModel::randomWalk: changing threshold with %1 to %2").arg(delta, m_parameters->getValue("threshold")));
 
     delta = Random::nextGaussian(0, 0.5*m_parameters->getStepSize("skewScale"));
     m_parameters->setValue("skewScale", m_parameters->getValue("skewScale") + delta);
