@@ -1,5 +1,7 @@
 #include "model.h"
+#include  "../misc/random.h"
 #include <QDebug>
+
 Model::Model()
 {
     m_parameters = new Parameters();
@@ -11,7 +13,7 @@ Parameters *Model::parameters() const
     return m_parameters;
 }
 
-bool Model::isInVoid(QVector3D point)
+bool Model::isInVoid(const QVector3D& point)
 {
     return isInVoid(point.x(), point.y(), point.z());
 }
@@ -33,6 +35,53 @@ void Model::loadParameters(CIniFile *iniFile)
 
 void Model::randomWalk()
 {
+
+}
+
+bool Model::fitSphere(const QVector3D &position, float radius, int count)
+{
+    // r uniform
+    float dx = 1.0*radius;
+    for (int i=0;i<count;i++) {
+        QVector3D p = Random::nextQVector3D(0, dx);
+        //p = p.normalized()*radius*Random::nextFloat();
+        p = p + position;
+
+        if (!isInVoid(p))
+            return false;
+    }
+    return true;
+}
+
+float Model::calculateFractalDimension(float min, float max)
+{
+    float dM = (max-min);
+    int N = 20;
+    int fitCount = 100;
+    for (int n=1;n<N;n++) {
+        float r = (1- (float)n/N)*dM/20;
+        int cnt = (int)(dM/r);
+
+        int fits = 0;
+
+        for (int i=0;i<cnt;i++)
+            for (int j=0;j<cnt;j++)
+                for (int k=0;k<cnt;k++)
+                {
+                    QVector3D p(i*r, j*r, k*r);
+                    if (fitSphere(p, r, r*10))
+                        fits++;
+                }
+        if (fits==0) {
+            qDebug() << "No fits for r = " << r;
+
+        }
+        else {
+            float Df = log(fits)/log(1.0/(r/dM));
+            qDebug() << Df << " for r = " << r;
+        }
+
+        }
 
 }
 

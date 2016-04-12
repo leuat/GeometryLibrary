@@ -137,7 +137,7 @@ Octree::Octree() : XYZModel()
     createParameters();
 }
 
-void Octree::buildTree(bool fromCellList)
+void Octree::buildTree(bool fromCellList, bool createTriangleList)
 {
 
     m_root = new OctNode(QVector3D(0,0,0), QVector3D(m_lx, m_ly, m_lz), 0, 0);
@@ -145,7 +145,7 @@ void Octree::buildTree(bool fromCellList)
 
     if (!fromCellList) {
         qDebug() << "Building octree with max depth : " << m_maxDepth << " and " << m_points.size() << " particles";
-        for (QVector3D p : m_points)
+        for (const QVector3D& p : m_points)
             insertValueAtPoint(p, 1);
     }
     else {
@@ -182,8 +182,8 @@ void Octree::buildTree(bool fromCellList)
 //*/
     }
     melt();
-
-    build2DTriangleList();
+    if (createTriangleList)
+        build2DTriangleList();
 
 }
 
@@ -493,5 +493,5 @@ void Octree::loadParameters(CIniFile *iniFile)
         double cutRadius = radius / (m_lx*0.5); // this radius is between 0 and 1
         removeCylinder(cutRadius);
     }
-    this->buildTree(true);
+    this->buildTree(true, true);
 }
