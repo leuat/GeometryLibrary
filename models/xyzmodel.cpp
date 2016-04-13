@@ -48,42 +48,7 @@ void XYZModel::calculateBoundingbox()
 void XYZModel::erode(int depth)
 {
     // http://se.mathworks.com/help/images/ref/imerode.html
-    for(int idx=0; idx<m_voxels.size(); idx++) {
-        if(m_voxels[idx] == 1) {
-            int i,j,k;
-            getIndexVectorFromIndex(idx, i, j, k);
-            int xMinus = m_voxels[indexPeriodic(i-1, j, k)];
-            int xPlus = m_voxels[indexPeriodic(i+1, j, k)];
-            int yMinus = m_voxels[indexPeriodic(i, j-1, k)];
-            int yPlus = m_voxels[indexPeriodic(i, j+1, k)];
-            int zMinus = m_voxels[indexPeriodic(i, j, k-1)];
-            int zPlus = m_voxels[indexPeriodic(i, j, k+1)];
 
-            if(xMinus==0) m_voxels[indexPeriodic(i-1, j, k)] = 2;
-            if(xPlus==0) m_voxels[indexPeriodic(i+1, j, k)] = 2;
-            if(yMinus==0) m_voxels[indexPeriodic(i, j-1, k)] = 2;
-            if(yPlus==0) m_voxels[indexPeriodic(i, j+1, k)] = 2;
-            if(zMinus==0) m_voxels[indexPeriodic(i, j, k-1)] = 2;
-            if(zPlus==0) m_voxels[indexPeriodic(i, j, k+1)] = 2;
-        }
-    }
-
-    int count = 0;
-    for(int idx=0; idx<m_voxels.size(); idx++) {
-        if(m_voxels[idx]==2) {
-            count++;
-            m_voxels[idx] = 1;
-        }
-    }
-
-    // qDebug() << "Eroding depth " << depth << " found " << count << " voxels fixed";
-
-    if(depth > 0) erode(depth-1);
-}
-
-void XYZModel::fill(int depth)
-{
-    // http://se.mathworks.com/help/images/ref/imfill.html
     for(int idx=0; idx<m_voxels.size(); idx++) {
         if(m_voxels[idx] == 1) {
             int i,j,k;
@@ -119,6 +84,42 @@ void XYZModel::fill(int depth)
 
     // qDebug() << "Filling depth " << depth << " found " << count << " voxels fixed";
 
+    if(depth > 0) erode(depth-1);
+}
+
+void XYZModel::fill(int depth)
+{
+    // http://se.mathworks.com/help/images/ref/imfill.html
+    for(int idx=0; idx<m_voxels.size(); idx++) {
+        if(m_voxels[idx] == 1) {
+            int i,j,k;
+            getIndexVectorFromIndex(idx, i, j, k);
+            int xMinus = m_voxels[indexPeriodic(i-1, j, k)];
+            int xPlus = m_voxels[indexPeriodic(i+1, j, k)];
+            int yMinus = m_voxels[indexPeriodic(i, j-1, k)];
+            int yPlus = m_voxels[indexPeriodic(i, j+1, k)];
+            int zMinus = m_voxels[indexPeriodic(i, j, k-1)];
+            int zPlus = m_voxels[indexPeriodic(i, j, k+1)];
+
+            if(xMinus==0) m_voxels[indexPeriodic(i-1, j, k)] = 2;
+            if(xPlus==0) m_voxels[indexPeriodic(i+1, j, k)] = 2;
+            if(yMinus==0) m_voxels[indexPeriodic(i, j-1, k)] = 2;
+            if(yPlus==0) m_voxels[indexPeriodic(i, j+1, k)] = 2;
+            if(zMinus==0) m_voxels[indexPeriodic(i, j, k-1)] = 2;
+            if(zPlus==0) m_voxels[indexPeriodic(i, j, k+1)] = 2;
+        }
+    }
+
+    int count = 0;
+    for(int idx=0; idx<m_voxels.size(); idx++) {
+        if(m_voxels[idx]==2) {
+            count++;
+            m_voxels[idx] = 1;
+        }
+    }
+
+    // qDebug() << "Eroding depth " << depth << " found " << count << " voxels fixed";
+
     if(depth > 0) fill(depth-1);
 }
 
@@ -151,6 +152,7 @@ void XYZModel::parametersUpdated()
     m_voxelsPerDimension = m_parameters->getValue(QString("voxelsperdimension"));
     m_threshold = m_parameters->getValue(QString("threshold"));
     m_maxDistance = m_parameters->getValue(QString("maxdistance"));
+    m_fillAndErodeDepth = m_parameters->getValue(QString("fillanderodedepth"));
 }
 
 void XYZModel::createParameters()
@@ -158,6 +160,7 @@ void XYZModel::createParameters()
     m_parameters->createParameter(QString("voxelsperdimension"), 128.0, 16.0, 512.0, 1.0);
     m_parameters->createParameter(QString("threshold"), 3.0, 1.0, 5.0, 0.1);
     m_parameters->createParameter(QString("maxdistance"), 20.0, 10.0, 100.0, 2.0);
+    m_parameters->createParameter(QString("fillanderodedepth"), 2, 0.0, 5.0, 1.0);
 }
 
 void XYZModel::loadParameters(CIniFile *iniFile)
@@ -166,6 +169,8 @@ void XYZModel::loadParameters(CIniFile *iniFile)
     m_voxelsPerDimension = iniFile->getint("xyzfile_resolution");
     m_threshold = iniFile->getdouble("xyzfile_threshold");
     m_maxDistance = iniFile->getdouble("xyzfile_maxdistance");
+    m_fillAndErodeDepth = iniFile->getint("xyzfile_fillanderodedepth");
+
     readFile();
     if(iniFile->find(QString("cut_cylinder"), true)) {
         double radius = iniFile->getdouble("cylinder_radius");
@@ -249,6 +254,11 @@ void XYZModel::removeFromModel(Model *model) {
     m_points.clear();
     m_points = points;
     model->stop();
+}
+
+int XYZModel::fillAndErodeDepth() const
+{
+    return m_fillAndErodeDepth;
 }
 
 void XYZModel::removeCylinder(float r)
@@ -403,8 +413,8 @@ void XYZModel::updateDistanceToAtomField() {
         }
     }
 
-    erode(4);
-    fill(4);
+    fill(m_fillAndErodeDepth);
+    erode(m_fillAndErodeDepth);
 
     m_isValid = true;
 }
@@ -448,4 +458,13 @@ void XYZModel::setMaxDistance(float maxDistance)
 
     m_maxDistance = maxDistance;
     emit maxDistanceChanged(maxDistance);
+}
+
+void XYZModel::setFillAndErodeDepth(int fillAndErodeDepth)
+{
+    if (m_fillAndErodeDepth == fillAndErodeDepth)
+        return;
+
+    m_fillAndErodeDepth = fillAndErodeDepth;
+    emit fillAndErodeDepthChanged(fillAndErodeDepth);
 }
