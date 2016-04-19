@@ -160,6 +160,7 @@ void Octree::buildTree(bool notUsed, bool createTriangleList)
     qDebug() << "Will fill and erode " << m_fillAndErodeDepth << " times.";
     fill(m_fillAndErodeDepth);
     erode(m_fillAndErodeDepth);
+    fill(1, 0.25);
 
     int count = 0;
     for (int i=0;i<m_voxelsPerDimension;i++) {

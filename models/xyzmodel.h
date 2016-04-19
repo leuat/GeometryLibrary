@@ -27,7 +27,7 @@ protected:
 public:
     void calculateBoundingbox();
     Q_INVOKABLE void erode(int depth = 1);
-    Q_INVOKABLE void fill(int depth = 1);
+    Q_INVOKABLE void fill(int depth = 1, float p = 1.0);
 
     inline int index(const int &i, const int &j, const int &k) { return i*m_voxelsPerDimension*m_voxelsPerDimension + j*m_voxelsPerDimension + k; }
     inline int indexPeriodic(const int i, const int j, const int k) { return ((i+m_voxelsPerDimension) % m_voxelsPerDimension)*m_voxelsPerDimension*m_voxelsPerDimension + ((j+m_voxelsPerDimension) % m_voxelsPerDimension)*m_voxelsPerDimension + ((k + m_voxelsPerDimension) % m_voxelsPerDimension); }

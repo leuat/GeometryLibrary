@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QUrl>
 #include "regularnoisemodel.h"
+#include "../misc/random.h"
 float XYZModel::getLx() const
 {
     return m_lx;
@@ -96,13 +97,13 @@ void XYZModel::erode(int depth)
     erode(depth-1);
 }
 
-void XYZModel::fill(int depth)
+void XYZModel::fill(int depth, float p)
 {
     // http://se.mathworks.com/help/images/ref/imfill.html
     if(depth==0) return;
 
     for(int idx=0; idx<m_voxels.size(); idx++) {
-        if(m_voxels[idx] == 1) {
+        if(m_voxels[idx] == 1 && Random::nextFloat() < p) {
             int i,j,k;
             getIndexVectorFromIndex(idx, i, j, k);
             int xMinus = m_voxels[indexPeriodic(i-1, j, k)];
@@ -369,6 +370,7 @@ void XYZModel::updateDistanceToAtomField() {
     qDebug() << "Will fill and erode " << m_fillAndErodeDepth << " times.";
     fill(m_fillAndErodeDepth);
     erode(m_fillAndErodeDepth);
+    fill(1, 0.25);
 
     m_isValid = true;
 }
