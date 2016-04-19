@@ -51,7 +51,7 @@ void XYZModel::erode(int depth)
     if(depth==0) return;
 
     for(int idx=0; idx<m_voxels.size(); idx++) {
-        if(m_voxels[idx] == 1) {
+        if(m_voxels[idx] == 0) {
             int i,j,k;
             getIndexVectorFromIndex(idx, i, j, k);
             int xMinus = m_voxels[indexPeriodic(i-1, j, k)];
@@ -60,17 +60,25 @@ void XYZModel::erode(int depth)
             int yPlus = m_voxels[indexPeriodic(i, j+1, k)];
             int zMinus = m_voxels[indexPeriodic(i, j, k-1)];
             int zPlus = m_voxels[indexPeriodic(i, j, k+1)];
+            if(true) {
+                if(xMinus==1) m_voxels[indexPeriodic(i-1, j, k)] = 2;
+                if(xPlus==1) m_voxels[indexPeriodic(i+1, j, k)] = 2;
+                if(yMinus==1) m_voxels[indexPeriodic(i, j-1, k)] = 2;
+                if(yPlus==1) m_voxels[indexPeriodic(i, j+1, k)] = 2;
+                if(zMinus==1) m_voxels[indexPeriodic(i, j, k-1)] = 2;
+                if(zPlus==1) m_voxels[indexPeriodic(i, j, k+1)] = 2;
+            } else {
+                int count = 0;
+                if(xMinus==0 || xMinus==2) count++;
+                if(xPlus==0 || xPlus==2)  count++;
+                if(yMinus==0 || yMinus==2) count++;
+                if(yPlus==0 || yPlus==2)  count++;
+                if(zMinus==0 || zMinus==2) count++;
+                if(zPlus==0 || zPlus==2)  count++;
 
-            int count = 0;
-            if(xMinus==1 || xMinus==2) count++;
-            if(xPlus==1 || xPlus==2)  count++;
-            if(yMinus==1 || yMinus==2) count++;
-            if(yPlus==1 || yPlus==2)  count++;
-            if(zMinus==1 || zMinus==2) count++;
-            if(zPlus==1 || zPlus==2)  count++;
-
-            if(count == 1) {
-                m_voxels[idx] = 2;
+                if(count == 1) {
+                    m_voxels[idx] = 2;
+                }
             }
         }
     }

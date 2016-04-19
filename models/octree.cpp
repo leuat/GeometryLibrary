@@ -474,8 +474,6 @@ void OctNode::insertValueAtPoint(const QVector3D &p, float value, int maxDepth)
     }
 }
 
-
-
 void Octree::loadParameters(CIniFile *iniFile)
 {
     m_file = QString::fromStdString(iniFile->getstring("xyzfile_file"));
