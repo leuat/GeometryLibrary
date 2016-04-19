@@ -113,18 +113,14 @@ bool Octree::isInVoid(float x, float y, float z)
 
 void Octree::parametersUpdated()
 {
-//    XYZModel
     m_maxDepth = m_parameters->getValue(QString("maxdepth"));
     m_fillAndErodeDepth = m_parameters->getValue(QString("fillanderodedepth"));
-    m_voxelsPerDimension = m_parameters->getValue(QString("voxelsperdimension"));
 }
 
 void Octree::createParameters()
 {
     m_parameters->createParameter(QString("maxdepth"), 7, 1, 12, 1);
     m_parameters->createParameter(QString("fillanderodedepth"), 2, 0, 10, 1);
-    m_parameters->createParameter(QString("voxelsperdimension"), 64, 16, 256, 8);
-
 }
 
 QVector<SimVis::TriangleCollectionVBOData> Octree::vboData() const
@@ -142,7 +138,8 @@ void Octree::buildTree(bool notUsed, bool createTriangleList)
     parametersUpdated();
     m_root = new OctNode(QVector3D(0,0,0), QVector3D(m_lx, m_ly, m_lz), 0, 0);
 
-    setVoxelsPerDimension(pow(2, m_maxDepth));
+    qDebug() << "Max depth: " << m_maxDepth;
+    m_voxelsPerDimension = pow(2, m_maxDepth);
     m_voxels.resize(0, 0); // Important so that the resize below actually sets all values to zero.
     m_voxels.resize(m_voxelsPerDimension*m_voxelsPerDimension*m_voxelsPerDimension, 0);
     qDebug() << "Building octree with " << m_points.size() << " points";
@@ -483,8 +480,7 @@ void Octree::loadParameters(CIniFile *iniFile)
 {
     m_file = QString::fromStdString(iniFile->getstring("xyzfile_file"));
     m_parameters->setParameter("fillanderodedepth", iniFile->getint("xyzfile_fillanderodedepth"), 0, 10, 1);
-    m_parameters->setParameter("maxdepth", log2(m_voxelsPerDimension), 2, 10, 1);
-    m_parameters->setParameter("voxelsperdimension", iniFile->getdouble("xyzfile_resolution"), 16, 256, 8);
+    m_parameters->setParameter("maxdepth", iniFile->getint("octree_maxdepth"), 2, 10, 1);
     parametersUpdated();
     readFile();
 
