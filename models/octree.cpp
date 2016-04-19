@@ -122,6 +122,8 @@ void Octree::parametersUpdated()
 void Octree::createParameters()
 {
     m_parameters->createParameter(QString("maxdepth"), 7, 1, 12, 1);
+    m_parameters->createParameter(QString("fillanderodedepth"), 2, 0, 10, 1);
+    m_parameters->createParameter(QString("voxelsperdimension"), 64, 16, 256, 8);
 
 }
 

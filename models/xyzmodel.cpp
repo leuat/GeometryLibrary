@@ -165,9 +165,9 @@ void XYZModel::createParameters()
 void XYZModel::loadParameters(CIniFile *iniFile)
 {
     m_file = QString::fromStdString(iniFile->getstring("xyzfile_file"));
-    m_voxelsPerDimension = iniFile->getint("xyzfile_resolution");
-    qDebug() << "Voxels per dimension: " << m_voxelsPerDimension;
-    m_fillAndErodeDepth = iniFile->getint("xyzfile_fillanderodedepth");
+    m_parameters->setParameter("fillanderodedepth", iniFile->getint("xyzfile_fillanderodedepth"), 0, 10, 1);
+    m_parameters->setParameter("voxelsperdimension", iniFile->getdouble("xyzfile_resolution"), 16, 256, 8);
+    parametersUpdated();
 
     readFile();
     if(iniFile->find(QString("cut_noise"), true)) {
