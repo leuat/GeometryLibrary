@@ -2,16 +2,6 @@
 #include <QDebug>
 #include "GeometryLibrary/models/models.h"
 
-int DTALikelihood::voxelsPerDimension() const
-{
-    return m_numberOfRandomVectors;
-}
-
-void DTALikelihood::setVoxelsPerDimension(int voxelsPerDimension)
-{
-    m_numberOfRandomVectors = voxelsPerDimension;
-}
-
 int DTALikelihood::histogramBins() const
 {
     return m_histogramBins;
@@ -32,15 +22,25 @@ void DTALikelihood::setCutoff(double cutoff)
     m_cutoff = cutoff;
 }
 
+int DTALikelihood::numberOfRandomVectors() const
+{
+    return m_numberOfRandomVectors;
+}
+
+void DTALikelihood::setNumberOfRandomVectors(int numberOfRandomVectors)
+{
+    m_numberOfRandomVectors = numberOfRandomVectors;
+}
+
 DTALikelihood::DTALikelihood()
 {
-
+    
 }
 
 LGraph DTALikelihood::calculateStatisticsDirect(Particles &particles)
 {
     QVector<QVector3D> qp;
-    particles.getVector3DList(qp);
+    particles.appendToQVector3DList(qp);
     LGraph graph;
     calculateStatistics(qp, graph);
     return graph;

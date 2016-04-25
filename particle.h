@@ -73,7 +73,7 @@ private:
     float m_calculatedPorosity;
 public:
     QVector<Particle *>& getParticles();
-
+    QVector<QVector3D> getQVector3DList();
 
     void save(const char *filename);
     void open(const char *filename);
@@ -89,7 +89,7 @@ public:
         particles.clear();
     }
 
-    void getVector3DList(QVector<QVector3D>& list);
+    void appendToQVector3DList(QVector<QVector3D>& list);
 
 
     int size() {
