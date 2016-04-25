@@ -1,5 +1,6 @@
 #include "model.h"
 #include  "../misc/random.h"
+#include "../likelihood/lgraph.h"
 #include <QDebug>
 
 Model::Model()
@@ -57,19 +58,19 @@ float Model::calculateFractalDimension(float min, float max)
 {
     float dM = (max-min);
     int N = 20;
-    int fitCount = 100;
+    int fitCountScale = 10;
+    LGraph results;
+    results.initialize(N-1);
     for (int n=1;n<N;n++) {
         float r = (1- (float)n/N)*dM/20;
         int cnt = (int)(dM/r);
-
         int fits = 0;
-
         for (int i=0;i<cnt;i++)
             for (int j=0;j<cnt;j++)
                 for (int k=0;k<cnt;k++)
                 {
                     QVector3D p(i*r, j*r, k*r);
-                    if (fitSphere(p, r, r*10))
+                    if (fitSphere(p, r, r*fitCountScale))
                         fits++;
                 }
         if (fits==0) {
@@ -79,9 +80,13 @@ float Model::calculateFractalDimension(float min, float max)
         else {
             float Df = log(fits)/log(1.0/(r/dM));
             qDebug() << Df << " for r = " << r;
+            results.val[n-1] = Df;
+            results.index[n-1] = r;
+            results.IndexScaled[n-1] = r;
         }
 
         }
+    results.SaveText("../../../../../fractal_dim.txt");
 
 }
 
