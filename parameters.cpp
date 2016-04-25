@@ -145,6 +145,15 @@ void Parameters::setValue(QString name, double value)
     if(parameter) parameter->setValue(value);
 }
 
+void Parameters::fitBounds(QString name)
+{
+    double value = getValue(name);
+    double max = getMax(name);
+    double min = getMin(name);
+    if(value > max) setValue(name, max);
+    else if(value < min) setValue(name, min);
+}
+
 double Parameters::getStepSize(QString name)
 {
     name = name.toLower();

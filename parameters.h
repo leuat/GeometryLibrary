@@ -81,6 +81,7 @@ public:
     double getMin(QString name);
     double getStepSize(QString name);
     void setValue(QString name, double value);
+    void fitBounds(QString name);
     QString getString(QString name);
     Q_INVOKABLE void save(QString filename);
     Q_INVOKABLE void load(QString filename);

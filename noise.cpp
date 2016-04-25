@@ -13,7 +13,7 @@ double Noise::get( const double x, const double y, const double z ) {
 }
 
 
-double Noise::get( const double x, const double y, const double z, const double per, const double f ) {
+double Noise::get( const double x, const double y, const double z, const double per, const double f) {
     double total = 0;
     double freq = f;
     double amplitude = 1.0;
