@@ -4,7 +4,8 @@
 #include <QRegExp>
 #include <QDebug>
 #include <QUrl>
-
+#include "regularnoisemodel.h"
+#include "../misc/random.h"
 float XYZModel::getLx() const
 {
     return m_lx;
@@ -48,9 +49,10 @@ void XYZModel::calculateBoundingbox()
 void XYZModel::erode(int depth)
 {
     // http://se.mathworks.com/help/images/ref/imerode.html
+    if(depth==0) return;
 
     for(int idx=0; idx<m_voxels.size(); idx++) {
-        if(m_voxels[idx] == 1) {
+        if(m_voxels[idx] == 0) {
             int i,j,k;
             getIndexVectorFromIndex(idx, i, j, k);
             int xMinus = m_voxels[indexPeriodic(i-1, j, k)];
@@ -59,17 +61,25 @@ void XYZModel::erode(int depth)
             int yPlus = m_voxels[indexPeriodic(i, j+1, k)];
             int zMinus = m_voxels[indexPeriodic(i, j, k-1)];
             int zPlus = m_voxels[indexPeriodic(i, j, k+1)];
+            if(true) {
+                if(xMinus==1) m_voxels[indexPeriodic(i-1, j, k)] = 2;
+                if(xPlus==1) m_voxels[indexPeriodic(i+1, j, k)] = 2;
+                if(yMinus==1) m_voxels[indexPeriodic(i, j-1, k)] = 2;
+                if(yPlus==1) m_voxels[indexPeriodic(i, j+1, k)] = 2;
+                if(zMinus==1) m_voxels[indexPeriodic(i, j, k-1)] = 2;
+                if(zPlus==1) m_voxels[indexPeriodic(i, j, k+1)] = 2;
+            } else {
+                int count = 0;
+                if(xMinus==0 || xMinus==2) count++;
+                if(xPlus==0 || xPlus==2)  count++;
+                if(yMinus==0 || yMinus==2) count++;
+                if(yPlus==0 || yPlus==2)  count++;
+                if(zMinus==0 || zMinus==2) count++;
+                if(zPlus==0 || zPlus==2)  count++;
 
-            int count = 0;
-            if(xMinus==1 || xMinus==2) count++;
-            if(xPlus==1 || xPlus==2)  count++;
-            if(yMinus==1 || yMinus==2) count++;
-            if(yPlus==1 || yPlus==2)  count++;
-            if(zMinus==1 || zMinus==2) count++;
-            if(zPlus==1 || zPlus==2)  count++;
-
-            if(count == 1) {
-                m_voxels[idx] = 2;
+                if(count == 1) {
+                    m_voxels[idx] = 2;
+                }
             }
         }
     }
@@ -82,16 +92,18 @@ void XYZModel::erode(int depth)
         }
     }
 
-    // qDebug() << "Filling depth " << depth << " found " << count << " voxels fixed";
+    qDebug() << "Eroding depth " << depth << " found " << count << " voxels fixed";
 
-    if(depth > 0) erode(depth-1);
+    erode(depth-1);
 }
 
-void XYZModel::fill(int depth)
+void XYZModel::fill(int depth, float p)
 {
     // http://se.mathworks.com/help/images/ref/imfill.html
+    if(depth==0) return;
+
     for(int idx=0; idx<m_voxels.size(); idx++) {
-        if(m_voxels[idx] == 1) {
+        if(m_voxels[idx] == 1 && Random::nextFloat() < p) {
             int i,j,k;
             getIndexVectorFromIndex(idx, i, j, k);
             int xMinus = m_voxels[indexPeriodic(i-1, j, k)];
@@ -118,9 +130,9 @@ void XYZModel::fill(int depth)
         }
     }
 
-    // qDebug() << "Eroding depth " << depth << " found " << count << " voxels fixed";
+    qDebug() << "Fill depth " << depth << " found " << count << " voxels fixed";
 
-    if(depth > 0) fill(depth-1);
+    fill(depth-1);
 }
 
 XYZModel::XYZModel() : Model()
@@ -150,44 +162,39 @@ bool XYZModel::isInVoid(float x, float y, float z)
 void XYZModel::parametersUpdated()
 {
     m_voxelsPerDimension = m_parameters->getValue(QString("voxelsperdimension"));
-    m_threshold = m_parameters->getValue(QString("threshold"));
-    m_maxDistance = m_parameters->getValue(QString("maxdistance"));
     m_fillAndErodeDepth = m_parameters->getValue(QString("fillanderodedepth"));
 }
 
 void XYZModel::createParameters()
 {
     m_parameters->createParameter(QString("voxelsperdimension"), 128.0, 16.0, 512.0, 1.0);
-    m_parameters->createParameter(QString("threshold"), 3.0, 1.0, 5.0, 0.1);
-    m_parameters->createParameter(QString("maxdistance"), 20.0, 10.0, 100.0, 2.0);
-    m_parameters->createParameter(QString("fillanderodedepth"), 2, 0.0, 5.0, 1.0);
+    m_parameters->createParameter(QString("fillanderodedepth"), 2, 0.0, 20.0, 1.0);
 }
 
 void XYZModel::loadParameters(CIniFile *iniFile)
 {
     m_file = QString::fromStdString(iniFile->getstring("xyzfile_file"));
-    m_voxelsPerDimension = iniFile->getint("xyzfile_resolution");
-    m_threshold = iniFile->getdouble("xyzfile_threshold");
-    m_maxDistance = iniFile->getdouble("xyzfile_maxdistance");
-    m_fillAndErodeDepth = iniFile->getint("xyzfile_fillanderodedepth");
+    m_parameters->setParameter("fillanderodedepth", iniFile->getint("xyzfile_fillanderodedepth"), 0, 10, 1);
+    m_parameters->setParameter("voxelsperdimension", iniFile->getdouble("xyzfile_resolution"), 16, 256, 8);
+    parametersUpdated();
 
     readFile();
-    if(iniFile->find(QString("cut_cylinder"), true)) {
-        double radius = iniFile->getdouble("cylinder_radius");
-        double cutRadius = radius / (m_lx*0.5); // this radius is between 0 and 1
-        removeCylinder(cutRadius);
+    if(iniFile->find(QString("cut_noise"), true)) {
+        qDebug() << "Cutting noise";
+        RegularNoiseModel *noiseModel = new RegularNoiseModel();
+        readNoiseParameters(iniFile, noiseModel);
+
+        qDebug() << "Removing from noise model";
+        removeFromModel(noiseModel);
     }
+
+    qDebug() << "Updating distance to atom field";
     updateDistanceToAtomField();
 }
 
 int XYZModel::voxelsPerDimension() const
 {
     return m_voxelsPerDimension;
-}
-
-float XYZModel::threshold() const
-{
-    return m_threshold;
 }
 
 void XYZModel::readFile()
@@ -247,12 +254,19 @@ void XYZModel::removeFromModel(Model *model) {
     model->start();
     QVector<QVector3D> points;
     for (const QVector3D &point : m_points) {
-        if(!model->isInVoid(point)) {
+        QVector3D mirroredPoint = point;
+        if(mirroredPoint[0] > 0.5*m_lx) mirroredPoint[0] = m_lx - mirroredPoint[0];
+        if(mirroredPoint[1] > 0.5*m_ly) mirroredPoint[1] = m_ly - mirroredPoint[1];
+        if(mirroredPoint[2] > 0.5*m_lz) mirroredPoint[2] = m_lz - mirroredPoint[2];
+
+        if(!model->isInVoid(mirroredPoint)) {
             points.append(point);
         }
     }
+    qDebug() << "I had " << m_points.size() << " points.";
     m_points.clear();
     m_points = points;
+    qDebug() << "I now have " << m_points.size() << " points.";
     model->stop();
 }
 
@@ -279,42 +293,6 @@ void XYZModel::removeCylinder(float r)
     }
     m_points.clear();
     m_points = points;
-}
-
-float XYZModel::maxDistance() const
-{
-    return m_maxDistance;
-}
-
-CellList XYZModel::buildCellList(QVector3D cellSize, int numCellsX, int numCellsY, int numCellsZ)
-{
-    CellList cellList;
-
-    QVector3D oneOverCellSize;
-    oneOverCellSize[0] = 1.0 / cellSize[0];
-    oneOverCellSize[1] = 1.0 / cellSize[1];
-    oneOverCellSize[2] = 1.0 / cellSize[2];
-    cellList.resize(numCellsX, vector<vector<vector<QVector3D> > >(numCellsY, vector<vector<QVector3D> >(numCellsZ)));
-
-    for(int i=0; i<m_points.size(); i++) {
-        const QVector3D &p = m_points[i];
-        int ci = p[0] * oneOverCellSize[0];
-        int cj = p[1] * oneOverCellSize[1];
-        int ck = p[2] * oneOverCellSize[2];
-        if(ci < 0 || ci >= numCellsX || cj < 0 || cj >= numCellsY || ck < 0 || ck >= numCellsZ) {
-            qDebug() << "Trouble with " << p;
-            qDebug() << "with indices: " << ci << ", " << cj << ", " << ck;
-            qDebug() << "and number of cells:: " << numCellsX << ", " << numCellsY << ", " << numCellsZ;
-            qDebug() << "Cell size: " << cellSize;
-            qDebug() << "Which gives systemSize: " << QVector3D(cellSize[0]*numCellsX, cellSize[1]*numCellsY, cellSize[2]*numCellsZ);
-            qFatal("XYZModel::buildCellList() error: point %d is out of cell list bounds.", i);
-            exit(1);
-        }
-//        else
-        cellList[ci][cj][ck].push_back(p);
-    }
-
-    return cellList;
 }
 
 void XYZModel::addQuad(QVector<SimVis::TriangleCollectionVBOData> &data, QVector3D c1,QVector3D c2,QVector3D c3, QVector3D c4, QVector3D color)
@@ -357,64 +335,42 @@ void XYZModel::addQuad(QVector<SimVis::TriangleCollectionVBOData> &data, QVector
 }
 
 void XYZModel::updateDistanceToAtomField() {
+    parametersUpdated();
+
     if(m_points.size() == 0) {
         qDebug() << "Error, tried to update distance to atom field with no atoms.";
         return;
     }
     m_isValid = false;
 
-    int numCellsX = m_lx / m_maxDistance;
-    int numCellsY = m_ly / m_maxDistance;
-    int numCellsZ = m_lz / m_maxDistance;
+    m_voxels.resize(0, 0); // Important so that the resize below actually sets all values to zero.
+    m_voxels.resize(m_voxelsPerDimension*m_voxelsPerDimension*m_voxelsPerDimension, 0);
 
-    // If max distance is too large, have at least three cells
-    if(numCellsX < 3) numCellsX = 3;
-    if(numCellsY < 3) numCellsY = 3;
-    if(numCellsZ < 3) numCellsZ = 3;
-
-    QVector3D cellSize(m_lx / numCellsX, m_ly / numCellsY, m_lz / numCellsZ);
-    QVector3D oneOverCellSize;
-    oneOverCellSize[0] = 1.0 / cellSize[0]; oneOverCellSize[1] = 1.0 / cellSize[1]; oneOverCellSize[2] = 1.0 / cellSize[2];
-    QVector3D voxelSize = QVector3D(m_lx, m_ly, m_lz) / QVector3D(m_voxelsPerDimension, m_voxelsPerDimension, m_voxelsPerDimension);
-    CellList cellList = buildCellList(cellSize, numCellsX, numCellsY, numCellsZ);
-    m_voxels.resize(m_voxelsPerDimension*m_voxelsPerDimension*m_voxelsPerDimension, false);
-
-    for(int i=0; i<m_voxelsPerDimension; i++) {
-        for(int j=0; j<m_voxelsPerDimension; j++) {
-            for(int k=0; k<m_voxelsPerDimension; k++) {
-                // Now map this voxel
-                QVector3D voxelCenter = (QVector3D(i,j,k) + QVector3D(0.5f, 0.5f, 0.5f)) * voxelSize;
-                QVector3D cellListCoordinate = voxelCenter * oneOverCellSize;
-                float minDistanceSquared = 1e10;
-                float minDistanceSquaredStartValue = 1e10;
-
-                for(int dx = -1; dx <= 1; dx++) {
-                    for(int dy = -1; dy <= 1; dy++) {
-                        for(int dz = -1; dz <= 1; dz++) {
-                            // Loop through cell lists around this point to get atom positions
-                            int cx = (int(cellListCoordinate.x()) + dx + numCellsX) % numCellsX;
-                            int cy = (int(cellListCoordinate.y()) + dy + numCellsY) % numCellsY;
-                            int cz = (int(cellListCoordinate.z()) + dz + numCellsZ) % numCellsZ;
-                            vector<QVector3D> &points = cellList[cx][cy][cz];
-                            for(const QVector3D &point : points) {
-                                float distanceSquared = (point - voxelCenter).lengthSquared();
-                                minDistanceSquared = std::min(minDistanceSquared, distanceSquared);
-                            }
-                        }
-                    }
-                }
-
-                if(minDistanceSquared != minDistanceSquaredStartValue) {
-                    m_voxels.at(index(i,j,k)) = (minDistanceSquared<m_threshold*m_threshold);
-                } else {
-                    m_voxels.at(index(i,j,k)) = 0;
-                }
-            }
+    qDebug() << "Updating XYZ field with " << m_points.size() << " points.";
+    qDebug() << "Voxels: " << m_voxels.size();
+    for(const QVector3D& p : m_points) {
+        int i = p[0]/m_lx * m_voxelsPerDimension;
+        int j = p[1]/m_ly * m_voxelsPerDimension;
+        int k = p[2]/m_lz * m_voxelsPerDimension;
+        if(index(i,j,k) >= m_voxels.size()) {
+            qDebug() << "XYZModel::updateDistanceToAtomField() out of bounds";
+            exit(1);
         }
+
+        m_voxels[index(i,j,k)] = 1;
     }
 
+    int count = 0;
+
+    for(int i=0; i<m_voxels.size(); i++) {
+        count += m_voxels[i];
+    }
+    qDebug() << "We have " << count << " non-zero voxels";
+
+    qDebug() << "Will fill and erode " << m_fillAndErodeDepth << " times.";
     fill(m_fillAndErodeDepth);
     erode(m_fillAndErodeDepth);
+    fill(1, 0.25);
 
     m_isValid = true;
 }
@@ -440,24 +396,6 @@ void XYZModel::setVoxelsPerDimension(int voxelsPerDimension)
 
     m_voxelsPerDimension = voxelsPerDimension;
     emit voxelsPerDimensionChanged(voxelsPerDimension);
-}
-
-void XYZModel::setThreshold(float threshold)
-{
-    if (m_threshold == threshold)
-        return;
-
-    m_threshold = threshold;
-    emit thresholdChanged(threshold);
-}
-
-void XYZModel::setMaxDistance(float maxDistance)
-{
-    if (m_maxDistance == maxDistance)
-        return;
-
-    m_maxDistance = maxDistance;
-    emit maxDistanceChanged(maxDistance);
 }
 
 void XYZModel::setFillAndErodeDepth(int fillAndErodeDepth)

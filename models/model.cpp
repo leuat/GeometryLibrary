@@ -1,6 +1,7 @@
-#include "model.h"
+#include "models.h"
 #include  "../misc/random.h"
 #include "../likelihood/lgraph.h"
+#include  "../misc/cinifile.h"
 #include <QDebug>
 
 Model::Model()
@@ -98,4 +99,22 @@ void Model::setParameters(Parameters *parameters)
     m_parameters = parameters;
     emit parametersChanged(parameters);
     parametersUpdated();
+}
+
+void readNoiseParameters(CIniFile *iniFile, RegularNoiseModel *noiseModel) {
+    if(QString::fromStdString((iniFile->getstring("noise_properties_filename"))).isEmpty()) {
+        noiseModel->parameters()->setValue("octaves", iniFile->getdouble("noise_octaves"));
+        noiseModel->parameters()->setValue("scale", iniFile->getdouble("noise_scale"));
+        noiseModel->parameters()->setValue("persistence", iniFile->getdouble("noise_persistence"));
+        noiseModel->parameters()->setValue("threshold", iniFile->getdouble("noise_threshold"));
+        noiseModel->parameters()->setValue("inverted", iniFile->getbool("noise_inverted"));
+        noiseModel->parameters()->setValue("seed", iniFile->getdouble("noise_seed"));
+        noiseModel->parameters()->setValue("absolute", iniFile->getbool("noise_absolute"));
+        noiseModel->parameters()->setValue("skewscale", iniFile->getdouble("noise_skewscale"));
+        noiseModel->parameters()->setValue("skewamplitude", iniFile->getdouble("noise_skewamplitude"));
+        noiseModel->parameters()->getParameter("noisetype")->setString(QString::fromStdString((iniFile->getstring("noise_noisetype"))));
+    } else {
+        noiseModel->parameters()->load(QString::fromStdString((iniFile->getstring("noise_properties_filename"))));
+        noiseModel->parameters()->setValue("seed", iniFile->getdouble("noise_seed"));
+    }
 }

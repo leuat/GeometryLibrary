@@ -34,4 +34,6 @@ signals:
     void parametersChanged(Parameters* parameters);
 };
 
+void readNoiseParameters(class CIniFile *iniFile, class RegularNoiseModel *noiseModel);
+
 #endif // GEOMETRYMODEL_H
