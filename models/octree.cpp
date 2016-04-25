@@ -1,6 +1,6 @@
 #include "octree.h"
 #include <fstream>
-
+#include "regularnoisemodel.h"
 int Octree::maxDepth() const
 {
     return m_maxDepth;
@@ -113,18 +113,14 @@ bool Octree::isInVoid(float x, float y, float z)
 
 void Octree::parametersUpdated()
 {
-//    XYZModel
-    m_maxDepth = m_parameters->getValue("maxdepth");
-    m_threshold = m_parameters->getValue("threshold");
-    m_maxDistance = m_threshold;
-
+    m_maxDepth = m_parameters->getValue(QString("maxdepth"));
+    m_fillAndErodeDepth = m_parameters->getValue(QString("fillanderodedepth"));
 }
 
 void Octree::createParameters()
 {
-    m_parameters->createParameter("maxdepth", 6, 1, 12, 1);
-    m_parameters->createParameter("threshold", 2,1 ,5, 0.1);
-
+    m_parameters->createParameter(QString("maxdepth"), 7, 1, 12, 1);
+    m_parameters->createParameter(QString("fillanderodedepth"), 2, 0, 10, 1);
 }
 
 QVector<SimVis::TriangleCollectionVBOData> Octree::vboData() const
@@ -137,54 +133,54 @@ Octree::Octree() : XYZModel()
     createParameters();
 }
 
-void Octree::buildTree(bool fromCellList, bool createTriangleList)
+void Octree::buildTree(bool notUsed, bool createTriangleList)
 {
-
+    parametersUpdated();
     m_root = new OctNode(QVector3D(0,0,0), QVector3D(m_lx, m_ly, m_lz), 0, 0);
-    qDebug() << m_lx;
 
-    if (!fromCellList) {
-        qDebug() << "Building octree with max depth : " << m_maxDepth << " and " << m_points.size() << " particles";
-        for (const QVector3D& p : m_points)
-            insertValueAtPoint(p, 1);
+    qDebug() << "Max depth: " << m_maxDepth;
+    m_voxelsPerDimension = pow(2, m_maxDepth);
+    m_voxels.resize(0, 0); // Important so that the resize below actually sets all values to zero.
+    m_voxels.resize(m_voxelsPerDimension*m_voxelsPerDimension*m_voxelsPerDimension, 0);
+    qDebug() << "Building octree with " << m_points.size() << " points";
+    qDebug() << "Building octree with " << m_points.size() << " points";
+    qDebug() << "Voxels: " << m_voxels.size();
+    for (const QVector3D& p : m_points) {
+        int i = p[0]/m_lx * m_voxelsPerDimension;
+        int j = p[1]/m_ly * m_voxelsPerDimension;
+        int k = p[2]/m_lz * m_voxelsPerDimension;
+        if(index(i,j,k) >= m_voxels.size()) {
+            qDebug() << "Octree::buildTree out of bounds";
+            exit(1);
+        }
+
+        m_voxels[index(i,j,k)] = 1;
     }
-    else {
-        // Based on cell list
-        int N = pow(2, m_maxDepth);
-//        qDebug() << "build octree from voxellist (test): cellsize = " << size;
-        qDebug() << "number of cells: " << N;
 
-        setVoxelsPerDimension(N);
+    qDebug() << "Will fill and erode " << m_fillAndErodeDepth << " times.";
+    fill(m_fillAndErodeDepth);
+    erode(m_fillAndErodeDepth);
+    fill(1, 0.25);
 
-        qDebug() << "updateDistance";
-        updateDistanceToAtomField();
-        qDebug() << "end";
+    int count = 0;
+    for (int i=0;i<m_voxelsPerDimension;i++) {
+        for (int j=0;j<m_voxelsPerDimension;j++) {
+            for (int k=0;k<m_voxelsPerDimension;k++) {
+                if (m_voxels[index(i,j,k)] != 0 ) {
+                    QVector3D p( (i+0.5)*m_lx/(float)m_voxelsPerDimension,
+                                 (j+0.5)*m_ly/(float)m_voxelsPerDimension,
+                                 (k+0.5)*m_lz/(float)m_voxelsPerDimension );
 
-        //CellList cellList = buildCellList(size, N,N,N);
-        for (int i=0;i<N;i++) {
-            for (int j=0;j<N;j++) {
- //               qDebug() << j;
-
-                for (int k=0;k<N;k++) {
-
-                    if (m_voxels[index(i,j,k)]!=0)
-                    {
-
-                        QVector3D p( (i+0.5)*m_lx/(float)N,
-                                     (j+0.5)*m_ly/(float)N,
-                                     (k+0.5)*m_lz/(float)N );
-
-                        insertValueAtPoint(p, m_voxels[index(i,j,k)]);
-                    }
+                    insertValueAtPoint(p, m_voxels[index(i,j,k)]);
+                    count++;
                 }
             }
         }
-//*/
     }
-    melt();
-    if (createTriangleList)
-        build2DTriangleList();
+    qDebug() << "Added " << count << " points to octree.";
 
+    melt();
+    if (createTriangleList) build2DTriangleList();
 }
 
 
@@ -479,19 +475,22 @@ void OctNode::insertValueAtPoint(const QVector3D &p, float value, int maxDepth)
     }
 }
 
-
-
 void Octree::loadParameters(CIniFile *iniFile)
 {
     m_file = QString::fromStdString(iniFile->getstring("xyzfile_file"));
-
-    m_maxDepth = log2(iniFile->getdouble("xyzfile_resolution"));
-    m_threshold = iniFile->getdouble("xyzfile_threshold");
+    m_parameters->setParameter("fillanderodedepth", iniFile->getint("xyzfile_fillanderodedepth"), 0, 10, 1);
+    m_parameters->setParameter("maxdepth", iniFile->getint("octree_maxdepth"), 2, 10, 1);
+    parametersUpdated();
     readFile();
-    if(iniFile->find(QString("cut_cylinder"), true)) {
-        double radius = iniFile->getdouble("cylinder_radius");
-        double cutRadius = radius / (m_lx*0.5); // this radius is between 0 and 1
-        removeCylinder(cutRadius);
+
+    if(iniFile->find(QString("cut_noise"), true)) {
+        qDebug() << "Cutting noise";
+        RegularNoiseModel *noiseModel = new RegularNoiseModel();
+        readNoiseParameters(iniFile, noiseModel);
+        qDebug() << "Removing from noise model";
+        removeFromModel(noiseModel);
     }
-    this->buildTree(true, true);
+
+    qDebug() << "Building octree";
+    buildTree(true, true);
 }

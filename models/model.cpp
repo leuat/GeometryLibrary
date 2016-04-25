@@ -1,5 +1,7 @@
-#include "model.h"
+#include "models.h"
 #include  "../misc/random.h"
+#include "../likelihood/lgraph.h"
+#include  "../misc/cinifile.h"
 #include <QDebug>
 
 Model::Model()
@@ -57,19 +59,19 @@ float Model::calculateFractalDimension(float min, float max)
 {
     float dM = (max-min);
     int N = 20;
-    int fitCount = 100;
+    int fitCountScale = 10;
+    LGraph results;
+    results.initialize(N-1);
     for (int n=1;n<N;n++) {
         float r = (1- (float)n/N)*dM/20;
         int cnt = (int)(dM/r);
-
         int fits = 0;
-
         for (int i=0;i<cnt;i++)
             for (int j=0;j<cnt;j++)
                 for (int k=0;k<cnt;k++)
                 {
                     QVector3D p(i*r, j*r, k*r);
-                    if (fitSphere(p, r, r*10))
+                    if (fitSphere(p, r, r*fitCountScale))
                         fits++;
                 }
         if (fits==0) {
@@ -79,9 +81,13 @@ float Model::calculateFractalDimension(float min, float max)
         else {
             float Df = log(fits)/log(1.0/(r/dM));
             qDebug() << Df << " for r = " << r;
+            results.val[n-1] = Df;
+            results.index[n-1] = r;
+            results.IndexScaled[n-1] = r;
         }
 
         }
+    results.SaveText("../../../../../fractal_dim.txt");
 
 }
 
@@ -93,4 +99,22 @@ void Model::setParameters(Parameters *parameters)
     m_parameters = parameters;
     emit parametersChanged(parameters);
     parametersUpdated();
+}
+
+void readNoiseParameters(CIniFile *iniFile, RegularNoiseModel *noiseModel) {
+    if(QString::fromStdString((iniFile->getstring("noise_properties_filename"))).isEmpty()) {
+        noiseModel->parameters()->setValue("octaves", iniFile->getdouble("noise_octaves"));
+        noiseModel->parameters()->setValue("scale", iniFile->getdouble("noise_scale"));
+        noiseModel->parameters()->setValue("persistence", iniFile->getdouble("noise_persistence"));
+        noiseModel->parameters()->setValue("threshold", iniFile->getdouble("noise_threshold"));
+        noiseModel->parameters()->setValue("inverted", iniFile->getbool("noise_inverted"));
+        noiseModel->parameters()->setValue("seed", iniFile->getdouble("noise_seed"));
+        noiseModel->parameters()->setValue("absolute", iniFile->getbool("noise_absolute"));
+        noiseModel->parameters()->setValue("skewscale", iniFile->getdouble("noise_skewscale"));
+        noiseModel->parameters()->setValue("skewamplitude", iniFile->getdouble("noise_skewamplitude"));
+        noiseModel->parameters()->getParameter("noisetype")->setString(QString::fromStdString((iniFile->getstring("noise_noisetype"))));
+    } else {
+        noiseModel->parameters()->load(QString::fromStdString((iniFile->getstring("noise_properties_filename"))));
+        noiseModel->parameters()->setValue("seed", iniFile->getdouble("noise_seed"));
+    }
 }

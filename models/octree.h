@@ -21,7 +21,6 @@ public:
 
     OctNode(QVector3D corner1, QVector3D corner2, int level, float value);
 
-
     OctNode* getQuadrant(const int& index);
 
     QVector<OctNode *> getChildren() const;

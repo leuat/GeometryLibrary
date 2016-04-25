@@ -21,15 +21,17 @@ double Noise::get( const double x, const double y, const double z, const double 
     // We have to keep track of the largest possible amplitude,
     // because each octave adds more, and we need a value in [-1, 1].
     double maxAmplitude = 0;
-
+//    A*p^()
     for( int i=0; i < octaves; i++ ) {
-        double v = raw_3d( (x+0.1231*i) * freq, (y+0.6123*i) * freq, (z+1.539127*i) * freq );
+        double v = raw_3d( (x+0.1231*i) * freq, (y+0.6123*i) * freq, (z+100.539127*i) * freq );
+//        double v = raw_3d( (x) * freq, (y) * freq, (z) * freq );
 
         total += v*amplitude;
         freq *= 2;
         maxAmplitude += amplitude;
         amplitude *= p;
         p = sqrt(p);
+
     }
 
     return total / maxAmplitude;
