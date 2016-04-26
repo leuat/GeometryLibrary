@@ -28,9 +28,7 @@ bool RegularNoiseModel::isInVoid(float x, float y, float z)
     // double p1 = (1 + m_skewAmplitude*m_noise->get(m_skewScale*x + sx,m_skewScale*y+sy,m_skewScale*z+sz));
     double p1 = 1.0;
     double val = m_noise->get(x*m_scale*p1 + add, y*m_scale*p1,z*m_scale*p1);
-    // val = pow(val, (0.5+m_skewScale*2.0));
-    float hore = 2.0*m_steepness;
-    val = sign<float>(val)*pow(fabs(val), hore);
+    val = sign<float>(val)*pow(fabs(val), m_steepness);
     if (m_absolute) {
         val = fabs(val);
     }

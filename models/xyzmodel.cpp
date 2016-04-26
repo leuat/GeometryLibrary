@@ -28,15 +28,37 @@ QVector<QVector3D> XYZModel::getPoints() const
 
 void XYZModel::calculateBoundingbox()
 {
-    m_lx = 0;
-    m_ly = 0;
-    m_lz = 0;
 
-    for (int i=0;i<m_points.size();i++) {
-        m_lx = std::max(m_lx, m_points[i].x());
-        m_ly = std::max(m_ly, m_points[i].y());
-        m_lz = std::max(m_lz, m_points[i].z());
+    double maxX = -1e9;
+    double maxY = -1e9;
+    double maxZ = -1e9;
+    double minX = 1e9;
+    double minY = 1e9;
+    double minZ = 1e9;
+
+    for (const QVector3D &p : m_points) {
+        maxX = std::max(maxX, (double)p.x());
+        maxY = std::max(maxY, (double)p.y());
+        maxZ = std::max(maxZ, (double)p.z());
+
+        minX = std::min(minX, (double)p.x());
+        minY = std::min(minY, (double)p.y());
+        minZ = std::min(minZ, (double)p.z());
     }
+
+    double deltaX = maxX - minX;
+    double deltaY = maxY - minY;
+    double deltaZ = maxZ - minZ;
+
+    for(QVector3D &p : m_points) {
+        p[0] -= minX;
+        p[1] -= minY;
+        p[2] -= minZ;
+    }
+
+    m_lx = deltaX;
+    m_ly = deltaY;
+    m_lz = deltaZ;
     m_lx += 0.001*m_lx;
     m_ly += 0.001*m_ly;
     m_lz += 0.001*m_lz;
