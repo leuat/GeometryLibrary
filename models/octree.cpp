@@ -9,6 +9,7 @@ int Octree::maxDepth() const
 void Octree::build2DTriangleList()
 {
     // return;
+#ifdef USE_SIMVIZ
 
     if (m_root==nullptr)
         return;
@@ -18,7 +19,9 @@ void Octree::build2DTriangleList()
 
     m_root->build2DTriangleList(m_vboData);
     m_vboDirty = true;
+#endif
 }
+#ifdef USE_SIMVIZ
 
 void OctNode::build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData> &data)
 {
@@ -50,7 +53,7 @@ void OctNode::build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData> &da
 
     }
 }
-
+#endif
 void OctNode::InsertNode(QStringList &list)
 {
     if (list.length()==1)
@@ -123,11 +126,13 @@ void Octree::createParameters()
     m_parameters->createParameter(QString("fillanderodedepth"), 2, 0, 10, 1);
 }
 
+#ifdef USE_SIMVIZ
+
 QVector<SimVis::TriangleCollectionVBOData> Octree::vboData() const
 {
     return m_vboData;
 }
-
+#endif
 Octree::Octree() : XYZModel()
 {
     createParameters();
