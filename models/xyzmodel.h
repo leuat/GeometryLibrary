@@ -2,7 +2,9 @@
 #define XYZMODEL_H
 #include "model.h"
 #include "vector"
+#ifdef USE_SIMVIZ
 #include <SimVis/TriangleCollection>
+#endif
 #include <QVector>
 #include <QVector3D>
 using std::vector;
@@ -48,8 +50,9 @@ public:
     float getLz() const;
     QVector<QVector3D> getPoints() const;
 
+#ifdef USE_SIMVIZ
     static void addQuad(QVector<SimVis::TriangleCollectionVBOData> &data, QVector3D c1,QVector3D c2,QVector3D c3, QVector3D c4, QVector3D color);
-
+#endif
     using Model::isInVoid;
 
     virtual bool isInVoid(float x, float y, float z) override;

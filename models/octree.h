@@ -5,8 +5,9 @@
 #include <QVector>
 #include <QVector3D>
 #include "GeometryLibrary/noise.h"
+#ifdef USE_SIMVIZ
 #include <SimVis/TriangleCollection>
-
+#endif
 class OctNode
 {
 private:
@@ -27,7 +28,9 @@ public:
     void saveNode(QString serialized, ofstream& file);
     void subdivide();
     bool hasChildren();
+#ifdef USE_SIMVIZ
     void build2DTriangleList(QVector<SimVis::TriangleCollectionVBOData>& data);
+#endif
     bool pointIsWithin(const QVector3D& p);
     OctNode* findNodePoint(const QVector3D& p);
     void InsertNode(QStringList& list);
@@ -56,8 +59,9 @@ private:
 
     int m_maxDepth = 0;
     OctNode* m_root = nullptr;
+#ifdef USE_SIMVIZ
     QVector<SimVis::TriangleCollectionVBOData> m_vboData;
-
+#endif
 public:
     bool m_vboDirty = true;
     Octree();
@@ -86,6 +90,8 @@ public:
     void parametersUpdated() override;
     void createParameters() override;
     virtual void loadParameters(CIniFile *iniFile) override;
+#ifdef USE_SIMVIZ
     QVector<SimVis::TriangleCollectionVBOData> vboData() const;
+#endif
 };
 

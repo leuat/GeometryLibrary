@@ -295,6 +295,8 @@ void XYZModel::removeCylinder(float r)
     m_points = points;
 }
 
+#ifdef USE_SIMVIZ
+
 void XYZModel::addQuad(QVector<SimVis::TriangleCollectionVBOData> &data, QVector3D c1,QVector3D c2,QVector3D c3, QVector3D c4, QVector3D color)
 {
     SimVis::TriangleCollectionVBOData tri;
@@ -333,7 +335,7 @@ void XYZModel::addQuad(QVector<SimVis::TriangleCollectionVBOData> &data, QVector
     data[i+2].normal = N;
 
 }
-
+#endif
 void XYZModel::updateDistanceToAtomField() {
     parametersUpdated();
 
