@@ -88,7 +88,6 @@ float Model::calculateFractalDimension(float min, float max)
 
         }
     results.SaveText("../../../../../fractal_dim.txt");
-
 }
 
 void Model::setParameters(Parameters *parameters)

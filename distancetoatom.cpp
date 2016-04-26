@@ -30,6 +30,10 @@ CellList DistanceToAtom::buildCellList(const QVector<QVector3D> &points, float s
         int ci = p[0] / cellSize;
         int cj = p[1] / cellSize;
         int ck = p[2] / cellSize;
+        if(ci==numCells) ci = numCells-1;
+        if(cj==numCells) cj = numCells-1;
+        if(ck==numCells) ck = numCells-1;
+
         if(!checkRange<int>(ci, 0, numCells-1) || !checkRange<int>(cj, 0, numCells-1) || !checkRange<int>(ck, 0, numCells-1)) {
             qFatal("DistanceToAtom::buildCellList() error: particle %d is out of cell list bounds.", i);
             exit(1);

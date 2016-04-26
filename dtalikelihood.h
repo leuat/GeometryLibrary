@@ -22,7 +22,7 @@ public:
     DTALikelihood();
 
     void setDataInput(Particles* dataParticles) {
-        dataParticles->getVector3DList(m_dataParticles);
+        dataParticles->appendToQVector3DList(m_dataParticles);
         calculateStatistics(m_dataParticles, m_data);
 //        m_currentData = m_data.toQVector();
     }
@@ -37,8 +37,6 @@ public:
     void calculateStatistics(QVector<QVector3D>& particleList, LGraph& graph);
     QVector<QPointF> currentModel() const;
     QVector<QPointF> currentData() const;
-    int voxelsPerDimension() const;
-    void setVoxelsPerDimension(int voxelsPerDimension);
     int histogramBins() const;
     void setHistogramBins(int histogramBins);
     double cutoff() const;
@@ -46,6 +44,8 @@ public:
 
     // Likelihood interface
     void calculateModel(class Model *model) override;
+    int numberOfRandomVectors() const;
+    void setNumberOfRandomVectors(int numberOfRandomVectors);
 };
 
 #endif // DTALIKELIHOOD_H
