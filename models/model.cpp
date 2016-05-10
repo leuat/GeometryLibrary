@@ -40,7 +40,7 @@ void Model::randomWalk()
 
 }
 
-bool Model::fitSphere(const QVector3D &position, float radius, int count)
+bool Model::voxelFits(const QVector3D &position, float radius, int count)
 {
     // r uniform
     float dx = 1.0*radius;
@@ -71,7 +71,7 @@ float Model::calculateFractalDimension(float min, float max)
                 for (int k=0;k<cnt;k++)
                 {
                     QVector3D p(i*r, j*r, k*r);
-                    if (fitSphere(p, r, r*fitCountScale))
+                    if (voxelFits(p, r, r*fitCountScale))
                         fits++;
                 }
         if (fits==0) {

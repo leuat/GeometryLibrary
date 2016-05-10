@@ -24,7 +24,7 @@ public:
     virtual void createParameters() = 0;
     virtual void loadParameters(class CIniFile *iniFile);
     virtual void randomWalk();
-    bool fitSphere(const QVector3D& position, float radius, int count);
+    bool voxelFits(const QVector3D& position, float radius, int count);
     float calculateFractalDimension(float min, float max);
 
 public slots:

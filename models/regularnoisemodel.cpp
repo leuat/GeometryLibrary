@@ -87,7 +87,7 @@ void RegularNoiseModel::createParameters()
     m_parameters->createParameter("absolute", 0.0, 0, 1, 1);
     m_parameters->createParameter("skewscale", 1.0, 0, 1, 0.1);
     m_parameters->createParameter("skewamplitude", 0.0, 0, 1, 0.1);
-    m_parameters->createParameter("steepness", 1.0, 0.5, 1.5, 0.1);
+    m_parameters->createParameter("steepness", 1.0, 0.5, 1.5, 0.001);
     m_parameters->createParameter("noisetype", "simplex");
     Logger::write(QString("RegularNoiseModel::createParameters: creating octaves=%1").arg(m_parameters->getValue("octaves")));
     Logger::write(QString("RegularNoiseModel::createParameters: creating scale=%1").arg(m_parameters->getValue("scale")));
