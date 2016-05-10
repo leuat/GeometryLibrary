@@ -44,9 +44,7 @@ QVector3D DistanceToAtomMap::findBoundingBox(QVector<QVector3D> &points) {
     return max;
 }
 
-void DistanceToAtomMap::build(QString xyzFilename, float cutoff) {
-    Points points;
-    points.readFile(xyzFilename);
+void DistanceToAtomMap::build(Points &points, float cutoff) {
     build(points.points(), cutoff);
 }
 

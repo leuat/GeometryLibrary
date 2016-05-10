@@ -50,7 +50,7 @@ void Points::calculateBoundingbox() {
     m_systemSize[2] += 0.001*deltaZ;
 }
 
-void Points::readFile(QString filename)
+void Points::readXYZ(QString filename)
 {
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {

@@ -10,7 +10,7 @@ public:
     Points();
     QVector3D systemSize();
     QVector<QVector3D> points();
-    void readFile(QString filename);
+    void readXYZ(QString filename);
 private:
     void calculateBoundingbox();
     QVector<QVector3D> m_points;

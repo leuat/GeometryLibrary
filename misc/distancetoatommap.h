@@ -1,6 +1,7 @@
 #pragma once
 #include "grid.h"
 #include "../measures/distancetoatom.h"
+#include "points.h"
 #include <vector>
 #include <QVector>
 #include <QVector3D>
@@ -17,6 +18,6 @@ private:
 public:
     DistanceToAtomMap(int nx, int ny, int nz);
     void build(QVector<QVector3D> points, float cutoff);
-    void build(QString xyzFilename, float cutoff);
+    void build(Points &points, float cutoff);
     Grid &grid();
 };
