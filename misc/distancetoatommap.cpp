@@ -9,7 +9,7 @@ DistanceToAtomMap::DistanceToAtomMap(int nx, int ny, int nz)
     m_grid.resize(nx, ny, nz);
 }
 
-QVector3D DistanceToAtomMap::findBoundingBox(QVector<QVector3D> &points) {
+QVector3D DistanceToAtomMap::calculateBoundingBox(QVector<QVector3D> &points) {
     double maxX = -1e9;
     double maxY = -1e9;
     double maxZ = -1e9;
@@ -57,7 +57,7 @@ void DistanceToAtomMap::build(QVector<QVector3D> points, float cutoff)
 
     QElapsedTimer timer;
     timer.start();
-    QVector3D systemSize = findBoundingBox(points); // This will also move all particles so lowest coordinate is 0 in each dimension
+    QVector3D systemSize = calculateBoundingBox(points); // This will also move all particles so lowest coordinate is 0 in each dimension
 
     QVector3D cellSize;
     QVector3D numCells;
