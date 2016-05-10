@@ -233,10 +233,11 @@ QVector<QPointF> DistanceToAtom::histogram(int bins) {
             maxValue = std::max(maxValue, (float)sqrt(val));
         }
     }
+
     gsl_histogram *hist = gsl_histogram_alloc (bins);
     gsl_histogram_set_ranges_uniform (hist, minValue, maxValue);
     for(const float &value : m_values) {
-        if(value >= 0) {
+        if(value >= 0.0) {
             gsl_histogram_increment (hist, sqrt(value));
         }
     }
