@@ -344,6 +344,10 @@ QVector3D OctNode::getCorner(const int id) const
         return m_corner2;
     if (id==7)
         return QVector3D(m_corner1.x(), m_corner2.y(), m_corner2.z());
+    else {
+        qDebug() << "Warning, tried to get Octree corner with id outside bounds [0,7]";
+        return QVector3D();
+    }
 }
 
 OctNode::OctNode(QVector3D corner1, QVector3D corner2, int level, float value)

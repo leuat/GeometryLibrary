@@ -16,9 +16,20 @@ template <typename T> int sign(T val) {
 
 bool RegularNoiseModel::isInVoid(float x, float y, float z)
 {
+    float value = getValue(x,y,z);
+    if (m_inverted) {
+        if (value>m_threshold) return true;
+    } else {
+        if (value<m_threshold)  return true;
+    }
+    return false;
+}
+
+float RegularNoiseModel::getValue(float x, float y, float z)
+{
     if(!m_noise) {
         qDebug() << "Warning, tried to call RegularNoiseModel::isInVoid(float x, float y, float z), but no noise type is chosen. Maybe you didn't call start()?";
-        return false;
+        return 0;
     }
 
     double add = m_seed;
@@ -27,18 +38,13 @@ bool RegularNoiseModel::isInVoid(float x, float y, float z)
     double sz = 0.9534;
     // double p1 = (1 + m_skewAmplitude*m_noise->get(m_skewScale*x + sx,m_skewScale*y+sy,m_skewScale*z+sz));
     double p1 = 1.0;
-    double val = m_noise->get(x*m_scale*p1 + add, y*m_scale*p1,z*m_scale*p1);
-    val = sign<float>(val)*pow(fabs(val), m_steepness);
+    double value = m_noise->get(x*m_scale*p1 + add, y*m_scale*p1,z*m_scale*p1);
+    value = sign<float>(value)*pow(fabs(value), m_steepness);
     if (m_absolute) {
-        val = fabs(val);
+        value = fabs(value);
     }
 
-    if (m_inverted) {
-        if (val>m_threshold) return true;
-    } else {
-        if (val<m_threshold)  return true;
-    }
-    return false;
+    return value;
 }
 
 void RegularNoiseModel::parametersUpdated()

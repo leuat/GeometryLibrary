@@ -24,6 +24,7 @@ public:
     // Model interface
 public:
     virtual bool isInVoid(float x, float y, float z) override;
+    virtual float getValue(float x, float y, float z) override;
     virtual void parametersUpdated() override;
     virtual void createParameters() override;
     virtual void loadParameters(class CIniFile *iniFile) override;

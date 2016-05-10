@@ -8,8 +8,6 @@
 
 class Measure
 {
-private:
-
 public:
     Measure();
     virtual void compute(Model &model) = 0;

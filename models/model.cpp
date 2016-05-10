@@ -20,6 +20,11 @@ bool Model::isInVoid(const QVector3D& point)
     return isInVoid(point.x(), point.y(), point.z());
 }
 
+float Model::getValue(const QVector3D &point)
+{
+    return getValue(point.x(), point.y(), point.z());
+}
+
 void Model::start()
 {
 
@@ -28,6 +33,11 @@ void Model::start()
 void Model::stop()
 {
 
+}
+
+float Model::getValue(float x, float y, float z)
+{
+    return isInVoid(x,y,z);
 }
 
 void Model::loadParameters(CIniFile *iniFile)
@@ -88,6 +98,16 @@ float Model::calculateFractalDimension(float min, float max)
 
         }
     results.SaveText("../../../../../fractal_dim.txt");
+}
+
+Grid Model::grid(int nx, int ny, int nz)
+{
+    Grid grid(nx, ny, nz);
+    grid.iterate(QVector3D(1.0, 1.0, 1.0), [&](QVector3D p, float &v) {
+        v = this->isInVoid(p);
+    });
+
+    return grid;
 }
 
 void Model::setParameters(Parameters *parameters)

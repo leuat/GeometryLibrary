@@ -5,6 +5,11 @@
 #include <QTextStream>
 #include <QDebug>
 
+Grid::Grid(int nx, int ny, int nz)
+{
+    resize(nx, ny, nz);
+}
+
 Grid::Grid()
 {
 
@@ -94,6 +99,20 @@ void Grid::setValue(int i, int j, int k, float value)
 void Grid::clear()
 {
     memset(&m_voxels[0], 0, m_voxels.size()*sizeof(float));
+}
+
+void Grid::iterate(QVector3D systemSize, std::function<void (QVector3D p, float &v)> action)
+{
+    QVector3D voxelSize = this->voxelSize(systemSize);
+    for(int i=0; i<m_nx; i++) {
+        for(int j=0; j<m_ny; j++) {
+            for(int k=0; k<m_nz; k++) {
+                const QVector3D voxelCenter((i+0.5)*voxelSize[0], (j+0.5)*voxelSize[1], (k+0.5)*voxelSize[2]);
+                action(voxelCenter, m_voxels[index(i,j,k)]);
+            }
+        }
+
+    }
 }
 
 void Grid::reallocate()

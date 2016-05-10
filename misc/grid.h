@@ -2,10 +2,11 @@
 #define GRID_H
 #include <QVector>
 #include <QVector3D>
-
+#include <functional>
 class Grid
 {
 public:
+    Grid(int nx, int ny, int nz);
     Grid();
     int index(const int &i, const int &j, const int &k) { return i*m_ny*m_nz + j*m_nz + k; }
     int indexPeriodic(const int i, const int j, const int k) { return ((i+m_nx) % m_nx)*m_ny*m_nz + ((j+m_ny) % m_ny)*m_nz + ((k + m_nz) % m_nz); }
@@ -31,6 +32,7 @@ public:
     void toVTKFile(QString filename, QVector3D systemSize = QVector3D(1.0, 1.0, 1.0));
     void setValue(int i, int j, int k, float value);
     void clear();
+    void iterate(QVector3D systemSize, std::function<void(QVector3D p, float &value)> action);
 private:
     QVector<float> m_voxels;
     int m_nx = 0;
