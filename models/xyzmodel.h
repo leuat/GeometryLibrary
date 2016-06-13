@@ -54,7 +54,6 @@ public:
     static void addQuad(QVector<SimVis::TriangleCollectionVBOData> &data, QVector3D c1,QVector3D c2,QVector3D c3, QVector3D c4, QVector3D color);
 #endif
     using Model::isInVoid;
-
     virtual bool isInVoid(float x, float y, float z) override;
     virtual void parametersUpdated() override;
     virtual void createParameters() override;

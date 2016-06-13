@@ -115,6 +115,11 @@ void Grid::iterate(QVector3D systemSize, std::function<void (QVector3D p, float 
     }
 }
 
+QVector<float> &Grid::voxels()
+{
+    return m_voxels;
+}
+
 void Grid::reallocate()
 {
     m_voxels.resize(m_nx*m_ny*m_nz);
