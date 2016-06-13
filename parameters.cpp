@@ -2,7 +2,18 @@
 #include <QDebug.h>
 #include <QUrl>
 #include <QFile>
+#include <qfileinfo.h>
 #include "logger.h"
+
+double Parameters::getLikelihood() const
+{
+    return m_likelihood;
+}
+
+void Parameters::setLikelihood(double likelihood)
+{
+    m_likelihood = likelihood;
+}
 
 QVariantList Parameters::parameters() const
 {
@@ -109,6 +120,29 @@ bool Parameters::removeParameter(QString name)
     }
 
     return false;
+}
+
+Parameters *Parameters::copy()
+{
+    Parameters* newParameters = new Parameters();
+  //QString name, float value, float min, float max, float stepSize
+    for (Parameter* p : parameterList())
+
+        newParameters->createParameter(p->getName(), p->value(), p->min(), p->max(), p->stepSize());
+
+    newParameters->setLikelihood(m_likelihood);
+
+    return newParameters;
+}
+
+void Parameters::copyFrom(Parameters *param)
+{
+    for (int i=0;i<param->parameterList().length();i++)
+
+        parameterList()[i]->setValue(param->parameterList()[i]->value());
+
+    m_likelihood = param->getLikelihood();
+
 }
 
 void Parameters::setParameters(QVariantList parameters)
@@ -244,6 +278,56 @@ void Parameters::load(QString filename)
         }
     }
     file.close();
+}
+
+void Parameters::FlushMonteCarloStep(QString filename, int currentStep, double likelihood, QString commentText, bool append)
+{
+
+    QFile file(filename);
+    bool isNew = false;
+
+    if (!file.exists(filename))
+        isNew = true;
+
+    bool exists = false;
+
+    if (append) // always append
+        exists = file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
+    else {
+
+        if (currentStep == 1) { // Only write new file
+            exists = file.open(QIODevice::WriteOnly | QIODevice::Text);
+            isNew = true;
+        }
+        else
+            exists = file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
+
+    }
+
+    if (!exists) {
+        file.setFileName(QUrl(filename).toLocalFile());
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            qWarning() << "Could not open file "+filename;
+            return;
+        }
+    }
+    QTextStream out(&file);
+    if (isNew) {
+        out << "step ";
+        for (Parameter* p : parameterList())
+            out << p->name() << " ";
+        out << "likelihood " << endl;
+    }
+    out << currentStep << " ";
+
+    for(Parameter *parameter : parameterList()) {
+        out << parameter->value() << " ";
+    }
+    out << likelihood << endl;
+    if (commentText.length()!=0)
+        out << " # " << commentText << endl;
+    file.close();
+
 }
 
 QString Parameter::string() const
