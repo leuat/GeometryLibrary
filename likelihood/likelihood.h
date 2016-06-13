@@ -13,6 +13,7 @@ protected:
         QString parametersFilename;
         QString bestFarametersFilename;
         int currentStep = 0;
+        int rejectedSteps = 0;
         int totalSteps = 100;
         float chiSquared = 0;
     };
@@ -33,6 +34,7 @@ protected:
 
     void tickLikelihoodMonteCarlo();
     void tickLikelihoodBruteforce1D();
+    void tickLikelihoodFullMonteCarlo();
     void tickModelStatistics();
 
 public:
@@ -40,11 +42,11 @@ public:
 
     virtual void calculateModel(class Model* modelData) = 0;
     enum AnalysisType { LikelihoodStatistics, ModelStatistics, None };
-    enum AnalysisAlgorithm { Bruteforce1D, MonteCarlo };
+    enum AnalysisAlgorithm { Bruteforce1D, MonteCarlo, FullMonteCarlo };
     AnalysisType m_analysisType = AnalysisType::None;
     AnalysisAlgorithm m_analysisAlgorithm = AnalysisAlgorithm::Bruteforce1D;
     void bruteForce1D(int bins, QString parameterKey, Model *modelData);
-    void monteCarlo(Model *model, int steps);
+    void monteCarlo(Model *model, int steps, AnalysisAlgorithm analysisAlgorithm);
     void modelAnalysis(int count, Model *modelData);
     bool tick();
 
