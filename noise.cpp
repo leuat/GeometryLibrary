@@ -37,6 +37,11 @@ double Noise::get( const double x, const double y, const double z, const double 
     return total / maxAmplitude;
 }
 
+double Noise::get_raw( const double x, const double y, const double z) {
+    return raw_3d( (x), (y) , (z) );
+}
+
+
 double Noise::get( const double x, const double y) {
     double total = 0;
     double freq = frequency;

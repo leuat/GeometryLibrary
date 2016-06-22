@@ -85,15 +85,15 @@ void RegularNoiseModel::parametersUpdated()
 void RegularNoiseModel::createParameters()
 {
     m_parameters->createParameter("octaves", 1, 1, 7, 1);
-    m_parameters->createParameter("scale", 0.01, 0.001, 0.1, 0.001);
-    m_parameters->createParameter("persistence", 1.0, 0.1, 3.0, 0.1);
-    m_parameters->createParameter("threshold", 0.1, -0.4, 0.4, 0.001);
+    m_parameters->createParameter("scale", 0.01, 0.001, 0.1, 0.00001);
+    m_parameters->createParameter("persistence", 1.0, 0.1, 3.0, 0.000001);
+    m_parameters->createParameter("threshold", 0.1, -0.4, 0.4, 0.00001);
     m_parameters->createParameter("inverted", 0, 0, 1, 1.0);
     m_parameters->createParameter("seed", 13.0, 1, 100, 1);
     m_parameters->createParameter("absolute", 0.0, 0, 1, 1);
     m_parameters->createParameter("skewscale", 1.0, 0, 1, 0.1);
     m_parameters->createParameter("skewamplitude", 0.0, 0, 1, 0.1);
-    m_parameters->createParameter("steepness", 1.0, 0.5, 1.5, 0.001);
+    m_parameters->createParameter("steepness", 1.0, 0.5, 1.5, 0.000001);
     m_parameters->createParameter("noisetype", "simplex");
     Logger::write(QString("RegularNoiseModel::createParameters: creating octaves=%1").arg(m_parameters->getValue("octaves")));
     Logger::write(QString("RegularNoiseModel::createParameters: creating scale=%1").arg(m_parameters->getValue("scale")));
@@ -152,6 +152,8 @@ void RegularNoiseModel::randomWalk()
     Logger::write(QString("RegularNoiseModel::randomWalk: changing scale with %1 to %2").arg(delta, m_parameters->getValue("scale")));
 
     delta = Random::nextGaussian(0, 0.5*m_parameters->getStepSize("persistence"));
+//    qDebug() << "Delta: " << delta;
+//    qDebug() << "RGauss: " << Random::nextGaussian(0,1);
     m_parameters->setValue("persistence", m_parameters->getValue("persistence") + delta);
     m_parameters->fitBounds("persistence");
     Logger::write(QString("RegularNoiseModel::randomWalk: changing persistence with %1 to %2").arg(delta, m_parameters->getValue("persistence")));
