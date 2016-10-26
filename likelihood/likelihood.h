@@ -23,6 +23,8 @@ protected:
     GraphStatistics m_statistics;
     LGraph m_likelihood;
     QString m_currentParameter;
+    QString m_likelihoodFileName = "mc.txt";
+
     class Model *m_model = nullptr;
     MCData *m_mcData = nullptr;
     QPointF m_minVal;
@@ -60,6 +62,8 @@ public:
     bool getDone() const;
     void setDone(bool done);
     GraphStatistics getStatistics() const;
+    QString getLikelihoodFileName() const;
+    void setLikelihoodFileName(const QString &likelihoodFileName);
 };
 
 #endif // LIKELIHOOD_H

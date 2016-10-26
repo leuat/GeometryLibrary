@@ -56,6 +56,16 @@ GraphStatistics Likelihood::getStatistics() const
     return m_statistics;
 }
 
+QString Likelihood::getLikelihoodFileName() const
+{
+    return m_likelihoodFileName;
+}
+
+void Likelihood::setLikelihoodFileName(const QString &likelihoodFileName)
+{
+    m_likelihoodFileName = likelihoodFileName;
+}
+
 void Likelihood::tickLikelihoodMonteCarlo()
 {
     m_model->parameters()->save(m_mcData->parametersFilename);
@@ -107,7 +117,7 @@ void Likelihood::tickLikelihoodFullMonteCarlo()
         ++m_mcData->currentStep;
         m_model->parameters()->setLikelihood(proposal_likelihood);
         double acceptRatio = (m_mcData->currentStep) / (double)(m_mcData->currentStep + m_mcData->rejectedSteps);
-        m_model->parameters()->FlushMonteCarloStep("mc.txt", m_mcData->currentStep, proposal_likelihood,
+        m_model->parameters()->FlushMonteCarloStep(m_likelihoodFileName, m_mcData->currentStep, proposal_likelihood,
                                                    "acceptance ratio: " + QString::number(acceptRatio), true);
     }
     else {

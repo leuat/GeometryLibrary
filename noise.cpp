@@ -30,7 +30,7 @@ double Noise::get( const double x, const double y, const double z, const double 
         freq *= 2;
         maxAmplitude += amplitude;
         amplitude *= p;
-        p = sqrt(p);
+        //p = sqrt(p);
 
     }
 
