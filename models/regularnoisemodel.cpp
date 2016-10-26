@@ -16,9 +16,20 @@ template <typename T> int sign(T val) {
 
 bool RegularNoiseModel::isInVoid(float x, float y, float z)
 {
+    float value = getValue(x,y,z);
+    if (m_inverted) {
+        if (value>m_threshold) return true;
+    } else {
+        if (value<m_threshold)  return true;
+    }
+    return false;
+}
+
+float RegularNoiseModel::getValue(float x, float y, float z)
+{
     if(!m_noise) {
         qDebug() << "Warning, tried to call RegularNoiseModel::isInVoid(float x, float y, float z), but no noise type is chosen. Maybe you didn't call start()?";
-        return false;
+        return 0;
     }
 
     double add = m_seed;
@@ -27,18 +38,13 @@ bool RegularNoiseModel::isInVoid(float x, float y, float z)
     double sz = 0.9534;
     // double p1 = (1 + m_skewAmplitude*m_noise->get(m_skewScale*x + sx,m_skewScale*y+sy,m_skewScale*z+sz));
     double p1 = 1.0;
-    double val = m_noise->get(x*m_scale*p1 + add, y*m_scale*p1,z*m_scale*p1);
-    val = sign<float>(val)*pow(fabs(val), m_steepness);
+    double value = m_noise->get(x*m_scale*p1 + add, y*m_scale*p1,z*m_scale*p1);
+    value = sign<float>(value)*pow(fabs(value), m_steepness);
     if (m_absolute) {
-        val = fabs(val);
+        value = fabs(value);
     }
 
-    if (m_inverted) {
-        if (val>m_threshold) return true;
-    } else {
-        if (val<m_threshold)  return true;
-    }
-    return false;
+    return value;
 }
 
 void RegularNoiseModel::parametersUpdated()
@@ -79,15 +85,15 @@ void RegularNoiseModel::parametersUpdated()
 void RegularNoiseModel::createParameters()
 {
     m_parameters->createParameter("octaves", 1, 1, 7, 1);
-    m_parameters->createParameter("scale", 0.01, 0.001, 0.1, 0.001);
-    m_parameters->createParameter("persistence", 1.0, 0.1, 3.0, 0.1);
-    m_parameters->createParameter("threshold", 0.1, -0.4, 0.4, 0.001);
+    m_parameters->createParameter("scale", 0.01, 0.001, 0.1, 0.00001);
+    m_parameters->createParameter("persistence", 1.0, 0.1, 3.0, 0.000001);
+    m_parameters->createParameter("threshold", 0.1, -0.4, 0.4, 0.00001);
     m_parameters->createParameter("inverted", 0, 0, 1, 1.0);
     m_parameters->createParameter("seed", 13.0, 1, 100, 1);
     m_parameters->createParameter("absolute", 0.0, 0, 1, 1);
     m_parameters->createParameter("skewscale", 1.0, 0, 1, 0.1);
     m_parameters->createParameter("skewamplitude", 0.0, 0, 1, 0.1);
-    m_parameters->createParameter("steepness", 1.0, 0.5, 1.5, 0.1);
+    m_parameters->createParameter("steepness", 1.0, 0.5, 1.5, 0.000001);
     m_parameters->createParameter("noisetype", "simplex");
     Logger::write(QString("RegularNoiseModel::createParameters: creating octaves=%1").arg(m_parameters->getValue("octaves")));
     Logger::write(QString("RegularNoiseModel::createParameters: creating scale=%1").arg(m_parameters->getValue("scale")));
@@ -146,6 +152,8 @@ void RegularNoiseModel::randomWalk()
     Logger::write(QString("RegularNoiseModel::randomWalk: changing scale with %1 to %2").arg(delta, m_parameters->getValue("scale")));
 
     delta = Random::nextGaussian(0, 0.5*m_parameters->getStepSize("persistence"));
+//    qDebug() << "Delta: " << delta;
+//    qDebug() << "RGauss: " << Random::nextGaussian(0,1);
     m_parameters->setValue("persistence", m_parameters->getValue("persistence") + delta);
     m_parameters->fitBounds("persistence");
     Logger::write(QString("RegularNoiseModel::randomWalk: changing persistence with %1 to %2").arg(delta, m_parameters->getValue("persistence")));

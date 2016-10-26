@@ -64,6 +64,8 @@ private:
     QMap<QString, Parameter*> m_parametersMap;
     QVariantList m_parameters;
 
+protected:
+    double m_likelihood;
 public:
     Parameters() { }
     QVariantList parameters() const;
@@ -74,6 +76,10 @@ public:
     void createParameter(QString name, float value = 0, float min = 0, float max = 0, float stepSize = 0);
     void createParameter(QString name, QString string);
     bool removeParameter(QString name);
+    Parameters* copy();
+    void copyFrom(Parameters* p);
+
+
     QMap<QString, Parameter *> parametersMap() const;
     void setParametersMap(const QMap<QString, Parameter *> &parametersMap);
     double getValue(QString name);
@@ -85,6 +91,7 @@ public:
     QString getString(QString name);
     Q_INVOKABLE void save(QString filename);
     Q_INVOKABLE void load(QString filename);
+    void FlushMonteCarloStep(QString filename, int currentStep, double likelihood, QString commentText, bool append);
 
 public slots:
     void setParameters(QVariantList parameters);
@@ -103,6 +110,8 @@ public:
         return out;
         out <<"] ";
     }
+    double getLikelihood() const;
+    void setLikelihood(double likelihood);
 };
 
 #endif // PARAMETERS_H

@@ -2,6 +2,9 @@
 #include <qdebug.h>
 #include "../models/model.h"
 #include <QStandardPaths>
+#include "../misc/random.h"
+
+
 
 LGraph Likelihood::data() const
 {
@@ -53,6 +56,16 @@ GraphStatistics Likelihood::getStatistics() const
     return m_statistics;
 }
 
+QString Likelihood::getLikelihoodFileName() const
+{
+    return m_likelihoodFileName;
+}
+
+void Likelihood::setLikelihoodFileName(const QString &likelihoodFileName)
+{
+    m_likelihoodFileName = likelihoodFileName;
+}
+
 void Likelihood::tickLikelihoodMonteCarlo()
 {
     m_model->parameters()->save(m_mcData->parametersFilename);
@@ -76,6 +89,55 @@ void Likelihood::tickLikelihoodMonteCarlo()
         qDebug() << "   MC finished with chi squared: " << chiSquared << endl;
     }
 }
+
+// This method explicitly calculates and rejects certain points
+void Likelihood::tickLikelihoodFullMonteCarlo()
+{
+    m_model->parameters()->save(m_mcData->parametersFilename);
+    Parameters* originalParameters = m_model->parameters()->copy();
+    m_model->randomWalk();
+    calculateModel(m_model);
+    float chiSquared = LGraph::ChiSQ(m_data, m_modelData);
+
+    float proposal_likelihood = exp(-chiSquared);
+    float current_likelihood = m_model->parameters()->getLikelihood();
+
+    // Always accept first step!
+    float p_accept = 1;
+    qDebug() << "Proposal / old: " << proposal_likelihood << ", "<<current_likelihood << endl;
+    bool accept = true;
+    if (current_likelihood != 0) {
+        // MC step: only accept when random uniform is < prop/current
+        p_accept = proposal_likelihood / current_likelihood;
+        accept = Random::nextDouble(0,1) < p_accept;
+    }
+
+    if (accept) {
+        qDebug() << "ACCEPT with " << p_accept <<endl;
+        ++m_mcData->currentStep;
+        m_model->parameters()->setLikelihood(proposal_likelihood);
+        double acceptRatio = (m_mcData->currentStep) / (double)(m_mcData->currentStep + m_mcData->rejectedSteps);
+        m_model->parameters()->FlushMonteCarloStep(m_likelihoodFileName, m_mcData->currentStep, proposal_likelihood,
+                                                   "acceptance ratio: " + QString::number(acceptRatio), true);
+    }
+    else {
+        // If not accepted, revert to original parameters
+        qDebug() << "REJECT with " << p_accept <<endl;
+        m_model->parameters()->copyFrom(originalParameters);
+        ++m_mcData->rejectedSteps;
+    }
+
+
+    if(m_mcData->currentStep == m_mcData->totalSteps) {
+        calculateModel(m_model);
+        chiSquared = m_mcData->chiSquared;
+        m_analysisType = AnalysisType::None;
+        m_done = true;
+        m_minVal = QPointF(0, m_mcData->chiSquared);
+        qDebug() << "   Full MC finished with chi squared: " << chiSquared << endl;
+    }
+}
+
 
 void Likelihood::tickLikelihoodBruteforce1D()
 {
@@ -118,7 +180,7 @@ Likelihood::Likelihood()
 
 }
 
-void Likelihood::monteCarlo(Model *model, int steps)
+void Likelihood::monteCarlo(Model *model, int steps, AnalysisAlgorithm analysisAlgorithm)
 {
     if(!model) {
         qDebug() << "Likelihood::bruteForce1D: Error, model is nullptr";
@@ -135,7 +197,12 @@ void Likelihood::monteCarlo(Model *model, int steps)
     qDebug() << "   Starting monte carlo with initial chi squared: " << m_mcData->chiSquared;
 
     m_analysisType = AnalysisType::LikelihoodStatistics;
-    m_analysisAlgorithm = AnalysisAlgorithm::MonteCarlo;
+    m_analysisAlgorithm = analysisAlgorithm;
+
+    m_mcData->currentStep = 0;
+    m_mcData->totalSteps = steps;
+    m_mcData->rejectedSteps = 0;
+
 }
 
 void Likelihood::bruteForce1D(int bins, QString parameterKey, Model *model)
@@ -179,12 +246,16 @@ bool Likelihood::tick()
             tickLikelihoodBruteforce1D();
         } else if(m_analysisAlgorithm == AnalysisAlgorithm::MonteCarlo) {
             tickLikelihoodMonteCarlo();
+        } else if(m_analysisAlgorithm == AnalysisAlgorithm::FullMonteCarlo) {
+            tickLikelihoodFullMonteCarlo();
         }
     }
 
     if (m_analysisType == AnalysisType::ModelStatistics) {
         tickModelStatistics();
     }
+
+
 
 
     return true;

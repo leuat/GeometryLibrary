@@ -82,8 +82,6 @@ public:
     void setPoints(QVector<QVector3D>& points);
     void calculateOctreeMeasure(QVector<QPointF>& points);
 
-
-
     // Model interface
 public:
     bool isInVoid(float x, float y, float z) override;

@@ -28,7 +28,6 @@ QVector<QVector3D> XYZModel::getPoints() const
 
 void XYZModel::calculateBoundingbox()
 {
-
     double maxX = -1e9;
     double maxY = -1e9;
     double maxZ = -1e9;

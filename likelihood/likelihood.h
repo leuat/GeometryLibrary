@@ -13,6 +13,7 @@ protected:
         QString parametersFilename;
         QString bestFarametersFilename;
         int currentStep = 0;
+        int rejectedSteps = 0;
         int totalSteps = 100;
         float chiSquared = 0;
     };
@@ -22,6 +23,8 @@ protected:
     GraphStatistics m_statistics;
     LGraph m_likelihood;
     QString m_currentParameter;
+    QString m_likelihoodFileName = "mc.txt";
+
     class Model *m_model = nullptr;
     MCData *m_mcData = nullptr;
     QPointF m_minVal;
@@ -33,6 +36,7 @@ protected:
 
     void tickLikelihoodMonteCarlo();
     void tickLikelihoodBruteforce1D();
+    void tickLikelihoodFullMonteCarlo();
     void tickModelStatistics();
 
 public:
@@ -40,11 +44,11 @@ public:
 
     virtual void calculateModel(class Model* modelData) = 0;
     enum AnalysisType { LikelihoodStatistics, ModelStatistics, None };
-    enum AnalysisAlgorithm { Bruteforce1D, MonteCarlo };
+    enum AnalysisAlgorithm { Bruteforce1D, MonteCarlo, FullMonteCarlo };
     AnalysisType m_analysisType = AnalysisType::None;
     AnalysisAlgorithm m_analysisAlgorithm = AnalysisAlgorithm::Bruteforce1D;
     void bruteForce1D(int bins, QString parameterKey, Model *modelData);
-    void monteCarlo(Model *model, int steps);
+    void monteCarlo(Model *model, int steps, AnalysisAlgorithm analysisAlgorithm);
     void modelAnalysis(int count, Model *modelData);
     bool tick();
 
@@ -58,6 +62,8 @@ public:
     bool getDone() const;
     void setDone(bool done);
     GraphStatistics getStatistics() const;
+    QString getLikelihoodFileName() const;
+    void setLikelihoodFileName(const QString &likelihoodFileName);
 };
 
 #endif // LIKELIHOOD_H

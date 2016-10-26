@@ -3,7 +3,7 @@
 
 #include "GeometryLibrary/likelihood/likelihood.h"
 #include "particle.h"
-#include "distancetoatom.h"
+#include "measures/distancetoatom.h"
 #include <QVector>
 #include <QVector3D>
 
