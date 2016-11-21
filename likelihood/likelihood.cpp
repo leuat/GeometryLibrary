@@ -198,7 +198,8 @@ void Likelihood::monteCarlo(Model *model, int steps, AnalysisAlgorithm analysisA
 
     m_analysisType = AnalysisType::LikelihoodStatistics;
     m_analysisAlgorithm = analysisAlgorithm;
-    m_likelihood = 0;
+    //m_likelihood = 0;
+
     m_mcData->currentStep = 0;
     m_mcData->totalSteps = steps;
     m_mcData->rejectedSteps = 0;
