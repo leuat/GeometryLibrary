@@ -90,7 +90,7 @@ void DistanceToAtom::compute(const QVector<QVector3D> &pointsOriginal, float cut
 
     const float oneOverCellSize = 1.0/cellSize;
 
-#pragma omp parallel for num_threads(8)
+#pragma omp parallel for
     for(int i=0; i<m_numberOfRandomVectors; i++) {
         const float x = m_randomNumbers[3*i+0];
         const float y = m_randomNumbers[3*i+1];
