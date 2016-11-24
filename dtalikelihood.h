@@ -31,7 +31,6 @@ public:
         //calculateStatistics(m_modelParticles, m_model);
         //m_currentModel = m_model.toQVector();
         m_originalParticles = originalParticles;
-        cout << "SIZE: " << m_originalParticles->size();
     }
 
     LGraph calculateStatisticsDirect(Particles& particles);

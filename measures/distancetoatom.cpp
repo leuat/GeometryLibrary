@@ -8,7 +8,9 @@
 #include <QElapsedTimer>
 
 float floatRandom(const float & min, const float & max) {
-    static std::mt19937 generator;
+    static std::mt19937 generator(time(0));
+
+
     std::uniform_real_distribution<float> distribution(min, max);
     return distribution(generator);
 }

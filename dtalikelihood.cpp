@@ -63,7 +63,6 @@ void DTALikelihood::calculateModel(Model *model)
 {
     m_modelParticles.clear();
     m_originalParticles->calculateBoundingBox();
-       qDebug() << "HALLO : "  << m_originalParticles->getParticles().count();
 
     model->start();
     for (Particle* pos : m_originalParticles->getParticles()) {
