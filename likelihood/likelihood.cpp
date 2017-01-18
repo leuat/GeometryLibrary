@@ -56,6 +56,16 @@ GraphStatistics Likelihood::getStatistics() const
     return m_statistics;
 }
 
+QString Likelihood::getLikelihoodFileName() const
+{
+    return m_likelihoodFileName;
+}
+
+void Likelihood::setLikelihoodFileName(const QString &likelihoodFileName)
+{
+    m_likelihoodFileName = likelihoodFileName;
+}
+
 void Likelihood::tickLikelihoodMonteCarlo()
 {
     m_model->parameters()->save(m_mcData->parametersFilename);
@@ -97,7 +107,7 @@ void Likelihood::tickLikelihoodFullMonteCarlo()
     qDebug() << "Proposal / old: " << proposal_likelihood << ", "<<current_likelihood << endl;
     bool accept = true;
     if (current_likelihood != 0) {
-        // MC step: only accept when random uniform is < prop/current
+        // MC step: onlæ accept when random uniform is < prop/current
         p_accept = proposal_likelihood / current_likelihood;
         accept = Random::nextDouble(0,1) < p_accept;
     }
@@ -107,7 +117,7 @@ void Likelihood::tickLikelihoodFullMonteCarlo()
         ++m_mcData->currentStep;
         m_model->parameters()->setLikelihood(proposal_likelihood);
         double acceptRatio = (m_mcData->currentStep) / (double)(m_mcData->currentStep + m_mcData->rejectedSteps);
-        m_model->parameters()->FlushMonteCarloStep("mc.txt", m_mcData->currentStep, proposal_likelihood,
+        m_model->parameters()->FlushMonteCarloStep(m_likelihoodFileName, m_mcData->currentStep, proposal_likelihood,
                                                    "acceptance ratio: " + QString::number(acceptRatio), true);
     }
     else {
@@ -188,6 +198,7 @@ void Likelihood::monteCarlo(Model *model, int steps, AnalysisAlgorithm analysisA
 
     m_analysisType = AnalysisType::LikelihoodStatistics;
     m_analysisAlgorithm = analysisAlgorithm;
+    //m_likelihood = 0;
 
     m_mcData->currentStep = 0;
     m_mcData->totalSteps = steps;

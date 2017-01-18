@@ -98,13 +98,13 @@ void Particles::open(const char *filename) {
   //            pt.color = QVector3D(1,1,1);
               p->setType(pt);
               particles.append(p);
-
           }
           cnt++;
 
        }
        inputFile.close();
     }
+    else qDebug() << "Could not open file " << filename;
 }
 
 void Particles::copyFrom(Particles &plist)

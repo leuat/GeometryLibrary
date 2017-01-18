@@ -32,6 +32,7 @@ public:
     Noise(int o,double f,double p,int s);
 
     double get( const double x, const double y, const double z);
+    double get_raw( const double x, const double y, const double z);
     double get(const double x, const double y, const double z, const double per, const double f);
     double get( const double x, const double y);
     double* generateSpectralWeights(double lacunarity, int octaves, double h, double frequency);

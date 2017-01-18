@@ -65,7 +65,7 @@ private:
     QVariantList m_parameters;
 
 protected:
-    double m_likelihood;
+    double m_likelihood = 0;
 public:
     Parameters() { }
     QVariantList parameters() const;

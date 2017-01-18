@@ -440,8 +440,13 @@ double LGraph::ChiSQ(LGraph& temp, LGraph& two) {
     if (temp.Bins!=two.Bins)
         return 0;
     for (int i=0;i<temp.Bins;i++) {
-        chisq += abs(pow((temp.val[i] - two.val[i]), 2.0));
+        float t = two.val[i];
+        if (t==0) t = 0.0001;
+        chisq += pow((temp.val[i] - two.val[i]), 2.0)/t;
     }
+//    chisq /= (double)temp.Bins;
+//    exp(-chi1*10) / exp(-chi2*10)
+
     return chisq;
 }
 
