@@ -33,13 +33,11 @@ float RegularNoiseModel::getValue(float x, float y, float z)
     }
 
     double add = m_seed;
-    double sx = 0.1245;
-    double sy = 1.2312;
-    double sz = 0.9534;
     // double p1 = (1 + m_skewAmplitude*m_noise->get(m_skewScale*x + sx,m_skewScale*y+sy,m_skewScale*z+sz));
     double p1 = 1.0;
     double value = m_noise->get(x*m_scale*p1 + add, y*m_scale*p1,z*m_scale*p1);
-    value = sign<float>(value)*pow(fabs(value), m_steepness);
+    //qDebug() << m_steepness;
+    value = sign<float>(value)*pow(fabs(value), (m_steepness));
     if (m_absolute) {
         value = fabs(value);
     }
@@ -152,9 +150,9 @@ void RegularNoiseModel::randomWalk()
     Logger::write(QString("RegularNoiseModel::randomWalk: changing scale with %1 to %2").arg(delta, m_parameters->getValue("scale")));
 
     delta = Random::nextGaussian(0, 0.5*m_parameters->getStepSize("persistence"));
-//    qDebug() << "Delta: " << delta;
+//    qDebug() << "Deltaperstie: " << delta;
 //    qDebug() << "RGauss: " << Random::nextGaussian(0,1);
-    m_parameters->setValue("persistence", m_parameters->getValue("persistence") + delta);
+    m_parameters->setValue("persistence", abs(m_parameters->getValue("persistence") + delta));
     m_parameters->fitBounds("persistence");
     Logger::write(QString("RegularNoiseModel::randomWalk: changing persistence with %1 to %2").arg(delta, m_parameters->getValue("persistence")));
 
