@@ -66,8 +66,11 @@ void DTALikelihood::calculateModel(Model *model)
 
     model->start();
 #pragma omp parallel for
-    for (Particle* pos : m_originalParticles->getParticles()) {
-        if (!model->isInVoid(pos->getPos())) {
+//    for (Particle* pos : m_originalParticles->getParticles()) {
+      for (int i=0;i< m_originalParticles->getParticles().size();i++) {
+
+         Particle* pos = m_originalParticles->getParticles()[i];
+         if (!model->isInVoid(pos->getPos())) {
             m_modelParticles.append(pos->getPos());
         }
     }
