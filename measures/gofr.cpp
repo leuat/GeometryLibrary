@@ -1,4 +1,7 @@
 #include "gofr.h"
+#include "neighborlist.h"
+
+#include "GeometryLibrary/misc/points.h"
 
 GOfR::GOfR()
 {
@@ -6,10 +9,97 @@ GOfR::GOfR()
 }
 
 
-void GOfR::compute(Model &model)
+void GOfR::compute(const QVector<QVector3D> &points, float cutoff, int numBins)
 {
+    NeighborList list;
+    QVector3D cellSize;
+    QVector3D numCells;
+    Points p;
+    p.setPoints(points);
+    p.calculateBoundingbox();
+    QVector3D systemSize = p.systemSize();
+
+    CellList cellList = list.buildCellList(points, systemSize, cutoff, cellSize, numCells);
+    QVector3D oneOverCellSize;
+    oneOverCellSize[0] = 1.0 / cellSize[0];
+    oneOverCellSize[1] = 1.0 / cellSize[1];
+    oneOverCellSize[2] = 1.0 / cellSize[2];
+
+    float cutsq = cutoff*cutoff;
+    m_dr = cutoff / numBins;
+    float oneOverDr = 1.0/m_dr;
+    m_numBins = numBins;
+    QVector<int> counts;
+    counts.resize(m_numBins);
+
+    for(int i=0; i<points.size(); i++) {
+        const QVector3D &point1 = points.at(i);
+
+        const int cx = point1[0] * oneOverCellSize[0];
+        const int cy = point1[1] * oneOverCellSize[1];
+        const int cz = point1[2] * oneOverCellSize[2];
+
+        // Loop through all 27 cells with size=cutoff
+        for(int dx=-1; dx<=1; dx++) {
+            for(int dy=-1; dy<=1; dy++) {
+                for(int dz=-1; dz<=1; dz++) {
+                    const vector<QVector3D> &pointsInCell = cellList[list.periodic(cx+dx, numCells[0])][list.periodic(cy+dy, numCells[1])][list.periodic(cz+dz, numCells[2])];
+                    const int numberOfPointsInCell = pointsInCell.size();
+
+                    for(int j=0; j<numberOfPointsInCell; j++) {
+                        // const QVector3D &point = points[pointIndex];
+                        const QVector3D &point2 = pointsInCell[j];
+
+                        float dx = point1.x() - point2.x();
+                        float dy = point1.y() - point2.y();
+                        float dz = point1.z() - point2.z();
+                        if(dx < -0.5*systemSize[0]) dx += systemSize[0];
+                        else if(dx > 0.5*systemSize[0]) dx -= systemSize[0];
+
+                        if(dy < -0.5*systemSize[1]) dy += systemSize[1];
+                        else if(dy > 0.5*systemSize[1]) dy -= systemSize[1];
+
+                        if(dz < -0.5*systemSize[2]) dz += systemSize[2];
+                        else if(dz > 0.5*systemSize[2]) dz -= systemSize[2];
+                        const float dr2 = dx*dx + dy*dy + dz*dz;
+                        if(dr2<cutsq) {
+                            float dr = sqrt(dr2);
+                            int binIndex = dr * oneOverDr;
+                            if (binIndex >= m_numBins) continue;
+                            counts[binIndex]++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    m_histogram.resize(m_numBins);
+    double constant = 4.0*M_PI / (3.0*systemSize[0]*systemSize[1]*systemSize[2]);
+    for(int binIndex=0; binIndex<m_numBins; binIndex++) {
+        float rlower = binIndex*m_dr;
+        float rupper = (binIndex+1)*m_dr;
+        float rmean = 0.5*(rlower + rupper);
+
+        float vfrac = constant * (rupper*rupper*rupper - rlower*rlower*rlower);
+        float gr = counts[binIndex] / (vfrac * points.size() * points.size());
+        qDebug() << rmean << " " << gr;
+
+        m_histogram[binIndex] = QPointF(rmean, gr);
+    }
 }
 
-QVector<QPointF> GOfR::histogram(int bins)
+QVector<QPointF> GOfR::histogram(bool cap, float min, float max)
 {
+    if(cap) {
+        for(int binIndex=0; binIndex<m_numBins; binIndex++) {
+            if(m_histogram[binIndex].y() < min) {
+                m_histogram[binIndex].setY(min);
+            }
+            if(m_histogram[binIndex].y() > max) {
+                m_histogram[binIndex].setY(max);
+            }
+        }
+    }
+    return m_histogram;
 }

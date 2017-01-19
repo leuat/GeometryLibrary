@@ -1,5 +1,6 @@
 #include "neighborlist.h"
 #include <QDebug>
+#include <QElapsedTimer>
 #include "GeometryLibrary/misc/points.h"
 using std::vector;
 
@@ -10,6 +11,8 @@ NeighborList::NeighborList()
 
 void NeighborList::build(const QVector<QVector3D> &points, float cutoff)
 {
+    QElapsedTimer t;
+    t.start();
     Points p;
     p.setPoints(points);
     p.calculateBoundingbox();
@@ -24,9 +27,6 @@ void NeighborList::build(const QVector<QVector3D> &points, float cutoff)
 
     if(m_neighborVectors.size() != points.size()) {
         m_neighborVectors.resize(points.size());
-    }
-    if(m_neighborIndices.size() != points.size()) {
-        m_neighborIndices.resize(points.size());
     }
 
     float cutsq = cutoff*cutoff;
@@ -77,11 +77,6 @@ void NeighborList::build(const QVector<QVector3D> &points, float cutoff)
 const QVector<QVector<QVector3D> > &NeighborList::getNeighborVectors() const
 {
     return m_neighborVectors;
-}
-
-const QVector<QVector<int> > &NeighborList::getNeighborIndices() const
-{
-    return m_neighborIndices;
 }
 
 CellList NeighborList::buildCellList(const QVector<QVector3D> &points, QVector3D size, float cutoff, QVector3D &cellSize, QVector3D &numCells)

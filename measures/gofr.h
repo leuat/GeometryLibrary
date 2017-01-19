@@ -3,15 +3,15 @@
 
 #include "measure.h"
 
-class GOfR : public Measure
+class GOfR
 {
 public:
     GOfR();
-
-    // Measure interface
-public:
-    virtual void compute(Model &model) override;
-    virtual QVector<QPointF> histogram(int bins) override;
+    void compute(const QVector<QVector3D> &points, float cutoff, int numBins);
+    QVector<QPointF> histogram(bool cap = false, float min = 0, float max = 0);
+    QVector<QPointF> m_histogram;
+    float m_dr;
+    int m_numBins;
 };
 
 #endif // GOFR_H
