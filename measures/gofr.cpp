@@ -103,8 +103,6 @@ void GOfR::compute(const QVector<QVector3D> &points, float cutoff, int numBins)
 
         float vfrac = constant * (rupper*rupper*rupper - rlower*rlower*rlower);
         float gr = counts[binIndex] / (vfrac * points.size() * points.size());
-        qDebug() << rmean << " " << gr;
-
         m_histogram[binIndex] = QPointF(rmean, gr);
     }
 }
