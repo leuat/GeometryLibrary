@@ -149,16 +149,7 @@ public:
     void Smooth(double B);
 
 
-    void LikelihoodFromChisq() {
-        // find min
-        double m = 1E20;
-        for (int i=0;i<Bins;i++)
-            m = min(val[i], m);
-
-        for (int i=0;i<Bins;i++) {
-            val[i] = exp(-(val[i]-m));
-        }
-    }
+    void LikelihoodFromChisq();
 
 
     void calculateStatistics();

@@ -39,8 +39,13 @@ protected:
     void tickLikelihoodFullMonteCarlo();
     void tickModelStatistics();
 
+    bool debugGraphs = false;
+
 public:
     Likelihood();
+    void setDebug(bool b) {
+        debugGraphs = b;
+    }
 
     virtual void calculateModel(class Model* modelData) = 0;
     enum AnalysisType { LikelihoodStatistics, ModelStatistics, None };
@@ -56,7 +61,7 @@ public:
     void setData(const LGraph &data);
     LGraph modelData() const;
     void setModelData(const LGraph &modelData);
-    LGraph likelihood() const;
+    LGraph& likelihood();
     void setLikelihood(const LGraph &likelihood);
     QPointF getMinVal() const;
     bool getDone() const;

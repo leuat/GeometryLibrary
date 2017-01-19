@@ -13,6 +13,7 @@ private:
     int m_numberOfRandomVectors = 65536;
     QVector<float> m_values;
     QVector<float> m_randomNumbers;
+    float m_cutoff;
     bool m_isValid = false;
 public:
     DistanceToAtom(int numberOfRandomVectors = 8192);
