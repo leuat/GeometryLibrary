@@ -26,7 +26,7 @@ void Likelihood::setModelData(const LGraph &modelData)
     m_modelData = modelData;
 }
 
-LGraph Likelihood::likelihood() const
+LGraph &Likelihood::likelihood()
 {
     return m_likelihood;
 }
@@ -96,6 +96,7 @@ void Likelihood::tickLikelihoodFullMonteCarlo()
     m_model->parameters()->save(m_mcData->parametersFilename);
     Parameters* originalParameters = m_model->parameters()->copy();
     m_model->randomWalk();
+    m_model->parameters()->getParameter("seed")->setValue(rand()%10000);
     calculateModel(m_model);
     float chiSquared = LGraph::ChiSQ(m_data, m_modelData);
 
@@ -144,15 +145,30 @@ void Likelihood::tickLikelihoodBruteforce1D()
     Parameter *parameter = m_model->parameters()->getParameter(m_currentParameter);
     parameter->setValue(m_currentVal);
     calculateModel(m_model);
+
+
     m_likelihood.val[m_currentBin] = LGraph::ChiSQ(m_data, m_modelData);
+    m_likelihood.index[m_currentBin] = m_currentVal;
+    m_likelihood.IndexScaled[m_currentBin] = m_currentVal;
+
+    if (debugGraphs) {
+//        qDebug() << "SAVIUNG";
+        QString s = "debugDTA_" + QString::number(m_currentBin) + ".txt";
+//        qDebug() << s;
+        m_modelData.SaveText(s.toStdString().c_str());
+    }
+
     m_currentVal += m_stepSize;
     m_currentBin++;
+    qDebug() << "Value: " << m_currentVal;
     if (m_currentBin == m_bins) {
         m_minVal = m_likelihood.getMin();
         parameter->setValue(m_minVal.x());
         calculateModel(m_model);
         m_analysisType = AnalysisType::None;
         m_done = true;
+
+
     }
 }
 
@@ -207,6 +223,10 @@ void Likelihood::monteCarlo(Model *model, int steps, AnalysisAlgorithm analysisA
 
 }
 
+
+
+
+
 void Likelihood::bruteForce1D(int bins, QString parameterKey, Model *model)
 {
     if(!model) {
@@ -214,6 +234,7 @@ void Likelihood::bruteForce1D(int bins, QString parameterKey, Model *model)
         return;
     }
     m_likelihood.initialize(bins);
+
     Parameter *parameter = model->parameters()->getParameter(parameterKey);
     m_stepSize = (parameter->max() - parameter->min())/(float)(bins+0);
     m_currentVal = parameter->min();

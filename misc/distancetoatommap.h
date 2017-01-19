@@ -5,6 +5,7 @@
 #include <vector>
 #include <QVector>
 #include <QVector3D>
+#include "../measures/neighborlist.h"
 
 using std::vector;
 

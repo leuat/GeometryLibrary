@@ -67,7 +67,7 @@ void DTALikelihood::calculateModel(Model *model)
     m_originalParticles->calculateBoundingBox();
 
     model->start();
-#pragma omp parallel for
+// #pragma omp parallel for
 //    for (Particle* pos : m_originalParticles->getParticles()) {
       for (int i=0;i< m_originalParticles->getParticles().size();i++) {
 
@@ -78,4 +78,6 @@ void DTALikelihood::calculateModel(Model *model)
     }
     model->stop();
     calculateStatistics(m_modelParticles,m_modelData);
+
+
 }

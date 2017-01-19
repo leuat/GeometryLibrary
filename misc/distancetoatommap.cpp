@@ -61,7 +61,8 @@ void DistanceToAtomMap::build(QVector<QVector3D> points, float cutoff)
 
     QVector3D cellSize;
     QVector3D numCells;
-    CellList cellList = buildCellList(points, systemSize, cutoff, cellSize, numCells);
+    NeighborList list;
+    CellList cellList = list.buildCellList(points, systemSize, cutoff, cellSize, numCells);
 
     QVector3D voxelSize = m_grid.voxelSize(systemSize);
     for(int i=0; i<m_grid.nx(); i++) {
@@ -107,31 +108,4 @@ void DistanceToAtomMap::build(QVector<QVector3D> points, float cutoff)
 Grid &DistanceToAtomMap::grid()
 {
     return m_grid;
-}
-
-CellList DistanceToAtomMap::buildCellList(const QVector<QVector3D> &points, QVector3D size, float cutoff, QVector3D &cellSize, QVector3D &numCells)
-{
-    CellList cellList;
-    for(int a=0; a<3; a++) {
-        numCells[a] = int(size[a] / cutoff);
-        cellSize[a] = size[a] / numCells[a];
-    }
-
-    cellList.resize(numCells[0], vector<vector<vector<QVector3D> > >(numCells[1], vector<vector<QVector3D> >(numCells[2])));
-    for(const QVector3D &p : points) {
-        int ci = p[0] / cellSize[0];
-        int cj = p[1] / cellSize[1];
-        int ck = p[2] / cellSize[2];
-
-        if(ci==numCells[0]) ci = numCells[0]-1;
-        if(cj==numCells[1]) cj = numCells[1]-1;
-        if(ck==numCells[2]) ck = numCells[2]-1;
-
-        if(!checkRange<int>(ci, 0, numCells[0]-1) || !checkRange<int>(cj, 0, numCells[1]-1) || !checkRange<int>(ck, 0, numCells[2]-1)) {
-            qDebug() << "DistanceToAtomMap::buildCellList() error: particle " << p << " is out of cell list bounds.";
-            exit(1);
-        }
-        cellList[ci][cj][ck].push_back(p);
-    }
-    return cellList;
 }

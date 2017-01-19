@@ -127,6 +127,9 @@ void RegularNoiseModel::loadParameters(CIniFile *iniFile)
 
 void RegularNoiseModel::start()
 {
+
+   m_noise = new Simplex(m_octaves, 1, m_persistence, m_seed);
+    return;
     if(m_noiseType.compare("perlin") == 0) {
         m_noise = new Perlin(m_octaves, 1, m_persistence, m_seed);
     } else if(m_noiseType.compare("simplex") == 0) {

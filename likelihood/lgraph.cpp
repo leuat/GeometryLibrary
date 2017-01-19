@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <qdebug.h>
+
 #ifdef USE_FFT
 
 void LGraph::FFT() {
@@ -435,6 +436,19 @@ float LGraph::getValAtScaledIndex(double& index) {
     return NONE;
 }
 
+void LGraph::LikelihoodFromChisq() {
+    // find min
+    double m = 1E20;
+    for (int i=0;i<Bins;i++)
+        m = min(val[i], m);
+
+    for (int i=0;i<Bins;i++) {
+        val[i] = exp(-(val[i]-m));
+    }
+
+}
+
+
 double LGraph::ChiSQ(LGraph& temp, LGraph& two) {
     // temp is data, two is model
     double chisq = 0;
@@ -445,7 +459,7 @@ double LGraph::ChiSQ(LGraph& temp, LGraph& two) {
     for (int i=0;i<temp.Bins;i++) {
         float t = two.val[i];
         if (t!=0)
-            chisq += powf(50*(temp.val[i] - two.val[i]), 2.0)/(50*t);
+            chisq += pow(50*(temp.val[i] - two.val[i]), 2.0)/(50*t);
     }
     return chisq;
 }

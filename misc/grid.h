@@ -33,6 +33,7 @@ public:
     void setValue(int i, int j, int k, float value);
     void clear();
     void iterate(QVector3D systemSize, std::function<void(QVector3D p, float &value)> action);
+    QVector<float> &voxels();
 private:
     QVector<float> m_voxels;
     int m_nx = 0;
