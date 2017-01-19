@@ -1,6 +1,6 @@
 #include "gofr.h"
 #include "neighborlist.h"
-
+#include <omp.h>
 #include "GeometryLibrary/misc/points.h"
 
 GOfR::GOfR()
@@ -29,9 +29,20 @@ void GOfR::compute(const QVector<QVector3D> &points, float cutoff, int numBins)
     m_dr = cutoff / numBins;
     float oneOverDr = 1.0/m_dr;
     m_numBins = numBins;
-    QVector<int> counts;
-    counts.resize(m_numBins);
 
+
+    int numthreads = omp_get_max_threads();
+
+    QVector<QVector<int>> allCounts;
+    allCounts.resize(numthreads);
+    for(int i=0; i<numthreads; i++) {
+        allCounts[i].resize(numBins);
+    }
+
+#pragma omp parallel num_threads(numthreads)
+    {
+        QVector<int> &counts = allCounts[omp_get_thread_num()];
+#pragma omp for
     for(int i=0; i<points.size(); i++) {
         const QVector3D &point1 = points.at(i);
 
@@ -71,6 +82,15 @@ void GOfR::compute(const QVector<QVector3D> &points, float cutoff, int numBins)
                     }
                 }
             }
+        }
+    }
+    }
+
+    QVector<int> counts;
+    counts.resize(numBins);
+    for(int i=0; i<numthreads; i++) {
+        for(int binIndex=0; binIndex<numBins; binIndex++) {
+            counts[binIndex] += allCounts[i][binIndex];
         }
     }
 
