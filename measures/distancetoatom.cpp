@@ -92,6 +92,9 @@ void DistanceToAtom::compute(const QVector<QVector3D> &pointsOriginal, float cut
 
     const float oneOverCellSize = 1.0/cellSize;
 
+    float porosity = 0;
+    float inside = 0;
+
 #pragma omp parallel for
     for(int i=0; i<m_numberOfRandomVectors; i++) {
         const float x = m_randomNumbers[3*i+0];
@@ -136,10 +139,15 @@ void DistanceToAtom::compute(const QVector<QVector3D> &pointsOriginal, float cut
         if(minimumDistanceSquared == minimumDistanceSquared0) {
             minimumDistanceSquared = -1;
         }
+        // 0.12 here corresponds to the correct porosity calculated from isInside
+        if (sqrt(minimumDistanceSquared)<0.12*cellSize)
+            inside++;
 
         m_values[i] = float(minimumDistanceSquared);
     }
+    qDebug() << "min dist: " << 0.12*cellSize;
 
+    qDebug() << ((1-inside/(float)m_numberOfRandomVectors)*100) << "% porosity";
     m_randomNumbers.clear();
     points.clear();
 
