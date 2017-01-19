@@ -15,15 +15,19 @@ private:
     QVector<QVector3D> m_dataParticles;
 
     int m_numberOfRandomVectors = 4096;
-    int m_histogramBins = 100;
+    int m_histogramBins = 10;
     double m_cutoff = 25;
 
 public:
     DTALikelihood();
 
+
     void setDataInput(Particles* dataParticles) {
         dataParticles->appendToQVector3DList(m_dataParticles);
         calculateStatistics(m_dataParticles, m_data);
+        if (debugGraphs)
+            m_data.SaveText("data.txt");
+
 //        m_currentData = m_data.toQVector();
     }
     void setOriginalInput(Particles* originalParticles) {
