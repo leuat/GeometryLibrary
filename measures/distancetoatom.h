@@ -19,6 +19,7 @@ private:
     int m_numberOfRandomVectors = 65536;
     QVector<float> m_values;
     QVector<float> m_randomNumbers;
+    float m_cutoff;
     bool m_isValid = false;
     inline int periodic(int idx, int count) { return (idx + count) % count; }
     CellList buildCellList(const QVector<QVector3D> &points, float size, float cutoff, float &cellSize);

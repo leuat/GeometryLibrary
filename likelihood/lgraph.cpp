@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 #include <iostream>
-
+#include <qdebug.h>
 #ifdef USE_FFT
 
 void LGraph::FFT() {
@@ -436,17 +436,17 @@ float LGraph::getValAtScaledIndex(double& index) {
 }
 
 double LGraph::ChiSQ(LGraph& temp, LGraph& two) {
+    // temp is data, two is model
     double chisq = 0;
     if (temp.Bins!=two.Bins)
         return 0;
+
+
     for (int i=0;i<temp.Bins;i++) {
         float t = two.val[i];
-        if (t==0) t = 0.0001;
-        chisq += pow((temp.val[i] - two.val[i]), 2.0)/t;
+        if (t!=0)
+            chisq += powf(50*(temp.val[i] - two.val[i]), 2.0)/(50*t);
     }
-//    chisq /= (double)temp.Bins;
-//    exp(-chi1*10) / exp(-chi2*10)
-
     return chisq;
 }
 

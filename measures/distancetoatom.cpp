@@ -51,7 +51,7 @@ void DistanceToAtom::compute(const QVector<QVector3D> &pointsOriginal, float cut
         qDebug() << "DistanceToAtom::compute WARNING: input vector is empty.";
         return;
     }
-
+    m_cutoff = cutoff;
     QElapsedTimer timer;
     timer.start();
 
@@ -234,15 +234,17 @@ QVector<QPointF> DistanceToAtom::histogram(int bins) {
         qFatal("DistanceToAtom is not valid. Run compute() first.");
         exit(1);
     }
-    float minValue = 1e90;
-    float maxValue = 0;
+    float minValue = 0;
+    float maxValue = m_cutoff;
 
-    for(const float &val : m_values) {
+/*    for(const float &val : m_values) {
         if(val >= 0) {
             minValue = std::min(minValue, (float)sqrt(val));
+
             maxValue = std::max(maxValue, (float)sqrt(val));
         }
-    }
+    }*/
+
     gsl_histogram *hist = gsl_histogram_alloc (bins);
     gsl_histogram_set_ranges_uniform (hist, minValue, maxValue);
     for(const float &value : m_values) {

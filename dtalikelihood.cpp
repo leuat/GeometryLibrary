@@ -52,8 +52,10 @@ void DTALikelihood::calculateStatistics(QVector<QVector3D> &points, LGraph& grap
     DistanceToAtom da(m_numberOfRandomVectors); // voxes_per_dimension
     if (points.size()==0)
         return;
+
     da.compute(points, m_cutoff); // cutoff
     QVector<QPointF> hist = da.histogram(m_histogramBins); // bins
+//    qDebug() << m_histogramBins;
     graph.fromQVector(hist);
     graph.normalizeArea();
 

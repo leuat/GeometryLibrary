@@ -168,6 +168,7 @@ void Likelihood::tickModelStatistics()
     m_statistics.calculate();
     m_modelData.Copy(m_statistics.average());
     m_data.Copy(m_statistics.average_plus_sigma());
+//    qDebug() << "HALLA";
 
     if (m_currentBin++ == m_bins) {
         m_analysisType = AnalysisType::None;
