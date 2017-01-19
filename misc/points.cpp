@@ -6,12 +6,23 @@ Points::Points()
 
 }
 
+void Points::clear()
+{
+    m_points.clear();
+    m_systemSize = QVector3D(); // Reset
+}
+
+size_t Points::size()
+{
+    return m_points.size();
+}
+
 QVector3D Points::systemSize()
 {
     return m_systemSize;
 }
 
-QVector<QVector3D> Points::points()
+const QVector<QVector3D> &Points::points()
 {
     return m_points;
 }
@@ -48,6 +59,11 @@ void Points::calculateBoundingbox() {
     m_systemSize[0] += 0.001*deltaX;
     m_systemSize[1] += 0.001*deltaY;
     m_systemSize[2] += 0.001*deltaZ;
+}
+
+void Points::setPoints(const QVector<QVector3D> &points)
+{
+    m_points = points;
 }
 
 void Points::readXYZ(QString filename)

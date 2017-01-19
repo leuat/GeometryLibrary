@@ -8,11 +8,17 @@ class Points
 {
 public:
     Points();
+    void clear();
+    size_t size();
     QVector3D systemSize();
-    QVector<QVector3D> points();
+    const QVector<QVector3D> &points();
     void readXYZ(QString filename);
-private:
+    void setPoints(const QVector<QVector3D> &points);
     void calculateBoundingbox();
+    const QVector3D &operator()(int index) { return m_points.at(index); }
+    QVector3D &operator[](int index) { return m_points[index]; }
+
+private:
     QVector<QVector3D> m_points;
     QVector3D m_systemSize;
 };
