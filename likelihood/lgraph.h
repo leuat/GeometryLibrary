@@ -156,7 +156,7 @@ public:
 
     void cutModes(int from, int to);
 
-    static double ChiSQ(LGraph& temp, LGraph& two);
+    static double ChiSQ(LGraph& temp, LGraph& two, double temperature);
 
     void loadWeirdFormat(string flux, string lambda);
 

@@ -30,6 +30,7 @@ protected:
     QPointF m_minVal;
     double m_currentVal=0;
     double m_stepSize=1;
+    double m_temperature = 20;
 
     int m_bins=0, m_currentBin=0;
     bool m_done = false;
@@ -56,6 +57,10 @@ public:
     void monteCarlo(Model *model, int steps, AnalysisAlgorithm analysisAlgorithm);
     void modelAnalysis(int count, Model *modelData);
     bool tick();
+
+    void setTemperature(double t) {
+        m_temperature = t;
+    }
 
     LGraph data() const;
     void setData(const LGraph &data);
