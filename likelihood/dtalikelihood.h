@@ -13,6 +13,7 @@ private:
     int m_numberOfRandomVectors = 4096;
     int m_histogramBins = 10;
     double m_cutoff = 25;
+    DistanceToAtom m_da;
 
 public:
     DTALikelihood();

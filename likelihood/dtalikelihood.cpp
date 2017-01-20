@@ -2,6 +2,11 @@
 #include <QDebug>
 #include "GeometryLibrary/models/models.h"
 
+DTALikelihood::DTALikelihood()
+{
+
+}
+
 int DTALikelihood::histogramBins() const
 {
     return m_histogramBins;
@@ -14,28 +19,24 @@ void DTALikelihood::setHistogramBins(int histogramBins)
 
 double DTALikelihood::cutoff() const
 {
-    return m_cutoff;
+    return m_da.cutoff();
 }
 
 void DTALikelihood::setCutoff(double cutoff)
 {
-    m_cutoff = cutoff;
+    m_da.setCutoff(cutoff);
 }
 
 int DTALikelihood::numberOfRandomVectors() const
 {
-    return m_numberOfRandomVectors;
+    return m_da.numberOfRandomVectors();
 }
 
 void DTALikelihood::setNumberOfRandomVectors(int numberOfRandomVectors)
 {
-    m_numberOfRandomVectors = numberOfRandomVectors;
+    m_da.setNumberOfRandomVectors(numberOfRandomVectors);
 }
 
-DTALikelihood::DTALikelihood()
-{
-    
-}
 
 void DTALikelihood::setDataInput(Particles *dataParticles) {
     dataParticles->appendToQVector3DList(m_dataParticles);
@@ -59,18 +60,13 @@ LGraph DTALikelihood::calculateStatisticsDirect(Particles &particles)
 
 void DTALikelihood::calculateStatistics(QVector<QVector3D> &points, LGraph& graph)
 {
-    DistanceToAtom da; // voxes_per_dimension
-    da.setNumberOfRandomVectors(m_numberOfRandomVectors);
-    da.setCutoff(m_cutoff);
     if (points.size()==0)
         return;
 
-    da.compute(points); // cutoff
-    QVector<QPointF> hist = da.histogram(m_histogramBins); // bins
-//    qDebug() << m_histogramBins;
+    m_da.compute(points); // cutoff
+    QVector<QPointF> hist = m_da.histogram(m_histogramBins); // bins
     graph.fromQVector(hist);
     graph.normalizeArea();
-
 }
 
 void DTALikelihood::calculateModel(Model *model)
@@ -79,10 +75,10 @@ void DTALikelihood::calculateModel(Model *model)
     m_originalParticles->calculateBoundingBox();
 
     model->start();
-      for (int i=0;i< m_originalParticles->getParticles().size();i++) {
+    for (int i=0;i< m_originalParticles->getParticles().size();i++) {
 
-         Particle* pos = m_originalParticles->getParticles()[i];
-         if (!model->isInVoid(pos->getPos())) {
+        Particle* pos = m_originalParticles->getParticles()[i];
+        if (!model->isInVoid(pos->getPos())) {
             m_modelParticles.append(pos->getPos());
         }
     }
