@@ -2,6 +2,7 @@
 #define GOFR_H
 
 #include "measure.h"
+int intRandom(const int & min, const int & max);
 
 class GOfR : public Measure
 {
@@ -22,6 +23,7 @@ public:
 
 private:
     int m_numBins;
+    int m_maximumNumberOfPoints;
     float m_cutoff;
     float m_dr;
 };
