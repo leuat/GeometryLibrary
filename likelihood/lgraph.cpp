@@ -459,7 +459,7 @@ double LGraph::ChiSQ(LGraph& temp, LGraph& two) {
     for (int i=0;i<temp.Bins;i++) {
         float t = two.val[i];
         if (t!=0)
-            chisq += pow(50*(temp.val[i] - two.val[i]), 2.0)/(50*t);
+            chisq += pow(20*(temp.val[i] - two.val[i]), 2.0)/(20*t);
     }
     return chisq;
 }
