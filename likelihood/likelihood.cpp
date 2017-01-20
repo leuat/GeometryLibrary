@@ -108,7 +108,7 @@ void Likelihood::tickLikelihoodFullMonteCarlo()
     qDebug() << "Proposal / old: " << proposal_likelihood << ", "<<current_likelihood << endl;
     bool accept = true;
     if (current_likelihood != 0) {
-        // MC step: onlæ accept when random uniform is < prop/current
+        // MC step: only accept when random uniform is < prop/current
         p_accept = proposal_likelihood / current_likelihood;
         accept = Random::nextDouble(0,1) < p_accept;
     }
@@ -223,10 +223,6 @@ void Likelihood::monteCarlo(Model *model, int steps, AnalysisAlgorithm analysisA
 
 }
 
-
-
-
-
 void Likelihood::bruteForce1D(int bins, QString parameterKey, Model *model)
 {
     if(!model) {
@@ -283,3 +279,4 @@ bool Likelihood::tick()
 
     return true;
 }
+

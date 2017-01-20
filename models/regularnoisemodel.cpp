@@ -33,8 +33,9 @@ float RegularNoiseModel::getValue(float x, float y, float z)
     }
 
     double add = m_seed;
-    double p1 = (1 + m_skewAmplitude*m_noise->get(m_skewScale*x + sx,m_skewScale*y+sy,m_skewScale*z+sz));
-    //double p1 = 1.0;
+    double skew = m_skewScale*0.025;
+    // double p1 = (1 + m_skewAmplitude*m_noise->get(skew*x -add,skew*y + 234.23,skew*z+51.234));
+    double p1 = 1.0;
     double value = m_noise->get(x*m_scale*p1 + add, y*m_scale*p1,z*m_scale*p1);
     //qDebug() << m_steepness;
     value = sign<float>(value)*pow(fabs(value), (m_steepness));
@@ -89,8 +90,8 @@ void RegularNoiseModel::createParameters()
     m_parameters->createParameter("inverted", 0, 0, 1, 1.0);
     m_parameters->createParameter("seed", 13.0, 1, 100, 1);
     m_parameters->createParameter("absolute", 0.0, 0, 1, 1);
-    m_parameters->createParameter("skewscale", 1.0, 0, 1, 0.1);
-    m_parameters->createParameter("skewamplitude", 0.0, 0, 1, 0.1);
+    m_parameters->createParameter("skewscale", 1.0, 0, 1, 0.01);
+    m_parameters->createParameter("skewamplitude", 0.0, 0, 1, 0.01);
     m_parameters->createParameter("steepness", 1.0, 0.5, 1.5, 0.000001);
     m_parameters->createParameter("noisetype", "simplex");
     Logger::write(QString("RegularNoiseModel::createParameters: creating octaves=%1").arg(m_parameters->getValue("octaves")));

@@ -15,7 +15,7 @@ private:
     QVector<QVector3D> m_dataParticles;
 
     int m_numberOfRandomVectors = 4096;
-    int m_histogramBins = 10;
+    int m_histogramBins = 100;
     double m_cutoff = 25;
 
 public:
