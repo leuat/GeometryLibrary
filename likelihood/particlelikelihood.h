@@ -14,6 +14,8 @@ public:
     bool normalize() const;
     void setNormalize(bool normalize);
 
+    void setOriginalInput(Particles *originalParticles);
+    void setDataInput(Particles *dataParticles);
 protected:
     int m_numberOfHistogramBins;
     bool m_normalize;

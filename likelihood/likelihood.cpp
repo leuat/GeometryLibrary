@@ -223,10 +223,6 @@ void Likelihood::monteCarlo(Model *model, int steps, AnalysisAlgorithm analysisA
 
 }
 
-
-
-
-
 void Likelihood::bruteForce1D(int bins, QString parameterKey, Model *model)
 {
     if(!model) {

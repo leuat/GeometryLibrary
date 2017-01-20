@@ -27,17 +27,6 @@ void DTALikelihood::setNumberOfRandomVectors(int numberOfRandomVectors)
     m_da.setNumberOfRandomVectors(numberOfRandomVectors);
 }
 
-
-void DTALikelihood::setDataInput(Particles *dataParticles) {
-    dataParticles->appendToQVector3DList(m_dataParticles);
-    calculateStatistics(m_dataParticles, m_data);
-    if (debugGraphs) m_data.SaveText("data.txt");
-}
-
-void DTALikelihood::setOriginalInput(Particles *originalParticles) {
-    m_originalParticles = originalParticles;
-}
-
 LGraph DTALikelihood::calculateStatisticsDirect(Particles &particles)
 {
     QVector<QVector3D> qp;

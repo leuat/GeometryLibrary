@@ -23,10 +23,6 @@ public:
     void setCutoff(double cutoff);
     int numberOfRandomVectors() const;
     void setNumberOfRandomVectors(int numberOfRandomVectors);
-    void setDataInput(Particles* dataParticles);
-    void setOriginalInput(Particles* originalParticles);
-    QVector<QPointF> currentModel() const;
-    QVector<QPointF> currentData() const;
 };
 
 #endif // DTALIKELIHOOD_H

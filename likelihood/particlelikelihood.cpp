@@ -42,3 +42,13 @@ void ParticleLikelihood::setNormalize(bool normalize)
 {
     m_normalize = normalize;
 }
+
+void ParticleLikelihood::setDataInput(Particles *dataParticles) {
+    dataParticles->appendToQVector3DList(m_dataParticles);
+    calculateStatistics(m_dataParticles, m_data);
+    if (debugGraphs) m_data.SaveText("data.txt");
+}
+
+void ParticleLikelihood::setOriginalInput(Particles *originalParticles) {
+    m_originalParticles = originalParticles;
+}
