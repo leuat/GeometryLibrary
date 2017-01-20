@@ -3,12 +3,30 @@
 #include <omp.h>
 #include "GeometryLibrary/misc/points.h"
 
-GOfR::GOfR(QObject *parent) : Measure(parent)
+GOfR::GOfR(QObject *parent) : Measure(parent),
+    m_numBins(100), m_cutoff(15)
 {
 
 }
 
-void GOfR::compute(const QVector<QVector3D> &points, float cutoff, int numBins)
+QVector<QPointF> GOfR::histogram(int numberOfBins)
+{
+    Q_UNUSED(numberOfBins)
+//    if(cap) {
+//        for(int binIndex=0; binIndex<m_numBins; binIndex++) {
+//            if(m_histogram[binIndex].y() < min) {
+//                m_histogram[binIndex].setY(min);
+//            }
+//            if(m_histogram[binIndex].y() > max) {
+//                m_histogram[binIndex].setY(max);
+//            }
+//        }
+//    }
+    return m_histogram;
+}
+
+
+void GOfR::compute(const QVector<QVector3D> &points)
 {
     NeighborList list;
     QVector3D cellSize;
@@ -18,24 +36,22 @@ void GOfR::compute(const QVector<QVector3D> &points, float cutoff, int numBins)
     p.calculateBoundingbox();
     QVector3D systemSize = p.systemSize();
 
-    CellList cellList = list.buildCellList(points, systemSize, cutoff, cellSize, numCells);
+    CellList cellList = list.buildCellList(points, systemSize, m_cutoff, cellSize, numCells);
     QVector3D oneOverCellSize;
     oneOverCellSize[0] = 1.0 / cellSize[0];
     oneOverCellSize[1] = 1.0 / cellSize[1];
     oneOverCellSize[2] = 1.0 / cellSize[2];
 
-    float cutsq = cutoff*cutoff;
-    m_dr = cutoff / numBins;
+    float cutsq = m_cutoff*m_cutoff;
+    m_dr = m_cutoff / m_numBins;
     float oneOverDr = 1.0/m_dr;
-    m_numBins = numBins;
-
 
     int numthreads = omp_get_max_threads();
 
     QVector<QVector<int>> allCounts;
     allCounts.resize(numthreads);
     for(int i=0; i<numthreads; i++) {
-        allCounts[i].resize(numBins);
+        allCounts[i].resize(m_numBins);
     }
 
 #pragma omp parallel num_threads(numthreads)
@@ -86,9 +102,9 @@ void GOfR::compute(const QVector<QVector3D> &points, float cutoff, int numBins)
     }
 
     QVector<int> counts;
-    counts.resize(numBins);
+    counts.resize(m_numBins);
     for(int i=0; i<numthreads; i++) {
-        for(int binIndex=0; binIndex<numBins; binIndex++) {
+        for(int binIndex=0; binIndex<m_numBins; binIndex++) {
             counts[binIndex] += allCounts[i][binIndex];
         }
     }
@@ -106,26 +122,22 @@ void GOfR::compute(const QVector<QVector3D> &points, float cutoff, int numBins)
     }
 }
 
-QVector<QPointF> GOfR::histogram(bool cap, float min, float max)
+int GOfR::numBins() const
 {
-    if(cap) {
-        for(int binIndex=0; binIndex<m_numBins; binIndex++) {
-            if(m_histogram[binIndex].y() < min) {
-                m_histogram[binIndex].setY(min);
-            }
-            if(m_histogram[binIndex].y() > max) {
-                m_histogram[binIndex].setY(max);
-            }
-        }
-    }
-    return m_histogram;
+    return m_numBins;
 }
 
-
-void GOfR::compute(const QVector<QVector3D> &points)
+void GOfR::setNumBins(int numBins)
 {
+    m_numBins = numBins;
 }
 
-QVector<QPointF> GOfR::histogram(int bins)
+float GOfR::cutoff() const
 {
+    return m_cutoff;
+}
+
+void GOfR::setCutoff(float cutoff)
+{
+    m_cutoff = cutoff;
 }

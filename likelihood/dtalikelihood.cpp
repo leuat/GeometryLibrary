@@ -2,19 +2,9 @@
 #include <QDebug>
 #include "GeometryLibrary/models/models.h"
 
-DTALikelihood::DTALikelihood()
+DTALikelihood::DTALikelihood() : ParticleLikelihood()
 {
 
-}
-
-int DTALikelihood::histogramBins() const
-{
-    return m_histogramBins;
-}
-
-void DTALikelihood::setHistogramBins(int histogramBins)
-{
-    m_histogramBins = histogramBins;
 }
 
 double DTALikelihood::cutoff() const
@@ -63,7 +53,7 @@ void DTALikelihood::calculateStatistics(QVector<QVector3D> &points, LGraph& grap
     if (points.size()==0) return;
 
     m_da.compute(points); // cutoff
-    QVector<QPointF> hist = m_da.histogram(m_histogramBins); // bins
+    QVector<QPointF> hist = m_da.histogram(m_numberOfHistogramBins); // bins
     graph.fromQVector(hist);
     graph.normalizeArea();
 }

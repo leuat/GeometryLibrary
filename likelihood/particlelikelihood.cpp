@@ -1,6 +1,7 @@
 #include "particlelikelihood.h"
 #include "../models/model.h"
-ParticleLikelihood::ParticleLikelihood()
+ParticleLikelihood::ParticleLikelihood() : Likelihood(),
+    m_numberOfHistogramBins(100)
 {
 
 }
@@ -20,4 +21,14 @@ void ParticleLikelihood::calculateModel(Model *model)
     }
     model->stop();
     calculateStatistics(m_modelParticles,m_modelData);
+}
+
+int ParticleLikelihood::numberOfHistogramBins() const
+{
+    return m_numberOfHistogramBins;
+}
+
+void ParticleLikelihood::setNumberOfHistogramBins(int numberOfHistogramBins)
+{
+    m_numberOfHistogramBins = numberOfHistogramBins;
 }

@@ -17,6 +17,12 @@ float floatRandom(const float & min, const float & max) {
     return distribution(generator);
 }
 
+DistanceToAtom::DistanceToAtom(QObject *parent) : Measure(parent),
+    m_numberOfRandomVectors(65536), m_cutoff(15)
+{
+
+}
+
 int DistanceToAtom::numberOfRandomVectors() const
 {
     return m_numberOfRandomVectors;
@@ -37,11 +43,6 @@ void DistanceToAtom::setCutoff(float cutoff)
     m_cutoff = cutoff;
 }
 
-DistanceToAtom::DistanceToAtom(QObject *parent) : Measure(parent),
-    m_numberOfRandomVectors(65536), m_cutoff(15)
-{
-
-}
 
 void DistanceToAtom::compute(const QVector<QVector3D> &pointsOriginal)
 {

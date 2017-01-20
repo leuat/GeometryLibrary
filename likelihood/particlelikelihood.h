@@ -9,7 +9,11 @@ class ParticleLikelihood : public Likelihood
 public:
     ParticleLikelihood();
     virtual void calculateModel(class Model *model) override;
+    int numberOfHistogramBins() const;
+    void setNumberOfHistogramBins(int numberOfHistogramBins);
+
 protected:
+    int m_numberOfHistogramBins;
     virtual void calculateStatistics(QVector<QVector3D> &points, LGraph& graph) = 0;
     QVector<QVector3D> m_modelParticles;
     Particles* m_originalParticles;

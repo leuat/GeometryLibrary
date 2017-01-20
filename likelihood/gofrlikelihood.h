@@ -1,23 +1,21 @@
-//#ifndef GOFRLIKELIHOOD_H
-//#define GOFRLIKELIHOOD_H
+#ifndef GOFRLIKELIHOOD_H
+#define GOFRLIKELIHOOD_H
+#include "../measures/gofr.h"
+#include "GeometryLibrary/likelihood/particlelikelihood.h"
 
-//#include "GeometryLibrary/likelihood/likelihood.h"
+class GOfRLikelihood : public ParticleLikelihood
+{
+public:
+    GOfRLikelihood();
+    float cutoff() const;
+    void setCutoff(float cutoff);
 
-//class GOfRLikelihood : public Likelihood
-//{
-//public:
-//    GOfRLikelihood();
-//    virtual void calculateModel(Model *modelData) override;
+private:
+    float m_cutoff;
+    GOfR m_gOfr;
+    // ParticleLikelihood interface
+protected:
+    virtual void calculateStatistics(QVector<QVector3D> &points, LGraph &graph) override;
+};
 
-//    float cutoff() const;
-//    void setCutoff(float cutoff);
-
-//    int numBins() const;
-//    void setNumBins(int numBins);
-
-//private:
-//    float m_cutoff;
-//    int m_numBins;
-//};
-
-//#endif // GOFRLIKELIHOOD_H
+#endif // GOFRLIKELIHOOD_H

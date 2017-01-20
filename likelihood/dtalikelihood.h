@@ -10,9 +10,6 @@
 class DTALikelihood: public ParticleLikelihood
 {
 private:
-    int m_numberOfRandomVectors = 4096;
-    int m_histogramBins = 10;
-    double m_cutoff = 25;
     DistanceToAtom m_da;
 
 public:
@@ -20,8 +17,6 @@ public:
 
     LGraph calculateStatisticsDirect(Particles& particles);
     void calculateStatistics(QVector<QVector3D>& particleList, LGraph& graph);
-    int histogramBins() const;
-    void setHistogramBins(int histogramBins);
 
     // Setters and getters
     double cutoff() const;
