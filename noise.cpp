@@ -15,6 +15,7 @@ double Noise::get( const double x, const double y, const double z ) {
 
 double Noise::get( const double x, const double y, const double z, const double per, const double f) {
     double total = 0;
+
     double freq = f;
     double amplitude = 1.0;
     double p = per;
@@ -22,6 +23,8 @@ double Noise::get( const double x, const double y, const double z, const double 
     // because each octave adds more, and we need a value in [-1, 1].
     double maxAmplitude = 0;
 //    A*p^()
+
+
     for( int i=0; i < octaves; i++ ) {
         double v = raw_3d( (x+0.1231*i) * freq, (y+0.6123*i) * freq, (z+100.539127*i) * freq );
 //        double v = raw_3d( (x) * freq, (y) * freq, (z) * freq );
