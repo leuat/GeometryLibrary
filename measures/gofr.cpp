@@ -1,6 +1,8 @@
 #include "gofr.h"
 #include "neighborlist.h"
+#if defined(_OPENMP)
 #include <omp.h>
+#endif
 #include "GeometryLibrary/misc/points.h"
 
 GOfR::GOfR(QObject *parent) : Measure(parent),
@@ -68,8 +70,10 @@ void GOfR::compute(const QVector<QVector3D> &points)
     float cutsq = m_cutoff*m_cutoff;
     m_dr = m_cutoff / m_numBins;
     float oneOverDr = 1.0/m_dr;
-
-    int numthreads = omp_get_max_threads();
+    int numthreads = 1;
+#if defined(_OPENMP)
+    numthreads = omp_get_max_threads();
+#endif
 
     QVector<QVector<int>> allCounts;
     allCounts.resize(numthreads);
@@ -79,7 +83,11 @@ void GOfR::compute(const QVector<QVector3D> &points)
 
 #pragma omp parallel num_threads(numthreads)
     {
+#if defined(_OPENMP)
         QVector<int> &counts = allCounts[omp_get_thread_num()];
+#else
+        QVector<int> &counts = allCounts[0];
+#endif
 #pragma omp for
     for(int i=0; i<points.size(); i++) {
         const QVector3D &point1 = points.at(i);
