@@ -49,11 +49,13 @@ LGraph DTALikelihood::calculateStatisticsDirect(Particles &particles)
 
 void DTALikelihood::calculateStatistics(QVector<QVector3D> &points, LGraph& graph)
 {
-    DistanceToAtom da(m_numberOfRandomVectors); // voxes_per_dimension
+    DistanceToAtom da; // voxes_per_dimension
+    da.setNumberOfRandomVectors(m_numberOfRandomVectors);
+    da.setCutoff(m_cutoff);
     if (points.size()==0)
         return;
 
-    da.compute(points, m_cutoff); // cutoff
+    da.compute(points); // cutoff
     QVector<QPointF> hist = da.histogram(m_histogramBins); // bins
 //    qDebug() << m_histogramBins;
     graph.fromQVector(hist);

@@ -3,11 +3,10 @@
 #include <omp.h>
 #include "GeometryLibrary/misc/points.h"
 
-GOfR::GOfR()
+GOfR::GOfR(QObject *parent) : Measure(parent)
 {
 
 }
-
 
 void GOfR::compute(const QVector<QVector3D> &points, float cutoff, int numBins)
 {
@@ -120,4 +119,13 @@ QVector<QPointF> GOfR::histogram(bool cap, float min, float max)
         }
     }
     return m_histogram;
+}
+
+
+void GOfR::compute(const QVector<QVector3D> &points)
+{
+}
+
+QVector<QPointF> GOfR::histogram(int bins)
+{
 }

@@ -17,20 +17,38 @@ float floatRandom(const float & min, const float & max) {
     return distribution(generator);
 }
 
-DistanceToAtom::DistanceToAtom(int numberOfRandomVectors)
+int DistanceToAtom::numberOfRandomVectors() const
+{
+    return m_numberOfRandomVectors;
+}
+
+void DistanceToAtom::setNumberOfRandomVectors(int numberOfRandomVectors)
 {
     m_numberOfRandomVectors = numberOfRandomVectors;
 }
 
+float DistanceToAtom::cutoff() const
+{
+    return m_cutoff;
+}
 
+void DistanceToAtom::setCutoff(float cutoff)
+{
+    m_cutoff = cutoff;
+}
 
-void DistanceToAtom::compute(const QVector<QVector3D> &pointsOriginal, float cutoff)
+DistanceToAtom::DistanceToAtom(QObject *parent) : Measure(parent),
+    m_numberOfRandomVectors(65536), m_cutoff(15)
+{
+
+}
+
+void DistanceToAtom::compute(const QVector<QVector3D> &pointsOriginal)
 {
     if(pointsOriginal.size() == 0) {
         qDebug() << "DistanceToAtom::compute WARNING: input vector is empty.";
         return;
     }
-    m_cutoff = cutoff;
     QElapsedTimer timer;
     timer.start();
 
@@ -42,7 +60,7 @@ void DistanceToAtom::compute(const QVector<QVector3D> &pointsOriginal, float cut
     QVector3D cellSize;
     QVector3D numCells;
     NeighborList list;
-    CellList cellList = list.buildCellList(points.points(), systemSize, cutoff, cellSize, numCells);
+    CellList cellList = list.buildCellList(points.points(), systemSize, m_cutoff, cellSize, numCells);
     m_values.clear();
     m_values.resize(m_numberOfRandomVectors);
     m_randomNumbers.resize(3*m_numberOfRandomVectors);
