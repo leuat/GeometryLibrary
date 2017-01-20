@@ -60,28 +60,10 @@ LGraph DTALikelihood::calculateStatisticsDirect(Particles &particles)
 
 void DTALikelihood::calculateStatistics(QVector<QVector3D> &points, LGraph& graph)
 {
-    if (points.size()==0)
-        return;
+    if (points.size()==0) return;
 
     m_da.compute(points); // cutoff
     QVector<QPointF> hist = m_da.histogram(m_histogramBins); // bins
     graph.fromQVector(hist);
     graph.normalizeArea();
-}
-
-void DTALikelihood::calculateModel(Model *model)
-{
-    m_modelParticles.clear();
-    m_originalParticles->calculateBoundingBox();
-
-    model->start();
-    for (int i=0;i< m_originalParticles->getParticles().size();i++) {
-
-        Particle* pos = m_originalParticles->getParticles()[i];
-        if (!model->isInVoid(pos->getPos())) {
-            m_modelParticles.append(pos->getPos());
-        }
-    }
-    model->stop();
-    calculateStatistics(m_modelParticles,m_modelData);
 }

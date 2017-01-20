@@ -18,22 +18,20 @@ private:
 public:
     DTALikelihood();
 
-    void setDataInput(Particles* dataParticles);
-    void setOriginalInput(Particles* originalParticles);
-
     LGraph calculateStatisticsDirect(Particles& particles);
     void calculateStatistics(QVector<QVector3D>& particleList, LGraph& graph);
-    QVector<QPointF> currentModel() const;
-    QVector<QPointF> currentData() const;
     int histogramBins() const;
     void setHistogramBins(int histogramBins);
+
+    // Setters and getters
     double cutoff() const;
     void setCutoff(double cutoff);
-
-    // Likelihood interface
-    void calculateModel(class Model *model) override;
     int numberOfRandomVectors() const;
     void setNumberOfRandomVectors(int numberOfRandomVectors);
+    void setDataInput(Particles* dataParticles);
+    void setOriginalInput(Particles* originalParticles);
+    QVector<QPointF> currentModel() const;
+    QVector<QPointF> currentData() const;
 };
 
 #endif // DTALIKELIHOOD_H
