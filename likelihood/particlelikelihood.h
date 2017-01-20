@@ -11,9 +11,12 @@ public:
     virtual void calculateModel(class Model *model) override;
     int numberOfHistogramBins() const;
     void setNumberOfHistogramBins(int numberOfHistogramBins);
+    bool normalize() const;
+    void setNormalize(bool normalize);
 
 protected:
     int m_numberOfHistogramBins;
+    bool m_normalize;
     virtual void calculateStatistics(QVector<QVector3D> &points, LGraph& graph) = 0;
     QVector<QVector3D> m_modelParticles;
     Particles* m_originalParticles;

@@ -8,7 +8,8 @@ class GOfR : public Measure
     Q_OBJECT
 public:
     explicit GOfR(QObject *parent = nullptr);
-    // QVector<QPointF> histogram(bool cap = false, float min = 0, float max = 0);
+    void capY(float min, float max);
+    void setXRange(float min, float max);
     QVector<QPointF> m_histogram;
     virtual void compute(const QVector<QVector3D> &points) override;
     virtual QVector<QPointF> histogram(int bins) override;

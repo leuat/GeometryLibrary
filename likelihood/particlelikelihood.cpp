@@ -1,7 +1,7 @@
 #include "particlelikelihood.h"
 #include "../models/model.h"
 ParticleLikelihood::ParticleLikelihood() : Likelihood(),
-    m_numberOfHistogramBins(100)
+    m_numberOfHistogramBins(100), m_normalize(true)
 {
 
 }
@@ -31,4 +31,14 @@ int ParticleLikelihood::numberOfHistogramBins() const
 void ParticleLikelihood::setNumberOfHistogramBins(int numberOfHistogramBins)
 {
     m_numberOfHistogramBins = numberOfHistogramBins;
+}
+
+bool ParticleLikelihood::normalize() const
+{
+    return m_normalize;
+}
+
+void ParticleLikelihood::setNormalize(bool normalize)
+{
+    m_normalize = normalize;
 }

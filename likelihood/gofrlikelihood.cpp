@@ -16,7 +16,7 @@ void GOfRLikelihood::calculateStatistics(QVector<QVector3D> &points, LGraph& gra
     m_gOfr.compute(points);
     QVector<QPointF> hist = m_gOfr.histogram(m_numberOfHistogramBins); // bins
     graph.fromQVector(hist);
-    graph.normalizeArea();
+    if(m_normalize) graph.normalizeArea();
 }
 
 float GOfRLikelihood::cutoff() const

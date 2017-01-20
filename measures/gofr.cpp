@@ -9,6 +9,29 @@ GOfR::GOfR(QObject *parent) : Measure(parent),
 
 }
 
+void GOfR::capY(float min, float max)
+{
+    for(int binIndex=0; binIndex<m_numBins; binIndex++) {
+        if(m_histogram[binIndex].y() < min) {
+            m_histogram[binIndex].setY(min);
+        }
+        if(m_histogram[binIndex].y() > max) {
+            m_histogram[binIndex].setY(max);
+        }
+    }
+}
+
+void GOfR::setXRange(float min, float max) {
+    QVector<QPointF> newPoints;
+
+    for(int binIndex=0; binIndex<m_numBins; binIndex++) {
+        if(m_histogram[binIndex].x() >= min && m_histogram[binIndex].x() <= max) {
+            newPoints.push_back(m_histogram[binIndex]);
+        }
+    }
+    m_histogram = newPoints;
+}
+
 QVector<QPointF> GOfR::histogram(int numberOfBins)
 {
     Q_UNUSED(numberOfBins)
