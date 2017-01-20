@@ -5,13 +5,25 @@
 
 class GOfR : public Measure
 {
+    Q_OBJECT
 public:
-    GOfR();
-
-    // Measure interface
-public:
-    virtual void compute(Model &model) override;
+    explicit GOfR(QObject *parent = nullptr);
+    void capY(float min, float max);
+    void setXRange(float min, float max);
+    QVector<QPointF> m_histogram;
+    virtual void compute(const QVector<QVector3D> &points) override;
     virtual QVector<QPointF> histogram(int bins) override;
+
+    int numBins() const;
+    void setNumBins(int numBins);
+
+    float cutoff() const;
+    void setCutoff(float cutoff);
+
+private:
+    int m_numBins;
+    float m_cutoff;
+    float m_dr;
 };
 
 #endif // GOFR_H
