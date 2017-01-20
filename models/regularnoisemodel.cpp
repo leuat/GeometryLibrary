@@ -33,8 +33,8 @@ float RegularNoiseModel::getValue(float x, float y, float z)
     }
 
     double add = m_seed;
-    // double p1 = (1 + m_skewAmplitude*m_noise->get(m_skewScale*x + sx,m_skewScale*y+sy,m_skewScale*z+sz));
-    double p1 = 1.0;
+    double p1 = (1 + m_skewAmplitude*m_noise->get(m_skewScale*x + sx,m_skewScale*y+sy,m_skewScale*z+sz));
+    //double p1 = 1.0;
     double value = m_noise->get(x*m_scale*p1 + add, y*m_scale*p1,z*m_scale*p1);
     //qDebug() << m_steepness;
     value = sign<float>(value)*pow(fabs(value), (m_steepness));
@@ -169,15 +169,15 @@ void RegularNoiseModel::randomWalk()
     m_parameters->fitBounds("steepness");
     Logger::write(QString("RegularNoiseModel::randomWalk: changing steepness with %1 to %2").arg(delta, m_parameters->getValue("steepness")));
 
-//    delta = Random::nextGaussian(0, 0.5*m_parameters->getStepSize("skewScale"));
-//    m_parameters->setValue("skewScale", m_parameters->getValue("skewScale") + delta);
-//    m_parameters->fitBounds("skewScale");
-//    Logger::write(QString("RegularNoiseModel::randomWalk: changing skewScale with %1 to %2").arg(delta, m_parameters->getValue("skewScale")));
+    delta = Random::nextGaussian(0, 0.5*m_parameters->getStepSize("skewScale"));
+    m_parameters->setValue("skewScale", m_parameters->getValue("skewScale") + delta);
+    m_parameters->fitBounds("skewScale");
+    Logger::write(QString("RegularNoiseModel::randomWalk: changing skewScale with %1 to %2").arg(delta, m_parameters->getValue("skewScale")));
 
-//    delta = Random::nextGaussian(0, 0.5*m_parameters->getStepSize("skewAmplitude"));
-//    m_parameters->setValue("skewAmplitude", m_parameters->getValue("skewAmplitude") + delta);
-//    m_parameters->fitBounds("skewAmplitude");
-//    Logger::write(QString("RegularNoiseModel::randomWalk: changing skewAmplitude with %1 to %2").arg(delta, m_parameters->getValue("skewAmplitude")));
+    delta = Random::nextGaussian(0, 0.5*m_parameters->getStepSize("skewAmplitude"));
+    m_parameters->setValue("skewAmplitude", m_parameters->getValue("skewAmplitude") + delta);
+    m_parameters->fitBounds("skewAmplitude");
+    Logger::write(QString("RegularNoiseModel::randomWalk: changing skewAmplitude with %1 to %2").arg(delta, m_parameters->getValue("skewAmplitude")));
 
     qDebug() << "Setting scale: " << m_parameters->getValue("scale") << " persistence: " << m_parameters->getValue("persistence") << " threshold: " << m_parameters->getValue("threshold") << " steepness: " << m_parameters->getValue("steepness");
     parametersUpdated();
