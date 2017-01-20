@@ -2,9 +2,15 @@
 #include "neighborlist.h"
 #include <omp.h>
 #include "GeometryLibrary/misc/points.h"
+#include <random>
+int intRandom(const int & min, const int & max) {
+    static std::mt19937 generator(time(0));
+    std::uniform_int_distribution<> distribution(min, max);
+    return distribution(generator);
+}
 
 GOfR::GOfR(QObject *parent) : Measure(parent),
-    m_numBins(100), m_cutoff(15)
+    m_numBins(100), m_maximumNumberOfPoints(10000), m_cutoff(15)
 {
 
 }
@@ -77,12 +83,25 @@ void GOfR::compute(const QVector<QVector3D> &points)
         allCounts[i].resize(m_numBins);
     }
 
+    QVector<int> indices;
+    if(p.size() > m_maximumNumberOfPoints) {
+        indices.resize(m_maximumNumberOfPoints);
+        for(int i=0; i<m_maximumNumberOfPoints; i++) {
+            indices[i] = intRandom(0, p.size()-1);
+        }
+    } else {
+        indices.resize(p.size());
+        for(int i=0; i<p.size(); i++) {
+            indices[i] = i;
+        }
+    }
+
 #pragma omp parallel num_threads(numthreads)
     {
         QVector<int> &counts = allCounts[omp_get_thread_num()];
 #pragma omp for
-    for(int i=0; i<points.size(); i++) {
-        const QVector3D &point1 = points.at(i);
+    for(int i=0; i<indices.size(); i++) {
+        const QVector3D &point1 = points.at(indices.at(i));
 
         const int cx = point1[0] * oneOverCellSize[0];
         const int cy = point1[1] * oneOverCellSize[1];
