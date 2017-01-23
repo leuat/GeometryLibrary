@@ -12,7 +12,7 @@ int intRandom(const int & min, const int & max) {
 }
 
 GOfR::GOfR(QObject *parent) : Measure(parent),
-    m_numBins(100), m_maximumNumberOfPoints(10000), m_cutoff(15)
+    m_numBins(100), m_maximumNumberOfPoints(20000), m_cutoff(15)
 {
 
 }
@@ -87,6 +87,8 @@ void GOfR::compute(const QVector<QVector3D> &points)
     for(int i=0; i<numthreads; i++) {
         allCounts[i].resize(m_numBins);
     }
+    QVector<int> totalCounts;
+    totalCounts.resize(numthreads);
 
     QVector<int> indices;
     if(p.size() > m_maximumNumberOfPoints) {
@@ -144,6 +146,11 @@ void GOfR::compute(const QVector<QVector3D> &points)
                             int binIndex = dr * oneOverDr;
                             if (binIndex >= m_numBins) continue;
                             counts[binIndex]++;
+#if defined(_OPENMP)
+                            totalCounts[omp_get_thread_num()]++;
+#else
+                            totalCounts[0]++;
+#endif
                         }
                     }
                 }
@@ -154,7 +161,9 @@ void GOfR::compute(const QVector<QVector3D> &points)
 
     QVector<int> counts;
     counts.resize(m_numBins);
+    long sumTotalCounts=0;
     for(int i=0; i<numthreads; i++) {
+        sumTotalCounts+=totalCounts[i];
         for(int binIndex=0; binIndex<m_numBins; binIndex++) {
             counts[binIndex] += allCounts[i][binIndex];
         }
@@ -162,15 +171,24 @@ void GOfR::compute(const QVector<QVector3D> &points)
 
     m_histogram.resize(m_numBins);
     double constant = 4.0*M_PI / (3.0*systemSize[0]*systemSize[1]*systemSize[2]);
+    //qDebug() << sumTotalCounts << " vs "  << points.size() * points.size();
     for(int binIndex=0; binIndex<m_numBins; binIndex++) {
         float rlower = binIndex*m_dr;
         float rupper = (binIndex+1)*m_dr;
         float rmean = 0.5*(rlower + rupper);
 
         float vfrac = constant * (rupper*rupper*rupper - rlower*rlower*rlower);
+
         float gr = counts[binIndex] / (vfrac * points.size() * points.size());
+//        float gr = counts[binIndex] / (vfrac *sumTotalCounts);
         m_histogram[binIndex] = QPointF(rmean, gr);
     }
+
+    float scaleVal = m_histogram.last().y();
+    for (int i=0;i<m_numBins;i++) {
+        m_histogram[i].setY(m_histogram[i].y()/scaleVal);
+    }
+
 }
 
 int GOfR::numBins() const
