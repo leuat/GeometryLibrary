@@ -71,7 +71,7 @@ void Likelihood::tickLikelihoodMonteCarlo()
     m_model->parameters()->save(m_mcData->parametersFilename);
     m_model->randomWalk();
     calculateModel(m_model);
-    float chiSquared = LGraph::ChiSQ(m_data, m_modelData);
+    float chiSquared = LGraph::ChiSQ(m_data, m_modelData,m_temperature);
     if(chiSquared < m_mcData->chiSquared) {
         m_mcData->chiSquared = chiSquared;
         m_model->parameters()->save(m_mcData->bestFarametersFilename);
@@ -98,8 +98,8 @@ void Likelihood::tickLikelihoodFullMonteCarlo()
     m_model->randomWalk();
     m_model->parameters()->getParameter("seed")->setValue(rand()%10000);
     calculateModel(m_model);
-    float chiSquared = LGraph::ChiSQ(m_data, m_modelData);
-
+    float chiSquared = LGraph::ChiSQ(m_data, m_modelData, m_temperature);
+    qDebug() << "chisq: " << chiSquared;
     float proposal_likelihood = exp(-chiSquared);
     float current_likelihood = m_model->parameters()->getLikelihood();
 
@@ -147,7 +147,7 @@ void Likelihood::tickLikelihoodBruteforce1D()
     calculateModel(m_model);
 
 
-    m_likelihood.val[m_currentBin] = LGraph::ChiSQ(m_data, m_modelData);
+    m_likelihood.val[m_currentBin] = LGraph::ChiSQ(m_data, m_modelData, m_temperature);
     m_likelihood.index[m_currentBin] = m_currentVal;
     m_likelihood.IndexScaled[m_currentBin] = m_currentVal;
 
@@ -210,7 +210,7 @@ void Likelihood::monteCarlo(Model *model, int steps, AnalysisAlgorithm analysisA
     m_model = model;
 
     calculateModel(m_model);
-    m_mcData->chiSquared = LGraph::ChiSQ(m_data, m_modelData);
+    m_mcData->chiSquared = LGraph::ChiSQ(m_data, m_modelData, m_temperature);
     qDebug() << "   Starting monte carlo with initial chi squared: " << m_mcData->chiSquared;
 
     m_analysisType = AnalysisType::LikelihoodStatistics;
@@ -269,7 +269,6 @@ bool Likelihood::tick()
             tickLikelihoodFullMonteCarlo();
         }
     }
-
     if (m_analysisType == AnalysisType::ModelStatistics) {
         tickModelStatistics();
     }

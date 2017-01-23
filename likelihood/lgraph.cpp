@@ -449,7 +449,7 @@ void LGraph::LikelihoodFromChisq() {
 }
 
 
-double LGraph::ChiSQ(LGraph& temp, LGraph& two) {
+double LGraph::ChiSQ(LGraph& temp, LGraph& two, double temperature) {
     // temp is data, two is model
     double chisq = 0;
     if (temp.Bins!=two.Bins)
@@ -459,7 +459,7 @@ double LGraph::ChiSQ(LGraph& temp, LGraph& two) {
     for (int i=0;i<temp.Bins;i++) {
         float t = two.val[i];
         if (t!=0)
-            chisq += pow(20*(temp.val[i] - two.val[i]), 2.0)/(20*t);
+            chisq += pow(temperature*(temp.val[i] - two.val[i]), 2.0)/(temperature*t);
     }
     return chisq;
 }
