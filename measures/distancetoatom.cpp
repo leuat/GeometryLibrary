@@ -44,7 +44,7 @@ void DistanceToAtom::setCutoff(float cutoff)
 }
 
 
-void DistanceToAtom::compute(const QVector<QVector3D> &pointsOriginal)
+void DistanceToAtom::compute(const QVector<QVector3D> &pointsOriginal, bool printResult)
 {
     if(pointsOriginal.size() == 0) {
         qDebug() << "DistanceToAtom::compute WARNING: input vector is empty.";

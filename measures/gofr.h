@@ -12,7 +12,7 @@ public:
     void capY(float min, float max);
     void setXRange(float min, float max);
     QVector<QPointF> m_histogram;
-    virtual void compute(const QVector<QVector3D> &points) override;
+    virtual void compute(const QVector<QVector3D> &points, bool printResult = false) override;
     virtual QVector<QPointF> histogram(int bins) override;
 
     int numBins() const;
@@ -21,6 +21,7 @@ public:
     float cutoff() const;
     void setCutoff(float cutoff);
 
+    void scaleToMaxY(float maxY);
 private:
     int m_numBins;
     int m_maximumNumberOfPoints;

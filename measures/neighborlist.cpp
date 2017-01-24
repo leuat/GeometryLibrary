@@ -98,8 +98,8 @@ CellList NeighborList::buildCellList(const QVector<QVector3D> &points, QVector3D
         if(ck==numCells[2]) ck = numCells[2]-1;
 
         if(!checkRange<int>(ci, 0, numCells[0]-1) || !checkRange<int>(cj, 0, numCells[1]-1) || !checkRange<int>(ck, 0, numCells[2]-1)) {
-            qDebug() << "DistanceToAtomMap::buildCellList() error: particle " << p << " is out of cell list bounds.";
-            exit(1);
+            qDebug() << "NeighborList::buildCellList() error: particle " << p << " is out of cell list bounds.";
+            continue;
         }
         cellList[ci][cj][ck].push_back(p);
     }

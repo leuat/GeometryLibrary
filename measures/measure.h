@@ -11,8 +11,8 @@ class Measure : public QObject
     Q_OBJECT
 public:
     explicit Measure(QObject *parent = nullptr);
-    virtual void compute(Model &model);
-    virtual void compute(const QVector<QVector3D> &points);
+    virtual void compute(Model &model, bool printResult = false);
+    virtual void compute(const QVector<QVector3D> &points, bool printResult = false);
     virtual QVector<QPointF> histogram(int bins);
 };
 

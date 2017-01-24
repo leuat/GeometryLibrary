@@ -12,7 +12,7 @@ int intRandom(const int & min, const int & max) {
 }
 
 GOfR::GOfR(QObject *parent) : Measure(parent),
-    m_numBins(100), m_maximumNumberOfPoints(20000), m_cutoff(15)
+    m_numBins(100), m_maximumNumberOfPoints(10000), m_cutoff(15)
 {
 
 }
@@ -39,6 +39,7 @@ void GOfR::setXRange(float min, float max) {
         }
     }
     m_histogram = newPoints;
+    setNumBins(m_histogram.size());
 }
 
 QVector<QPointF> GOfR::histogram(int numberOfBins)
@@ -58,7 +59,7 @@ QVector<QPointF> GOfR::histogram(int numberOfBins)
 }
 
 
-void GOfR::compute(const QVector<QVector3D> &points)
+void GOfR::compute(const QVector<QVector3D> &points, bool printResult)
 {
     NeighborList list;
     QVector3D cellSize;
@@ -183,12 +184,21 @@ void GOfR::compute(const QVector<QVector3D> &points)
 //        float gr = counts[binIndex] / (vfrac *sumTotalCounts);
         m_histogram[binIndex] = QPointF(rmean, gr);
     }
-
     float scaleVal = m_histogram.last().y();
-    for (int i=0;i<m_numBins;i++) {
-        m_histogram[i].setY(m_histogram[i].y()/scaleVal);
+    for (int binIndex=0;binIndex<m_numBins;binIndex++) {
+        m_histogram[binIndex].setY(m_histogram[binIndex].y()/scaleVal);
     }
+}
 
+void GOfR::scaleToMaxY(float maxY) {
+    qreal maxValue = 0;
+    for(int binIndex=0; binIndex<m_numBins; binIndex++) {
+        maxValue = std::max(maxValue, m_histogram[binIndex].y());
+    }
+    qreal scalingFactor = maxValue / maxY;
+    for(int binIndex=0; binIndex<m_numBins; binIndex++) {
+        m_histogram[binIndex].setY(m_histogram[binIndex].y()/scalingFactor);
+    }
 }
 
 int GOfR::numBins() const

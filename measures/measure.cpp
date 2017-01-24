@@ -5,12 +5,12 @@ Measure::Measure(QObject *parent) : QObject(parent)
 
 }
 
-void Measure::compute(Model &model)
+void Measure::compute(Model &model, bool printResult)
 {
     qDebug() << "Error, Model::compute() called with no overloaded implementation";
 }
 
-void Measure::compute(const QVector<QVector3D> &points)
+void Measure::compute(const QVector<QVector3D> &points, bool printResult)
 {
     Q_UNUSED(points)
     qDebug() << "Error, Model::compute() called with no overloaded implementation";

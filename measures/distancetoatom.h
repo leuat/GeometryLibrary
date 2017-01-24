@@ -18,7 +18,7 @@ private:
     QVector<float> m_randomNumbers;
 public:
     explicit DistanceToAtom(QObject *parent = nullptr);
-    void compute(const QVector<QVector3D> &points) override;
+    void compute(const QVector<QVector3D> &points, bool printResult = false) override;
     bool isValid();
     QVector<QPointF> histogram(int bins);
     int numberOfRandomVectors() const;
