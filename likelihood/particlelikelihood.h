@@ -16,6 +16,8 @@ public:
 
     void setOriginalInput(Particles *originalParticles);
     void setDataInput(Particles *dataParticles);
+    QVector<QVector3D> &dataParticles();
+
 protected:
     int m_numberOfHistogramBins;
     bool m_normalize;
